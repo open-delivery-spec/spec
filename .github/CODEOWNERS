@@ -1,0 +1,13 @@
+# Open Delivery Spec — Code Owners
+
+# Spec modules
+spec/                                                     @open-delivery-spec/spec-maintainers
+
+# JSON Schemas
+schemas/                                                  @open-delivery-spec/spec-maintainers
+
+# Core docs
+README.md                                                 @open-delivery-spec/spec-maintainers
+LICENSE                                                   @open-delivery-spec/spec-maintainers
+CHANGELOG.md                                              @open-delivery-spec/spec-maintainers
+CONTRIBUTING.md                                           @open-delivery-spec/spec-maintainers
