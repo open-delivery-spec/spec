@@ -6,7 +6,20 @@ Organizations and projects that have adopted Open Delivery Spec. If you're using
 
 | Project | Modules Used | Since |
 |---------|-------------|-------|
-| [open-delivery-spec](https://github.com/open-delivery-spec) (self-hosted) | All 9 (reference implementation) | May 2026 |
+| [open-delivery-spec](https://github.com/open-delivery-spec) (self-hosted) | 01 Branch Naming, 02 Commit Message, 03 PR Description | May 2026 |
+
+## Planned Internal Adoption
+
+These modules are implemented in the reference CLI/action but aren't yet dogfooded:
+
+| Module | Status |
+|--------|--------|
+| 04 AI Change Review | Draft |
+| 05 CI Failure | Draft |
+| 06 Release Readiness | Draft |
+| 07 Approval Workflow | Draft |
+| 08 Rollback Plan | Draft |
+| 09 Production Release Evidence | Draft |
 
 ## Adding Your Organization
 

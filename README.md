@@ -4,7 +4,7 @@
 
 AI is writing more code than ever — [90% of developers use AI daily](https://cloud.google.com/blog/products/devops-sre/dora-2025-report), spending a median of 2 hours per day with AI tools. But delivery governance hasn't caught up. Faster coding doesn't mean safer shipping.
 
-Open Delivery Spec defines **standardized, machine-parseable schemas** for every artifact in the software delivery lifecycle — from branch naming to production release evidence. Think of it as "OpenAPI for delivery governance."
+Open Delivery Spec defines **standardized, machine-parseable schemas** for core software delivery governance artifacts — from branch naming and PR descriptions to release readiness and production evidence. Think of it as "OpenAPI for delivery governance."
 
 ## The Problem
 
