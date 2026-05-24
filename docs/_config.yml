@@ -1,21 +1,3 @@
 title: Open Delivery Spec
 description: The open standard for AI-era software delivery governance
 baseurl: "/spec"
-remote_theme: just-the-docs/just-the-docs
-plugins:
-  - jekyll-remote-theme
-color_scheme: light
-search_enabled: true
-heading_anchors: true
-aux_links:
-  "GitHub":
-    - "https://github.com/open-delivery-spec"
-  "Spec":
-    - "https://github.com/open-delivery-spec/spec"
-  "CLI":
-    - "https://github.com/open-delivery-spec/cli"
-aux_links_new_tab: true
-nav_sort: case_insensitive
-back_to_top: true
-back_to_top_text: "Back to top"
-footer_content: "Copyright © 2026 Open Delivery Spec Contributors. Licensed under <a href=\"https://www.apache.org/licenses/LICENSE-2.0\">Apache 2.0</a>."
