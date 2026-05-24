@@ -2,9 +2,13 @@
 
 **The open standard for AI-era software delivery governance.**
 
+[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](docs/levels.md)
+
 AI is writing more code than ever — [90% of developers use AI daily](https://cloud.google.com/blog/products/devops-sre/dora-2025-report), spending a median of 2 hours per day with AI tools. But delivery governance hasn't caught up. Faster coding doesn't mean safer shipping.
 
-Open Delivery Spec defines **standardized, machine-parseable schemas** for core software delivery governance artifacts — from branch naming and PR descriptions to release readiness and production evidence. Think of it as "OpenAPI for delivery governance."
+Open Delivery Spec defines **standardized, machine-parseable schemas** for core software delivery governance artifacts — from branch naming and PR descriptions to release readiness and production evidence.
+
+> **How ODS fits**: SLSA proves how artifacts were built. ODS proves how changes were delivered. See [ODS and SLSA](docs/comparison/slsa.md).
 
 ## The Problem
 
@@ -42,17 +46,19 @@ ODS defines a **JSON Schema** for each delivery artifact. Tools validate artifac
 
 ## Specification Modules
 
-| # | Module | Summary |
-|---|--------|---------|
-| 01 | [Branch Naming](spec/01-branch-naming.md) | Standardized, machine-parseable branch names |
-| 02 | [Commit Message](spec/02-commit-message.md) | AI-attributable, semantically rich commit format |
-| 03 | [PR Description](spec/03-pr-description.md) | Structured PR body with AI disclosure |
-| 04 | [AI Change Review](spec/04-ai-change-review.md) | Protocol for reviewing AI-generated changes |
-| 05 | [CI Failure](spec/05-ci-failure.md) | Machine-parseable CI failure reports |
-| 06 | [Release Readiness](spec/06-release-readiness.md) | Evidence-based release gate checklist |
-| 07 | [Approval Workflow](spec/07-approval-workflow.md) | Declarative approval policy format |
-| 08 | [Rollback Plan](spec/08-rollback-plan.md) | Required rollback plan structure |
-| 09 | [Production Release Evidence](spec/09-prod-release-evidence.md) | Audit-ready deployment evidence |
+> **Maturity**: Modules 01–03 are **Candidate**. 04–09 are **Draft**. See [ODS Levels](docs/levels.md) for the adoption path.
+
+| # | Module | Summary | Stage |
+|---|--------|---------|-------|
+| 01 | [Branch Naming](spec/01-branch-naming.md) | Standardized, machine-parseable branch names | Candidate |
+| 02 | [Commit Message](spec/02-commit-message.md) | AI-attributable, semantically rich commit format | Candidate |
+| 03 | [PR Description](spec/03-pr-description.md) | Structured PR body with AI disclosure | Candidate |
+| 04 | [AI Change Review](spec/04-ai-change-review.md) | Protocol for reviewing AI-generated changes | Draft |
+| 05 | [CI Failure](spec/05-ci-failure.md) | Machine-parseable CI failure reports | Draft |
+| 06 | [Release Readiness](spec/06-release-readiness.md) | Evidence-based release gate checklist | Draft |
+| 07 | [Approval Workflow](spec/07-approval-workflow.md) | Declarative approval policy format | Draft |
+| 08 | [Rollback Plan](spec/08-rollback-plan.md) | Required rollback plan structure | Draft |
+| 09 | [Production Release Evidence](spec/09-prod-release-evidence.md) | Audit-ready deployment evidence | Draft |
 
 ## Getting Started
 

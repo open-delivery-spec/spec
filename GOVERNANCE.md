@@ -1,55 +1,91 @@
 # Governance
 
-Open Delivery Spec is an open standard developed in the open. This document describes how decisions are made, who has authority, and how the specification evolves.
+This document describes how Open Delivery Spec is governed and how decisions are made.
 
-## Roles
+---
 
-| Role | Responsibilities |
-|------|-----------------|
-| **Maintainers** | Approve RFCs, merge PRs, cut releases. Small group of trusted contributors. |
-| **Contributors** | Anyone who opens issues, proposes changes, or submits PRs. |
-| **Community** | Users who adopt ODS, give feedback, and spread the word. |
+## Current State
 
-Current maintainers are listed in [CODEOWNERS](../.github/CODEOWNERS).
+ODS is **maintainer-led** as of May 2026. The project was initiated by [@sxp](https://github.com/sxp) and is open to community contributions under the [Apache 2.0 License](LICENSE).
+
+The maintainer has decision-making authority over:
+
+- Specification changes (schema additions, modifications, deprecations)
+- Module maturity levels (Draft → Candidate → Stable → Deprecated)
+- Repository structure and tooling direction
+- Release versioning
+
+---
+
+## Path to Community Governance
+
+ODS will evolve toward community governance as external contributors and adopters grow. The planned progression:
+
+| Phase | Trigger | Governance Model |
+|-------|---------|-----------------|
+| **Phase 1** (current) | Project initiated | Maintainer-led |
+| **Phase 2** | 3+ recurring external contributors | Lightweight steering group with maintainer as chair |
+| **Phase 3** | 5+ external adopters, multiple orgs represented | Community steering committee with formal charter |
+| **Phase 4** | Broad adoption, ecosystem tools exist | Foundation-hosted or independent community governance |
+
+---
 
 ## Decision Making
 
-### Day-to-day changes
+### Specification Changes
 
-- Documentation fixes, example updates, minor schema clarifications → PR + one maintainer approval.
-- New optional fields, new enum values → PR + discussion + one maintainer approval.
+1. **Open an issue** describing the proposed change
+2. **Discuss** in the issue thread (minimum 7 days for non-trivial changes)
+3. **Maintainer decision** or community consensus (Phase 2+)
+4. **PR merged** with schema update, spec doc update, and changelog entry
 
-### Significant changes
+### Module Maturity
 
-- New required fields, new modules, schema restructuring → requires an RFC.
-- Breaking changes to Candidate or Stable modules → requires an RFC and a migration plan.
+Module maturity levels follow [ROADMAP.md](ROADMAP.md):
 
-### RFC Process
+| Stage | Criteria | Decision |
+|-------|----------|----------|
+| **Draft** | Initial specification, may change significantly | Maintainer |
+| **Candidate** | Stable specification, at least one reference implementation, open for feedback | Maintainer + community input |
+| **Stable** | Widely adopted, backward-compatible changes only, formal test suite | Community steering group |
+| **Deprecated** | Superseded by newer module, maintained for legacy compatibility | Community steering group |
 
-1. **Proposal** — Open a GitHub Issue using the appropriate template ([schema change](.github/ISSUE_TEMPLATE/schema-change.md) or [module proposal](.github/ISSUE_TEMPLATE/module-proposal.md)).
-2. **Discussion** — Community and maintainers discuss. Minimum 7-day comment period.
-3. **Decision** — Maintainers reach consensus (lazy consensus: no objection within 3 days after discussion).
-4. **Implementation** — PR with spec changes, schema updates, and examples.
-5. **Release** — Included in the next versioned spec release.
+---
 
-### Lazy Consensus
+## Contribution
 
-For non-controversial changes, if no maintainer objects within 3 business days after the final proposal is posted, the change is considered approved. Explicit approval is always preferred but not always required.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution process.
 
-## Module Status Transitions
+Key principles:
 
-| From → To | Requirements |
-|-----------|-------------|
-| Draft → Candidate | Schema implemented in CLI. At least one real-world use case validated. |
-| Candidate → Stable | No breaking changes for 3 months. At least 2 external adopters. |
-| Any → Deprecated | Announcement with migration path. 6-month deprecation window before removal. |
+- **Open discussion**: Proposals start as GitHub issues
+- **Spec-first**: Implementation follows specification
+- **Backward compatibility**: Stable modules don't break existing users
+- **Reference implementation**: Changes must include CLI/action updates when applicable
 
-See [SPEC_VERSIONING.md](SPEC_VERSIONING.md) for version numbering rules.
+---
+
+## Community Channels
+
+| Channel | Purpose |
+|---------|---------|
+| [GitHub Issues](https://github.com/open-delivery-spec/spec/issues) | Bug reports, feature proposals, spec discussions |
+| [GitHub Discussions](https://github.com/orgs/open-delivery-spec/discussions) | General Q&A, adoption stories, ecosystem ideas |
+
+Additional channels (Slack, mailing list) will be added as the community grows.
+
+---
 
 ## Code of Conduct
 
-This project follows the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
+ODS follows the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
+
+---
 
 ## License
 
-All specification content is licensed under [Apache License 2.0](LICENSE). Contributions are accepted under the same license.
+All repositories under `github.com/open-delivery-spec` are [Apache 2.0](LICENSE) licensed. Contributions are made under the same license.
+
+---
+
+*This document was last updated May 2026. It will be revised as the project evolves toward community governance.*
