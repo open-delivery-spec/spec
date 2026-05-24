@@ -1,5 +1,5 @@
 title: Open Delivery Spec
-description: The open standard for AI-era software delivery governance
+description: An open specification for machine-readable delivery governance evidence in the AI era
 baseurl: "/spec"
 remote_theme: just-the-docs/just-the-docs
 plugins:

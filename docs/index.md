@@ -6,11 +6,15 @@ nav_order: 1
 
 # Open Delivery Spec
 
-**The open standard for AI-era software delivery governance.**
+**An open specification for machine-readable delivery governance evidence in the AI era.**
 
 AI is writing more code than ever — [90% of developers use AI daily](https://cloud.google.com/blog/products/devops-sre/dora-2025-report), spending a median of 2 hours per day with AI tools. But delivery governance hasn't caught up. Faster coding doesn't mean safer shipping.
 
-Open Delivery Spec (ODS) defines **standardized, machine-parseable schemas** for every artifact in the software delivery lifecycle — from branch naming to production release evidence. Think of it as "OpenAPI for delivery governance."
+Open Delivery Spec (ODS) is an early-stage open specification that defines **standardized, machine-parseable schemas** for core delivery governance artifacts — so teams can answer questions like "what did AI write?", "who reviewed it?", and "what evidence existed before we deployed?"
+
+> **Start here**: [ODS Levels](levels) → [Get Started](get-started).  
+> **Why this exists**: [Threats & Failure Modes](threats-and-failure-modes).  
+> **How it fits**: [ODS and SLSA](comparison/slsa).
 
 ## The Problem
 
@@ -47,7 +51,8 @@ ods validate branch feature/add-oauth-login
 # Use GitHub Action
 - uses: open-delivery-spec/github-action@v1
   with:
-    check: all
+    check: branch-naming
+    branch_name: ${{ github.head_ref }}
 ```
 
 ## Modules

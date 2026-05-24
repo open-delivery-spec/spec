@@ -1,6 +1,6 @@
 # Contributing to Open Delivery Spec
 
-Thank you for your interest in contributing! ODS is an open standard for AI-era delivery governance, and we welcome contributions from everyone.
+Thank you for your interest in contributing! ODS is an open specification for AI-era delivery governance, and we welcome contributions from everyone.
 
 ## How to Contribute
 

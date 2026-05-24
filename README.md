@@ -1,14 +1,18 @@
 # Open Delivery Spec (ODS)
 
-**The open standard for AI-era software delivery governance.**
+**An open specification for machine-readable delivery governance evidence in the AI era.**
 
 [![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](docs/levels.md)
 
 AI is writing more code than ever — [90% of developers use AI daily](https://cloud.google.com/blog/products/devops-sre/dora-2025-report), spending a median of 2 hours per day with AI tools. But delivery governance hasn't caught up. Faster coding doesn't mean safer shipping.
 
-Open Delivery Spec defines **standardized, machine-parseable schemas** for core software delivery governance artifacts — from branch naming and PR descriptions to release readiness and production evidence.
+Open Delivery Spec is an early-stage open specification that defines **standardized, machine-parseable schemas** for delivery governance artifacts — so teams can answer questions like "what did AI write?", "who reviewed it?", and "what evidence existed before we deployed?"
 
+> **ODS is early-stage** (2026). The spec defines 9 modules across 4 maturity levels. The MVP — [ODS L1](docs/levels.md) (structured branches, commits, PRs) + AI disclosure + PR review evidence — is the recommended starting point.
+>
 > **How ODS fits**: SLSA proves how artifacts were built. ODS proves how changes were delivered. See [ODS and SLSA](docs/comparison/slsa.md).
+>
+> **Why this exists**: See [Threats and Failure Modes](docs/threats-and-failure-modes.md).
 
 ## The Problem
 
