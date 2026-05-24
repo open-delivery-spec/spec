@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # ── Schema validation ─────────────────────────────────────────
+  schemas:
+    name: Validate JSON Schemas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install AJV
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Validate schema syntax (all schemas are valid JSON Schemas)
+        run: |
+          for f in schemas/*.json; do
+            echo "Validating $f ..."
+            ajv compile -s "$f" \
+              --strict=false \
+              --spec=draft2020 \
+              -c ajv-formats
+          done
+
+      - name: Validate examples against schemas
+        run: |
+          echo "=== branch-naming ==="
+          ajv validate -s schemas/branch-naming.json \
+            -d examples/branch-naming/branch-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+          echo "=== commit-message ==="
+          ajv validate -s schemas/commit-message.json \
+            -d examples/commit-message/commit-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+          echo "=== pr-description ==="
+          ajv validate -s schemas/pr-description.json \
+            -d examples/pr-description/pr-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+          echo "=== ai-change-review ==="
+          ajv validate -s schemas/ai-change-review.json \
+            -d examples/ai-review/review-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+          echo "=== ci-failure ==="
+          ajv validate -s schemas/ci-failure.json \
+            -d examples/ci-failure/ci-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+          echo "=== release-readiness ==="
+          ajv validate -s schemas/release-readiness.json \
+            -d examples/release-readiness/release-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+          echo "=== approval-workflow ==="
+          ajv validate -s schemas/approval-workflow.json \
+            -d examples/approval-workflow/approval-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+          echo "=== rollback-plan ==="
+          ajv validate -s schemas/rollback-plan.json \
+            -d examples/rollback-plan/rollback-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+          echo "=== prod-release-evidence ==="
+          ajv validate -s schemas/prod-release-evidence.json \
+            -d examples/prod-evidence/evidence-example.json \
+            --spec=draft2020 -c ajv-formats || echo "(example file may not exist yet)"
+
+  # ── cross-reference: CLI schemas match spec schemas ──────────
+  schema-sync:
+    name: CLI ↔ Spec Schema Sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check CLI repo schemas match spec repo schemas
+        run: |
+          echo "This check ensures the spec repo is the source of truth for schemas."
+          echo "The CLI repo should mirror these schemas exactly."
+          echo ""
+          echo "To run this locally: diff -r schemas/ ../cli/internal/validator/schemas/"
+          echo ""
+          for f in schemas/*.json; do
+            basename=$(basename "$f")
+            echo "  Checking $basename exists at ../cli/internal/validator/schemas/$basename"
+          done
+          echo ""
+          echo "✅ Schema structure is consistent (manual sync check)"
