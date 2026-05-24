@@ -25,6 +25,7 @@ ODS defines a progressive maturity model for delivery governance. Teams can adop
 
 **Outcome**: Every change has structured metadata that CI systems and AI agents can consume.
 
+> [!TIP]
 > Start here. L1 is the foundation.
 
 ---

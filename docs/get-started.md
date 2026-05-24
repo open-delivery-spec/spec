@@ -127,4 +127,5 @@ ods evidence verify ".ods/releases/v1.4.0/evidence-bundle.json"
 | Release audit trails | [Path C](#path-c-evidence-based-delivery-ods-l3) |
 | The simplest possible check | `ods validate branch feature/my-feature` |
 
+> [!TIP]
 > Not sure where to start? [Path A](#path-a-structured-delivery-ods-l1) takes 5 minutes.

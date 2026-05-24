@@ -2,6 +2,7 @@
 
 **ODS complements SLSA. They address different layers of software delivery trust.**
 
+> [!NOTE]
 > ODS is inspired by SLSA's approach to levels, specification rigor, and ecosystem thinking. ODS is early-stage (2026); SLSA is established (OpenSSF, v1.2). This page explains where each fits.
 
 ## One Sentence
@@ -93,6 +94,7 @@ ODS does:
 - Provide structure for release readiness decisions
 - Create machine-readable evidence of delivery governance
 
+> [!TIP]
 > **Use SLSA when you need artifact integrity. Use ODS when you need delivery governance. Use both when you need both.**
 
 ---

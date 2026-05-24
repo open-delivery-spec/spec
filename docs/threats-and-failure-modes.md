@@ -1,8 +1,7 @@
 # Threats and Failure Modes
 
-ODS exists because software delivery has predictable failure modes — and they get worse when AI generates code at speed.
-
-This page maps each ODS module to the governance failure it prevents.
+> [!IMPORTANT]
+> ODS exists because software delivery has predictable failure modes — and they get worse when AI generates code at speed. This page maps each ODS module to the governance failure it prevents.
 
 ---
 

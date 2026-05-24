@@ -9,6 +9,7 @@ AI is writing more code than ever — [90% of developers use AI daily](https://c
 
 Open Delivery Spec is an early-stage open specification that defines **standardized, machine-parseable schemas** for delivery governance artifacts — so teams can answer questions like "what did AI write?", "who reviewed it?", and "what evidence existed before we deployed?"
 
+> [!NOTE]
 > **ODS is early-stage** (2026). The spec defines 9 modules across 4 maturity levels. The MVP — [ODS L1](docs/levels.md) (structured branches, commits, PRs) + AI disclosure + PR review evidence — is the recommended starting point.
 >
 > **How ODS fits**: SLSA proves how artifacts were built. ODS proves how changes were delivered. See [ODS and SLSA](docs/comparison/slsa.md).
@@ -51,6 +52,7 @@ ODS defines a **JSON Schema** for each delivery artifact. Tools validate artifac
 
 ## Specification Modules
 
+> [!NOTE]
 > **Maturity**: Modules 01–03 are **Candidate**. 04–09 are **Draft**. See [ODS Levels](docs/levels.md) for the adoption path.
 
 | # | Module | Summary | Stage |

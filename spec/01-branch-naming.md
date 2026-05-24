@@ -104,7 +104,8 @@ feature/ai-add-oauth-provider
 bugfix/ai-fix-null-pointer
 ```
 
-This is purely a human-readable convention. The `ai-` prefix triggers a **warning** in ODS tooling (not an error), reminding reviewers to apply appropriate scrutiny. The primary AI attribution mechanism is the JSON metadata.
+> [!NOTE]
+> This is purely a human-readable convention. The `ai-` prefix triggers a **warning** in ODS tooling (not an error), reminding reviewers to apply appropriate scrutiny. The primary AI attribution mechanism is the JSON metadata.
 
 ### Ticket Integration
 
