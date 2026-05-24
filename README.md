@@ -22,22 +22,22 @@ AI makes coding faster. Everything after coding gets harder:
 ODS defines a **JSON Schema** for each delivery artifact. Tools validate artifacts against these schemas. AI agents produce compliant artifacts by default.
 
 ```
-┌─────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────┐
 │                  OPEN DELIVERY SPEC                  │
 │                                                      │
 │  Branch     Commit    PR         CI        Release   │
-│  Naming ──► Message ─►Desc ──► Failure ──►Readiness │
+│  Naming ──► Message ─►Desc ──► Failure ──►Readiness  │
 │    │          │        │         │           │       │
 │    ▼          ▼        ▼         ▼           ▼       │
-│  ┌──────────────────────────────────────────────┐   │
-│  │         JSON Schema (machine-readable)       │   │
-│  └──────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────┐    │
+│  │         JSON Schema (machine-readable)       │    │
+│  └──────────────────────────────────────────────┘    │
 │    │          │        │         │           │       │
 │    ▼          ▼        ▼         ▼           ▼       │
 │  AI Review   Approval   Rollback   Production        │
 │  Protocol    Workflow   Plan       Evidence          │
 │                                                      │
-└─────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────┘
 ```
 
 ## Specification Modules
