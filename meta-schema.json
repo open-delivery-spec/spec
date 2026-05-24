@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-delivery-spec.dev/meta-schema.json",
+  "title": "ODS Meta-Schema",
+  "description": "Meta-schema for validating Open Delivery Spec schemas against JSON Schema Draft 2020-12.",
+  "allOf": [
+    { "$ref": "https://json-schema.org/draft/2020-12/schema" }
+  ],
+  "properties": {
+    "$id": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://open-delivery-spec\\.dev/schemas/"
+    },
+    "title": {
+      "type": "string",
+      "pattern": "^ODS "
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": ["$id", "title", "description", "type"]
+}
