@@ -2,6 +2,8 @@
 
 **ODS complements SLSA. They address different layers of software delivery trust.**
 
+> ODS is inspired by SLSA's approach to levels, specification rigor, and ecosystem thinking. ODS is early-stage (2026); SLSA is established (OpenSSF, v1.2). This page explains where each fits.
+
 ## One Sentence
 
 > **SLSA proves how software artifacts were built. ODS proves how software changes were delivered.**
