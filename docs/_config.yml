@@ -2,6 +2,8 @@ title: Open Delivery Spec
 description: The open standard for AI-era software delivery governance
 baseurl: "/spec"
 remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-remote-theme
 color_scheme: light
 search_enabled: true
 heading_anchors: true
