@@ -1,6 +1,7 @@
 # 08 — Rollback Plan
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Draft  
 **Schema:** [`schemas/rollback-plan.json`](../schemas/rollback-plan.json)
 
 ## Overview

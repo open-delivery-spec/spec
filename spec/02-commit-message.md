@@ -1,6 +1,7 @@
 # 02 — Commit Message
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Candidate  
 **Schema:** [`schemas/commit-message.json`](../schemas/commit-message.json)  
 **Based on:** [Conventional Commits 1.0.0](https://www.conventionalcommits.org)
 

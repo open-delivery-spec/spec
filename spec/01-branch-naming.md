@@ -1,6 +1,7 @@
 # 01 — Branch Naming
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Candidate  
 **Schema:** [`schemas/branch-naming.json`](../schemas/branch-naming.json)  
 **Based on:** [Conventional Branch 1.0.0](https://conventional-branch.github.io)
 
@@ -88,14 +89,22 @@ Beyond Conventional Branch, ODS adds:
 
 ### AI Attribution
 
-When a branch is created by an AI agent, the description should include an AI marker:
+AI attribution is supported via JSON metadata (primary) and optional branch name convention (secondary).
+
+**Primary — JSON metadata (recommended):**
+
+The [branch-naming.json schema](../schemas/branch-naming.json) includes `ai_generated` and `ai_tool` fields for machine-readable AI attribution. Tools should rely on this metadata, not branch name heuristics.
+
+**Secondary — Branch name convention (optional):**
+
+As a lightweight signal, teams MAY prefix the description with `ai-` when the branch was created by an AI agent:
 
 ```
 feature/ai-add-oauth-provider
 bugfix/ai-fix-null-pointer
 ```
 
-The `ai-` prefix in the description signals that the branch was AI-generated, enabling automated review workflows to apply additional scrutiny.
+This is purely a human-readable convention. The `ai-` prefix triggers a **warning** in ODS tooling (not an error), reminding reviewers to apply appropriate scrutiny. The primary AI attribution mechanism is the JSON metadata.
 
 ### Ticket Integration
 

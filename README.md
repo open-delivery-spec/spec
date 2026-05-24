@@ -110,12 +110,58 @@ AI-scope: auth module implementation
 4. **Tool-agnostic.** Works with any CI/CD, any AI coding tool, any VCS.
 5. **Audit-ready.** Every artifact carries evidence for compliance and security review.
 
+## Current Scope & Vision
+
+ODS today provides:
+- **9 JSON Schemas** defining the structure of every delivery artifact
+- **Reference CLI** (`ods`) for validation and generation
+- **GitHub Action** for automated CI compliance checks
+
+We're building toward the vision of "OpenAPI for delivery governance" — a complete ecosystem including dashboards, code generators, multi-platform CI integrations, and compliance reporting. See [ROADMAP.md](ROADMAP.md) for what's next.
+
 ## Inspiration
 
 - [Conventional Commits](https://www.conventionalcommits.org)
 - [Conventional Branch](https://conventional-branch.github.io)
 - [OpenAPI Specification](https://www.openapis.org)
 - [DORA 2025 Report](https://cloud.google.com/blog/products/devops-sre/dora-2025-report)
+
+## ODS Artifacts — Where Do They Live?
+
+ODS supports two modes of operation:
+
+### Mode 1 — Lightweight Validation (CI-native)
+
+Validate artifacts directly from CI context. No files written to the repository. Ideal for branch naming, commit message, and PR description checks.
+
+```yaml
+- uses: open-delivery-spec/github-action@v1
+  with:
+    check: branch-naming
+    branch_name: ${{ github.head_ref }}
+```
+
+### Mode 2 — Evidence Artifacts (audit trail)
+
+Generate structured JSON evidence files and store them alongside the release. Evidence artifacts live in a `.ods/` directory at the repository root.
+
+```
+.ods/
+  releases/
+    v1.4.0/
+      branch-meta.json
+      pr-description.json
+      ai-review.json
+      release-readiness.json
+      rollback-plan.json
+      evidence-bundle.json
+```
+
+**Conventions:**
+- `.ods/` is the canonical location for ODS-generated artifacts.
+- Each release gets a subdirectory named by its version tag.
+- Evidence bundles are immutable after generation (hash-verified).
+- Add `.ods/` to `.gitignore` if artifacts are generated in CI; commit them if you want in-repo audit trail.
 
 ## License
 

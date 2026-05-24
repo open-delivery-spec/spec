@@ -1,6 +1,7 @@
 # 04 — AI Change Review
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Draft  
 **Schema:** [`schemas/ai-change-review.json`](../schemas/ai-change-review.json)
 
 ## Overview

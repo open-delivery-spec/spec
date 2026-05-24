@@ -1,6 +1,7 @@
 # 09 — Production Release Evidence
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Draft  
 **Schema:** [`schemas/prod-release-evidence.json`](../schemas/prod-release-evidence.json)
 
 ## Overview

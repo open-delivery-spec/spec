@@ -1,6 +1,7 @@
 # 06 — Release Readiness
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Draft  
 **Schema:** [`schemas/release-readiness.json`](../schemas/release-readiness.json)
 
 ## Overview

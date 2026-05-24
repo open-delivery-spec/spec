@@ -1,6 +1,7 @@
 # 03 — PR Description
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Candidate  
 **Schema:** [`schemas/pr-description.json`](../schemas/pr-description.json)
 
 ## Overview

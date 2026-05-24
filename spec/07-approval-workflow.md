@@ -1,6 +1,7 @@
 # 07 — Approval Workflow
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Draft  
 **Schema:** [`schemas/approval-workflow.json`](../schemas/approval-workflow.json)
 
 ## Overview

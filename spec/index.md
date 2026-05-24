@@ -7,19 +7,28 @@
 
 Open Delivery Spec (ODS) defines standards for software delivery artifacts in the AI era. Each module below specifies a **format**, provides a **JSON Schema**, and includes **examples** that tools can validate against.
 
+## Module Status
+
+| Acronym | Meaning | Description |
+|---------|---------|-------------|
+| **Draft** | Work in progress | Scope and schema may change. Feedback welcome. |
+| **Candidate** | Implementation-validated | Schema is stable enough for tooling. Minor additions only. |
+| **Stable** | Production-ready | Schema follows semver. Breaking changes require a new major version. |
+| **Deprecated** | To be removed | Superseded by another module or retired. |
+
 ## Modules
 
 | # | Module | Schema | Status |
 |---|--------|--------|--------|
-| 01 | [Branch Naming](01-branch-naming.md) | [`branch-naming.json`](../schemas/branch-naming.json) | ✅ Stable |
-| 02 | [Commit Message](02-commit-message.md) | [`commit-message.json`](../schemas/commit-message.json) | ✅ Stable |
-| 03 | [PR Description](03-pr-description.md) | [`pr-description.json`](../schemas/pr-description.json) | ✅ Stable |
-| 04 | [AI Change Review](04-ai-change-review.md) | [`ai-change-review.json`](../schemas/ai-change-review.json) | ✅ Stable |
-| 05 | [CI Failure](05-ci-failure.md) | [`ci-failure.json`](../schemas/ci-failure.json) | ✅ Stable |
-| 06 | [Release Readiness](06-release-readiness.md) | [`release-readiness.json`](../schemas/release-readiness.json) | ✅ Stable |
-| 07 | [Approval Workflow](07-approval-workflow.md) | [`approval-workflow.json`](../schemas/approval-workflow.json) | ✅ Stable |
-| 08 | [Rollback Plan](08-rollback-plan.md) | [`rollback-plan.json`](../schemas/rollback-plan.json) | ✅ Stable |
-| 09 | [Production Release Evidence](09-prod-release-evidence.md) | [`prod-release-evidence.json`](../schemas/prod-release-evidence.json) | ✅ Stable |
+| 01 | [Branch Naming](01-branch-naming.md) | [`branch-naming.json`](../schemas/branch-naming.json) | 🟡 Candidate |
+| 02 | [Commit Message](02-commit-message.md) | [`commit-message.json`](../schemas/commit-message.json) | 🟡 Candidate |
+| 03 | [PR Description](03-pr-description.md) | [`pr-description.json`](../schemas/pr-description.json) | 🟡 Candidate |
+| 04 | [AI Change Review](04-ai-change-review.md) | [`ai-change-review.json`](../schemas/ai-change-review.json) | 🔵 Draft |
+| 05 | [CI Failure](05-ci-failure.md) | [`ci-failure.json`](../schemas/ci-failure.json) | 🔵 Draft |
+| 06 | [Release Readiness](06-release-readiness.md) | [`release-readiness.json`](../schemas/release-readiness.json) | 🔵 Draft |
+| 07 | [Approval Workflow](07-approval-workflow.md) | [`approval-workflow.json`](../schemas/approval-workflow.json) | 🔵 Draft |
+| 08 | [Rollback Plan](08-rollback-plan.md) | [`rollback-plan.json`](../schemas/rollback-plan.json) | 🔵 Draft |
+| 09 | [Production Release Evidence](09-prod-release-evidence.md) | [`prod-release-evidence.json`](../schemas/prod-release-evidence.json) | 🔵 Draft |
 
 ## The Delivery Lifecycle
 

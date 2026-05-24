@@ -1,6 +1,7 @@
 # 05 — CI Failure
 
-**Version:** 1.0.0  
+**Version:** 1.0.0-draft  
+**Status:** Draft  
 **Schema:** [`schemas/ci-failure.json`](../schemas/ci-failure.json)
 
 ## Overview
