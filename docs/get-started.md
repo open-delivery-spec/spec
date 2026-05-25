@@ -105,6 +105,8 @@ AI-confidence: high
 
 **Goal**: Explore the draft release-governance schemas before enforcing them.
 
+> See [`.ods/` Convention](ods-artifacts) for the artifact directory layout and naming conventions.
+
 ### 1. Complete Paths A and B first
 
 ### 2. Validate draft evidence files directly

@@ -1,12 +1,12 @@
 # 04 — AI Change Review
 
-**Version:** 1.0.0-draft  
-**Status:** Draft  
+**Version:** 1.0.0-candidate
+**Status:** Candidate
 **Schema:** [`schemas/ai-change-review.json`](../schemas/ai-change-review.json)
 
 ## Overview
 
-Reviewing AI-generated code is fundamentally different from reviewing human code. You're not just checking for bugs — you're verifying that the AI understood the intent, didn't hallucinate, and didn't introduce subtle security issues. ODS defines a structured review protocol and machine-parseable review record.
+Reviewing AI-generated code is fundamentally different from reviewing human code. You're not just checking for bugs - you're verifying that the AI understood the intent, didn't hallucinate, and didn't introduce subtle security issues. ODS defines a structured review protocol and machine-parseable review record.
 
 ## Specification
 
@@ -14,11 +14,11 @@ Reviewing AI-generated code is fundamentally different from reviewing human code
 
 | Level | When Required | Description |
 |-------|--------------|-------------|
-| **L1 — Quick Scan** | AI-assisted < 20% of diff | Same as normal human review |
-| **L2 — Enhanced Review** | AI-assisted 20-80% of diff | Additional checklist required |
-| **L3 — Full Audit** | AI-assisted > 80% of diff | Mandatory second reviewer, full audit trail |
+| **L1 - Quick Scan** | AI-assisted < 20% of diff | Same as normal human review |
+| **L2 - Enhanced Review** | AI-assisted 20-80% of diff | Additional checklist required |
+| **L3 - Full Audit** | AI-assisted > 80% of diff | Mandatory second reviewer, full audit trail |
 
-### L2 — Enhanced Review Checklist
+### L2 - Enhanced Review Checklist
 
 When AI generates 20-80% of the PR diff, the reviewer MUST verify:
 
@@ -46,14 +46,14 @@ When AI generates 20-80% of the PR diff, the reviewer MUST verify:
 - [ ] Code follows project conventions and style
 - [ ] Naming is clear and consistent
 - [ ] Comments explain WHY, not WHAT
-- [ ] No obvious performance issues (N+1 queries, O(n²) loops)
+- [ ] No obvious performance issues (N+1 queries, O(n2) loops)
 
 ### Scope
 - [ ] AI only changed what was requested (no scope creep)
 - [ ] No unrelated files were modified
 ```
 
-### L3 — Full Audit Checklist
+### L3 - Full Audit Checklist
 
 When AI generates > 80% of the PR diff, ALL L2 items PLUS:
 
@@ -166,6 +166,6 @@ ods review ai-percentage --pr 42
 
 ## Relationship to Other Specs
 
-- [03 — PR Description](03-pr-description.md): PR body provides AI disclosure needed for review level
-- [02 — Commit Message](02-commit-message.md): `AI-review` status updated after review
-- [06 — Release Readiness](06-release-readiness.md): AI review records are required evidence
+- [03 - PR Description](03-pr-description.md): PR body provides AI disclosure needed for review level
+- [02 - Commit Message](02-commit-message.md): `AI-review` status updated after review
+- [06 - Release Readiness](06-release-readiness.md): AI review records are required evidence

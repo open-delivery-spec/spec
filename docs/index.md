@@ -14,7 +14,8 @@ Open Delivery Spec (ODS) defines **standardized, machine-parseable schemas** for
 
 > **Start here**: [ODS Levels](levels) → [Get Started](get-started).  
 > **Why this exists**: [Threats & Failure Modes](threats-and-failure-modes).  
-> **How it fits**: [ODS and SLSA](comparison/slsa).
+> **How it fits**: [ODS and SLSA](comparison/slsa).  
+> **Artifact storage**: [`.ods/` Convention](ods-artifacts).
 
 ## The Problem
 

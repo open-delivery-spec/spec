@@ -20,8 +20,8 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | 01 — Branch Naming | 🟡 Candidate | ✅ validate |
 | 02 — Commit Message | 🟡 Candidate | ✅ validate |
 | 03 — PR Description | 🟡 Candidate | ✅ validate (section checks) |
-| 04 — AI Change Review | 🔵 Draft | ⬜ generate only |
-| 05 — CI Failure | 🔵 Draft | ⬜ |
+| 04 — AI Change Review | 🟡 Candidate | ✅ generate + validate |
+| 05 — CI Failure | 🟡 Candidate | ✅ parse + explain + fix-suggestions |
 | 06 — Release Readiness | 🔵 Draft | ⬜ |
 | 07 — Approval Workflow | 🔵 Draft | ⬜ |
 | 08 — Rollback Plan | 🔵 Draft | ⬜ |
@@ -35,19 +35,19 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 **Goal:** Prove the loop works end-to-end for the simplest modules.
 
-- [ ] CLI: `ods validate branch|commit|pr` passes against real projects
-- [ ] GitHub Action runs reliably with Go-based CLI
-- [ ] One end-to-end example repo (branch → commit → PR → passing Action)
-- [ ] `.ods/` artifact directory convention documented
+- [x] CLI: `ods validate branch|commit|pr` passes against real projects
+- [x] GitHub Action runs reliably with Go-based CLI (validate-action@v1 published)
+- [x] End-to-end example with workflow files (see `examples/end-to-end/`)
+- [x] `.ods/` artifact directory convention documented
 
 ### M2 — CI Failure & AI Review (Q4 2026)
 
 **Goal:** Demonstrate the AI-native value proposition.
 
-- [ ] Module 05 (CI Failure) promoted to Candidate
-- [ ] CLI: `ods ci parse` with hallucination detection
-- [ ] Module 04 (AI Change Review) promoted to Candidate
-- [ ] CLI: `ods review generate` producing L1/L2/L3 records
+- [x] Module 05 (CI Failure) promoted to Candidate
+- [x] CLI: `ods ci parse` with hallucination detection
+- [x] Module 04 (AI Change Review) promoted to Candidate
+- [x] CLI: `ods review generate` producing L1/L2/L3 records
 
 ### M3 — Release Governance (Q1 2027)
 
@@ -63,7 +63,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 **Goal:** First stable release of the core modules.
 
 - [ ] Modules 01-03 promoted to Stable (1.0.0)
-- [ ] Modules 04-06 promoted to Candidate
+- [ ] Module 06 promoted to Candidate
 - [ ] Formal governance model operating (RFC process live)
 - [ ] 3+ external adopters listed in ADOPTERS.md
 
