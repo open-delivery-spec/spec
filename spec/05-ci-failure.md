@@ -140,12 +140,7 @@ ods ci fix-suggestions --pipeline build-12345
 ```
 
 ### GitHub Action
-```yaml
-- uses: open-delivery-spec/validate-action@v1
-  with:
-    check: ci-failure
-    ci-log: ${{ steps.test.outputs.log }}
-```
+GitHub Action enforcement for CI failure records is planned. For now, use the CLI while this module is Draft.
 
 ## Relationship to Other Specs
 

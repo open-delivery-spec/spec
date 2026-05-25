@@ -6,11 +6,11 @@ nav_order: 1
 
 # Open Delivery Spec
 
-**An open specification for machine-readable delivery governance evidence in the AI era.**
+**Machine-readable delivery governance evidence for the AI era.**
 
-AI is writing more code than ever — [90% of developers use AI daily](https://cloud.google.com/blog/products/devops-sre/dora-2025-report), spending a median of 2 hours per day with AI tools. But delivery governance hasn't caught up. Faster coding doesn't mean safer shipping.
+AI coding tools make changes faster than delivery processes can explain them. Teams need a standard way to answer: what did AI generate, who reviewed it, and what evidence existed before merge or release?
 
-Open Delivery Spec (ODS) is an early-stage open specification that defines **standardized, machine-parseable schemas** for core delivery governance artifacts — so teams can answer questions like "what did AI write?", "who reviewed it?", and "what evidence existed before we deployed?"
+Open Delivery Spec (ODS) defines **standardized, machine-parseable schemas** for delivery governance artifacts. The practical starting point is **ODS L1 + AI Disclosure**: branch, commit, and PR checks that can run in CI today.
 
 > **Start here**: [ODS Levels](levels) → [Get Started](get-started).  
 > **Why this exists**: [Threats & Failure Modes](threats-and-failure-modes).  
@@ -20,16 +20,16 @@ Open Delivery Spec (ODS) is an early-stage open specification that defines **sta
 
 AI makes coding faster. Everything after coding gets harder:
 
-| Before Merge | At Merge | After Merge |
-|---|---|---|
-| Branch naming is ad-hoc | PR descriptions are inconsistent | CI failures lack structured explanation |
-| Commit messages are inconsistent | AI-generated changes lack review standards | Release readiness is a gut-feel decision |
-| | Approval workflows are unclear | Rollback plans are missing |
-| | | Production releases lack audit evidence |
+| Question | Why it matters |
+|---|---|
+| Was this code AI-assisted? | Reviewers need to know where to apply extra scrutiny. |
+| Was AI-generated code reviewed by a human? | Teams need accountability, not just fast diffs. |
+| Did the PR include expected delivery metadata? | CI should catch missing context before merge. |
+| What evidence existed before release? | Audit and incident review need structured records. |
 
 ## The Solution: Standardized Delivery Artifacts
 
-ODS defines a **JSON Schema** for each delivery artifact. Tools validate artifacts against these schemas. AI agents produce compliant artifacts by default.
+ODS defines a **JSON Schema** for each delivery artifact. Tools validate artifacts against these schemas, and AI agents can produce compliant artifacts by default.
 
 ```
 Branch Naming → Commit Message → PR Description → AI Review
@@ -48,11 +48,13 @@ go install github.com/open-delivery-spec/cli/cmd/ods@latest
 ods validate branch feature/add-oauth-login
 # ✅ conformant
 
-# Use GitHub Action
+# Use GitHub Action for the L1 checks available today
 - uses: open-delivery-spec/validate-action@v1
   with:
-    check: branch-naming
+    check: all
     branch_name: ${{ github.head_ref }}
+    pr_body: ${{ github.event.pull_request.body }}
+    strict: "true"
 ```
 
 ## Modules

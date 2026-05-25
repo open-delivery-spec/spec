@@ -1,59 +1,110 @@
 # Open Delivery Spec (ODS)
 
-**An open specification for machine-readable delivery governance evidence in the AI era.**
+**Machine-readable delivery governance evidence for the AI era.**
 
 [![CI](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml/badge.svg)](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml)
 [![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](docs/levels.md)
 
-AI is writing more code than ever — [90% of developers use AI daily](https://cloud.google.com/blog/products/devops-sre/dora-2025-report), spending a median of 2 hours per day with AI tools. But delivery governance hasn't caught up. Faster coding doesn't mean safer shipping.
+AI now participates in everyday software delivery. Teams still need to answer basic governance questions before a change ships:
 
-Open Delivery Spec is an early-stage open specification that defines **standardized, machine-parseable schemas** for delivery governance artifacts — so teams can answer questions like "what did AI write?", "who reviewed it?", and "what evidence existed before we deployed?"
+- What did AI generate or substantially modify?
+- Which human reviewed that work?
+- What evidence existed before merge or release?
+- Can CI/CD tools verify those answers automatically?
+
+Open Delivery Spec defines standardized, machine-parseable artifacts for those answers. Think of it as a delivery-governance layer that starts small with branch, commit, and PR checks, then grows into review and release evidence as teams need it.
 
 > [!NOTE]
-> **ODS is early-stage** (2026). The spec defines 9 modules across 4 maturity levels. The MVP — [ODS L1](docs/levels.md) (structured branches, commits, PRs) + AI disclosure + PR review evidence — is the recommended starting point.
+> **ODS is early-stage** (2026). The recommended starting point is **ODS L1 + AI Disclosure**: structured branch names, Conventional-Commit-compatible messages, PR descriptions with explicit AI disclosure, and CI validation through the ODS GitHub Action.
+>
+> Modules 04-09 are intentionally draft. They describe the direction for AI review, CI failure records, release readiness, rollback plans, approval policies, and production evidence, but they are not the first adoption path.
 >
 > **How ODS fits**: SLSA proves how artifacts were built. ODS proves how changes were delivered. See [ODS and SLSA](docs/comparison/slsa.md).
->
-> **Why this exists**: See [Threats and Failure Modes](docs/threats-and-failure-modes.md).
 
-## The Problem
+## Why This Exists
 
 AI makes coding faster. Everything after coding gets harder:
 
-| Before Merge | At Merge | After Merge |
+| Question | Why it matters |
+|---|---|
+| Was this code AI-assisted? | Reviewers need to know where to apply extra scrutiny. |
+| Was AI-generated code reviewed by a human? | Teams need accountability, not just fast diffs. |
+| Did the PR include the expected delivery metadata? | CI should catch missing context before merge. |
+| What evidence existed before release? | Audit and incident review need structured records. |
+
+## Start With ODS L1
+
+ODS L1 is the minimum useful checkpoint:
+
+| Module | What it checks | Status |
 |---|---|---|
-| Branch naming is ad-hoc | PR descriptions are inconsistent | CI failures lack structured explanation |
-| Commit messages are low-quality | AI-generated changes lack review standards | Release readiness is a gut-feel decision |
-| | Approval workflows are unclear | Rollback plans are missing |
-| | | Production releases lack audit evidence |
+| 01 | [Branch Naming](spec/01-branch-naming.md) uses `<type>/<description>` | Candidate |
+| 02 | [Commit Message](spec/02-commit-message.md) uses Conventional Commits plus optional AI attribution | Candidate |
+| 03 | [PR Description](spec/03-pr-description.md) includes summary, type, AI disclosure, changes, testing, and checklist sections | Candidate |
 
-## The Solution: Standardized Delivery Artifacts
+Run the CLI locally:
 
-ODS defines a **JSON Schema** for each delivery artifact. Tools validate artifacts against these schemas. AI agents produce compliant artifacts by default.
+```bash
+go install github.com/open-delivery-spec/cli/cmd/ods@latest
 
-```
-┌──────────────────────────────────────────────────────┐
-│                  OPEN DELIVERY SPEC                  │
-│                                                      │
-│  Branch     Commit    PR         CI        Release   │
-│  Naming ──► Message ─►Desc ──► Failure ──►Readiness  │
-│    │          │        │         │           │       │
-│    ▼          ▼        ▼         ▼           ▼       │
-│  ┌──────────────────────────────────────────────┐    │
-│  │         JSON Schema (machine-readable)       │    │
-│  └──────────────────────────────────────────────┘    │
-│    │          │        │         │           │       │
-│    ▼          ▼        ▼         ▼           ▼       │
-│  AI Review   Approval   Rollback   Production        │
-│  Protocol    Workflow   Plan       Evidence          │
-│                                                      │
-└──────────────────────────────────────────────────────┘
+ods validate branch feature/add-oauth-login
+ods validate commit --file commit-msg.txt
+ods validate pr --file PR_BODY.md
 ```
 
-## Specification Modules
+Add the GitHub Action to PRs:
 
-> [!NOTE]
-> **Maturity**: Modules 01–03 are **Candidate**. 04–09 are **Draft**. See [ODS Levels](docs/levels.md) for the adoption path.
+```yaml
+name: ODS L1
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  ods:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: open-delivery-spec/validate-action@v1
+        with:
+          check: all
+          branch_name: ${{ github.head_ref }}
+          pr_body: ${{ github.event.pull_request.body }}
+          strict: "true"
+```
+
+For commit-message checks, pass the commit body from your workflow context or a preceding checkout/log step:
+
+```yaml
+- uses: open-delivery-spec/validate-action@v1
+  with:
+    check: commit-message
+    commit_message: ${{ github.event.head_commit.message }}
+```
+
+## AI Disclosure Example
+
+Commit footer:
+
+```text
+feat(auth): add OAuth login flow
+
+AI-assisted: true
+AI-tool: GitHub Copilot
+AI-scope: auth module implementation
+AI-review: pending
+```
+
+PR section:
+
+```markdown
+## AI Disclosure
+- [x] This PR contains AI-generated code
+- AI Tool: GitHub Copilot
+- AI Scope: Provider abstraction, token exchange, session management
+- Human Review: Verified OAuth flow, redirect validation, and token handling
+```
+
+## Full Module Map
 
 | # | Module | Summary | Stage |
 |---|--------|---------|-------|
@@ -67,98 +118,28 @@ ODS defines a **JSON Schema** for each delivery artifact. Tools validate artifac
 | 08 | [Rollback Plan](spec/08-rollback-plan.md) | Required rollback plan structure | Draft |
 | 09 | [Production Release Evidence](spec/09-prod-release-evidence.md) | Audit-ready deployment evidence | Draft |
 
-## Getting Started
+## Tooling Status
 
-### Validate a branch name
+| Tool | Repository | Current production surface |
+|------|------------|----------------------------|
+| ODS CLI | [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) | `ods validate branch`, `commit`, `pr` |
+| GitHub Action | [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) | `branch-naming`, `commit-message`, `pr-description`, `all` |
 
-```json
-{
-  "type": "feature",
-  "description": "add-oauth-login",
-  "ticket": "PROJ-1234"
-}
-```
-→ Validates against [`schemas/branch-naming.json`](schemas/branch-naming.json)
+Draft modules can still be explored through schemas and examples, but they should not be treated as production gates yet. See [ROADMAP.md](ROADMAP.md) for the maturity path.
 
-### Write an AI-attributable commit
-
-```
-feat(auth): add OAuth login flow
-
-AI-assisted: true
-AI-tool: GitHub Copilot
-AI-scope: auth module implementation
-```
-→ Validates against [`schemas/commit-message.json`](schemas/commit-message.json)
-
-### Generate a release readiness report
-
-```json
-{
-  "version": "v1.4.0",
-  "checks": {
-    "ci_passed": true,
-    "security_scan_clean": true,
-    "rollback_plan_exists": true,
-    "required_approvals": 2,
-    "actual_approvals": 2
-  },
-  "ready": true
-}
-```
-→ Validates against [`schemas/release-readiness.json`](schemas/release-readiness.json)
-
-## Tooling
-
-| Tool | Repository | Description |
-|------|-----------|-------------|
-| ODS CLI | [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) | Reference CLI for validation and generation |
-| GitHub Action | [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) | Automated compliance checks in CI |
-
-## Design Principles
-
-1. **Machine-first, human-readable.** Every artifact has a JSON Schema. Every schema has human docs.
-2. **AI-native.** Schemas include fields for AI attribution, scope, and confidence.
-3. **Composable.** Use one module or all. Each schema is independently useful.
-4. **Tool-agnostic.** Works with any CI/CD, any AI coding tool, any VCS.
-5. **Audit-ready.** Every artifact carries evidence for compliance and security review.
-
-## Current Scope & Vision
-
-ODS today provides:
-- **9 JSON Schemas** defining the structure of every delivery artifact
-- **Reference CLI** (`ods`) for validation and generation
-- **GitHub Action** for automated CI compliance checks
-
-We're building toward the vision of "OpenAPI for delivery governance" — a complete ecosystem including dashboards, code generators, multi-platform CI integrations, and compliance reporting. See [ROADMAP.md](ROADMAP.md) for what's next.
-
-## Inspiration
-
-- [Conventional Commits](https://www.conventionalcommits.org)
-- [Conventional Branch](https://conventional-branch.github.io)
-- [OpenAPI Specification](https://www.openapis.org)
-- [DORA 2025 Report](https://cloud.google.com/blog/products/devops-sre/dora-2025-report)
-
-## ODS Artifacts — Where Do They Live?
+## ODS Artifacts
 
 ODS supports two modes of operation:
 
-### Mode 1 — Lightweight Validation (CI-native)
+### Lightweight Validation
 
-Validate artifacts directly from CI context. No files written to the repository. Ideal for branch naming, commit message, and PR description checks.
+Validate delivery metadata directly from CI context. No files are written to the repository. This is the recommended L1 adoption mode.
 
-```yaml
-- uses: open-delivery-spec/validate-action@v1
-  with:
-    check: branch-naming
-    branch_name: ${{ github.head_ref }}
-```
+### Evidence Artifacts
 
-### Mode 2 — Evidence Artifacts (audit trail)
+As draft release-governance modules mature, teams can store structured records in `.ods/`:
 
-Generate structured JSON evidence files and store them alongside the release. Evidence artifacts live in a `.ods/` directory at the repository root.
-
-```
+```text
 .ods/
   releases/
     v1.4.0/
@@ -170,11 +151,20 @@ Generate structured JSON evidence files and store them alongside the release. Ev
       evidence-bundle.json
 ```
 
-**Conventions:**
-- `.ods/` is the canonical location for ODS-generated artifacts.
-- Each release gets a subdirectory named by its version tag.
-- Evidence bundles are immutable after generation (hash-verified).
-- Add `.ods/` to `.gitignore` if artifacts are generated in CI; commit them if you want in-repo audit trail.
+## Design Principles
+
+1. **Machine-first, human-readable.** Every artifact has a JSON Schema. Every schema has human docs.
+2. **AI-native.** Delivery metadata records AI attribution, scope, and review state.
+3. **Composable.** Start with one check or all L1 checks.
+4. **Tool-agnostic.** Works with any CI/CD, AI coding tool, or VCS.
+5. **Audit-ready over time.** L1 creates structure now; later levels add release evidence.
+
+## Inspiration
+
+- [Conventional Commits](https://www.conventionalcommits.org)
+- [Conventional Branch](https://conventional-branch.github.io)
+- [OpenAPI Specification](https://www.openapis.org)
+- [DORA 2025 Report](https://cloud.google.com/blog/products/devops-sre/dora-2025-report)
 
 ## License
 
