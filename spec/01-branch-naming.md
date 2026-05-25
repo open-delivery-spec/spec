@@ -1,6 +1,6 @@
 # 01 — Branch Naming
 
-**Version:** 1.0.0-draft  
+**Version:** 1.0.0-candidate  
 **Status:** Candidate  
 **Schema:** [`schemas/branch-naming.json`](../schemas/branch-naming.json)  
 **Based on:** [Conventional Branch 1.0.0](https://conventional-branch.github.io)
