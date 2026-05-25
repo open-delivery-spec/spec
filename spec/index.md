@@ -114,7 +114,7 @@ Tools that validate ODS compliance SHALL report:
 ## Tooling
 
 - [ODS CLI](https://github.com/open-delivery-spec/cli) — Reference implementation
-- [GitHub Action](https://github.com/open-delivery-spec/github-action) — CI integration
+- [GitHub Action](https://github.com/open-delivery-spec/validate-action) — CI integration
 - Schema validation: Use any JSON Schema validator with our [schemas](../schemas/)
 
 ## Contributing

@@ -149,7 +149,7 @@ ods generate pr --type feature --ai-tool "GitHub Copilot"
 
 ### GitHub Action
 ```yaml
-- uses: open-delivery-spec/github-action@v1
+- uses: open-delivery-spec/validate-action@v1
   with:
     check: pr-description
     pr-body: ${{ github.event.pull_request.body }}

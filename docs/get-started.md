@@ -29,12 +29,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: open-delivery-spec/github-action@v1
+      - uses: open-delivery-spec/validate-action@v1
         with:
           check: branch-naming
           branch_name: ${{ github.head_ref }}
 
-      - uses: open-delivery-spec/github-action@v1
+      - uses: open-delivery-spec/validate-action@v1
         with:
           check: pr-description
           pr_body: ${{ github.event.pull_request.body }}
@@ -75,7 +75,7 @@ AI-confidence: high
 ### 3. Enable AI review validation
 
 ```yaml
-- uses: open-delivery-spec/github-action@v1
+- uses: open-delivery-spec/validate-action@v1
   with:
     check: ai-review
     pr_number: ${{ github.event.pull_request.number }}
@@ -102,7 +102,7 @@ ods release check --version v1.4.0
 ### 3. Add rollback plan validation
 
 ```yaml
-- uses: open-delivery-spec/github-action@v1
+- uses: open-delivery-spec/validate-action@v1
   with:
     check: rollback-plan
     rollback_plan: "./.ods/releases/v1.4.0/rollback-plan.json"

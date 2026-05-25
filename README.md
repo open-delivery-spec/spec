@@ -113,7 +113,7 @@ AI-scope: auth module implementation
 | Tool | Repository | Description |
 |------|-----------|-------------|
 | ODS CLI | [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) | Reference CLI for validation and generation |
-| GitHub Action | [open-delivery-spec/github-action](https://github.com/open-delivery-spec/github-action) | Automated compliance checks in CI |
+| GitHub Action | [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) | Automated compliance checks in CI |
 
 ## Design Principles
 
@@ -148,7 +148,7 @@ ODS supports two modes of operation:
 Validate artifacts directly from CI context. No files written to the repository. Ideal for branch naming, commit message, and PR description checks.
 
 ```yaml
-- uses: open-delivery-spec/github-action@v1
+- uses: open-delivery-spec/validate-action@v1
   with:
     check: branch-naming
     branch_name: ${{ github.head_ref }}

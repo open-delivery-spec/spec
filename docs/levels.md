@@ -73,7 +73,7 @@ You don't need to start at L3. Most teams start at L1:
 
 ```yaml
 # .github/workflows/ods.yml
-- uses: open-delivery-spec/github-action@v1
+- uses: open-delivery-spec/validate-action@v1
   with:
     check: branch-naming
     branch_name: ${{ github.head_ref }}
