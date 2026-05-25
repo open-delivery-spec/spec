@@ -6,15 +6,19 @@ nav_order: 1
 
 # Open Delivery Spec
 
-**Machine-readable delivery governance evidence for the AI era.**
+**A lightweight, machine-readable standard for AI-aware pull request and delivery metadata.**
+
+> ODS does not prove the code is correct. It proves the delivery process contains the minimum structured evidence needed for humans and machines to review the change responsibly.
 
 AI coding tools make changes faster than delivery processes can explain them. Teams need a standard way to answer: what did AI generate, who reviewed it, and what evidence existed before merge or release?
 
-Open Delivery Spec (ODS) defines **standardized, machine-parseable schemas** for delivery governance artifacts. The practical starting point is **ODS L1 + AI Disclosure**: branch, commit, and PR checks that can run in CI today.
+Open Delivery Spec (ODS) defines a small set of **machine-readable metadata conventions** that CI tools and AI agents can validate before merge. The starting point is **ODS L1 + AI Disclosure**: branch, commit, and PR checks that run in CI today.
 
-> **Start here**: [ODS Levels](levels) → [Get Started](get-started).  
+> **Start here**: [Get Started](get-started) → [PR Template](../examples/ods-pr-template).  
+> **See the difference**: [Before & After](case-study).  
 > **Why this exists**: [Threats & Failure Modes](threats-and-failure-modes).  
-> **How it fits**: [ODS and SLSA](comparison/slsa).  
+> **Why this exists**: [Threats & Failure Modes](threats-and-failure-modes).  
+> **How it fits**: [ODS and SLSA](comparison/slsa) — SLSA proves how artifacts were built; ODS proves how changes were delivered.  
 > **Artifact storage**: [`.ods/` Convention](ods-artifacts).
 
 ## The Problem
@@ -28,16 +32,30 @@ AI makes coding faster. Everything after coding gets harder:
 | Did the PR include expected delivery metadata? | CI should catch missing context before merge. |
 | What evidence existed before release? | Audit and incident review need structured records. |
 
-## The Solution: Standardized Delivery Artifacts
+## Before / After
 
-ODS defines a **JSON Schema** for each delivery artifact. Tools validate artifacts against these schemas, and AI agents can produce compliant artifacts by default.
+| Before ODS | After ODS L1 + AI Disclosure |
+|---|---|
+| `Title: fix stuff` | `fix(auth): handle expired OAuth state parameter` |
+| Empty PR body | Summary, Type, AI Disclosure, Changes, Testing, Risk Assessment |
+| "What does this do? Which part is AI? Was it tested?" | Reviewer has answers before opening the PR |
+| No CI validation of PR metadata | CI blocks merges with missing sections |
+
+See the [PR Template](../examples/ods-pr-template.md) for a copy-paste version.
+
+## The Solution: ODS L1 + AI Disclosure
+
+ODS L1 defines three checks that run in CI:
 
 ```
-Branch Naming → Commit Message → PR Description → AI Review
-                                                      ↓
-Production Evidence ← Rollback Plan ← Release ← CI Failure
-                                    Readiness   Approval Flow
+Branch Naming → Commit Message → PR Description
+       ↓               ↓                ↓
+  type/description  Conventional     Summary, Type,
+                    Commits + AI     AI Disclosure,
+                    attribution      Changes, Testing
 ```
+
+Experimental modules (04-09) define direction for AI review records, CI failure reports, release readiness, and production evidence. They are **not the recommended adoption path today**.
 
 ## Quick Start
 
@@ -60,12 +78,19 @@ ods validate branch feature/add-oauth-login
 
 ## Modules
 
+### Production (L1)
+
 | # | Module | Purpose |
 |---|--------|---------|
-| 01 | [Branch Naming](modules/01-branch-naming) | Standardized branch names with AI markers |
-| 02 | [Commit Message](modules/02-commit-message) | AI-attributable commit format |
+| 01 | [Branch Naming](modules/01-branch-naming) | Standardized `<type>/<description>` branch names |
+| 02 | [Commit Message](modules/02-commit-message) | Conventional Commits + optional AI attribution |
 | 03 | [PR Description](modules/03-pr-description) | Structured PR body with AI disclosure |
-| 04 | [AI Change Review](modules/04-ai-change-review) | L1/L2/L3 review protocol |
+
+### Experimental (04-09)
+
+| # | Module | Purpose |
+|---|--------|---------|
+| 04 | [AI Change Review](modules/04-ai-change-review) | Review protocol for AI-generated changes |
 | 05 | [CI Failure](modules/05-ci-failure) | Machine-parseable failure reports |
 | 06 | [Release Readiness](modules/06-release-readiness) | Evidence-based release gates |
 | 07 | [Approval Workflow](modules/07-approval-workflow) | Declarative approval policies |
@@ -75,10 +100,10 @@ ods validate branch feature/add-oauth-login
 ## Design Principles
 
 1. **Machine-first, human-readable.** Every artifact has a JSON Schema. Every schema has human docs.
-2. **AI-native.** Schemas include fields for AI attribution, scope, and confidence.
-3. **Composable.** Use one module or all. Each schema is independently useful.
-4. **Tool-agnostic.** Works with any CI/CD, any AI tool, any VCS.
-5. **Audit-ready.** Every artifact carries evidence for compliance.
+2. **AI-aware, not AI-obsessed.** Metadata records AI involvement qualitatively — where and how, not what percentage.
+3. **Composable.** Start with one L1 check. Adopt experimental modules when they mature.
+4. **Tool-agnostic.** Works with any CI/CD, AI coding tool, or VCS.
+5. **Honest about scope.** ODS proves delivery metadata exists — it does not prove code correctness. That's the reviewer's job.
 
 ## Inspiration
 

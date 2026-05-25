@@ -1,6 +1,9 @@
 # Get Started
 
-Start with the smallest production-ready loop: L1 checks plus explicit AI disclosure in commits and PR descriptions.
+Start with the smallest production-ready loop: **ODS L1 + AI Disclosure**. This takes ~5 minutes and runs in CI.
+
+> [!TIP]
+> Want to see what an ODS-compliant PR looks like? Copy the [PR Template](../examples/ods-pr-template.md) into `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ---
 
@@ -99,9 +102,9 @@ AI-confidence: high
 
 ---
 
-## Path C: Draft Evidence Modules
+## Path C: Experimental Evidence Modules
 
-**For**: Release managers, compliance teams, anyone who needs audit trails.
+**For**: Release managers, compliance teams exploring the direction (not production-ready).
 
 **Goal**: Explore the draft release-governance schemas before enforcing them.
 

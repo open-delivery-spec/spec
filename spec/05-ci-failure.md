@@ -1,8 +1,11 @@
 # 05 — CI Failure
 
-**Version:** 1.0.0-candidate
-**Status:** Candidate
+**Version:** 1.0.0-draft
+**Status:** Experimental
 **Schema:** [`schemas/ci-failure.json`](../schemas/ci-failure.json)
+
+> [!WARNING]
+> This module is **experimental**. The schema and CLI tools are direction-setting. The recommended adoption path today is ODS L1 + AI Disclosure (modules 01-03). See [ROADMAP.md](../ROADMAP.md).
 
 ## Overview
 
