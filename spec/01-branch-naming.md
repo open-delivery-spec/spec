@@ -141,7 +141,7 @@ ods validate branch --json branch-metadata.json
 
 ### GitHub Action
 ```yaml
-- uses: open-delivery-spec/github-action@v1
+- uses: open-delivery-spec/validate-action@v1
   with:
     check: branch-naming
 ```

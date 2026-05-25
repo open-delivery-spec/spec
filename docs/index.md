@@ -49,7 +49,7 @@ ods validate branch feature/add-oauth-login
 # ✅ conformant
 
 # Use GitHub Action
-- uses: open-delivery-spec/github-action@v1
+- uses: open-delivery-spec/validate-action@v1
   with:
     check: branch-naming
     branch_name: ${{ github.head_ref }}

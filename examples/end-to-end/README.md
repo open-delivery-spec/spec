@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: open-delivery-spec/github-action@v1
+      - uses: open-delivery-spec/validate-action@v1
         with:
           check: all
           branch_name: ${{ github.head_ref }}

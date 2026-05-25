@@ -141,7 +141,7 @@ ods ci fix-suggestions --pipeline build-12345
 
 ### GitHub Action
 ```yaml
-- uses: open-delivery-spec/github-action@v1
+- uses: open-delivery-spec/validate-action@v1
   with:
     check: ci-failure
     ci-log: ${{ steps.test.outputs.log }}
