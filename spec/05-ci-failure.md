@@ -1,7 +1,7 @@
 # 05 — CI Failure
 
-**Version:** 1.0.0-draft  
-**Status:** Draft  
+**Version:** 1.0.0-candidate
+**Status:** Candidate
 **Schema:** [`schemas/ci-failure.json`](../schemas/ci-failure.json)
 
 ## Overview
@@ -111,11 +111,11 @@ When AI contributed to the failing code, the report MUST include:
 
 ODS CI tools should detect common AI hallucinations:
 
-1. **Non-existent functions** — Symbol not found in codebase
-2. **Wrong import paths** — Package not available at specified version
-3. **Incorrect defaults** — Configuration values that don't match any environment
-4. **Fake URLs** — URLs flagged by domain verification
-5. **Deprecated APIs** — Using APIs marked deprecated in current dependency version
+1. **Non-existent functions** - Symbol not found in codebase
+2. **Wrong import paths** - Package not available at specified version
+3. **Incorrect defaults** - Configuration values that don't match any environment
+4. **Fake URLs** - URLs flagged by domain verification
+5. **Deprecated APIs** - Using APIs marked deprecated in current dependency version
 
 ## JSON Schema
 
@@ -144,6 +144,6 @@ GitHub Action enforcement for CI failure records is planned. For now, use the CL
 
 ## Relationship to Other Specs
 
-- [04 — AI Change Review](04-ai-change-review.md): CI failures inform AI review severity
-- [06 — Release Readiness](06-release-readiness.md): CI must pass (or have approved waivers) for release
-- [09 — Production Release Evidence](09-prod-release-evidence.md): CI results are part of deployment evidence
+- [04 - AI Change Review](04-ai-change-review.md): CI failures inform AI review severity
+- [06 - Release Readiness](06-release-readiness.md): CI must pass (or have approved waivers) for release
+- [09 - Production Release Evidence](09-prod-release-evidence.md): CI results are part of deployment evidence
