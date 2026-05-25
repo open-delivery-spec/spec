@@ -137,7 +137,7 @@ Validate delivery metadata directly from CI context. No files are written to the
 
 ### Evidence Artifacts
 
-As draft release-governance modules mature, teams can store structured records in `.ods/`:
+As draft release-governance modules mature, teams can store structured records in `.ods/`. See [`.ods/` Convention](docs/ods-artifacts.md) for the full layout.
 
 ```text
 .ods/

@@ -35,10 +35,10 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 **Goal:** Prove the loop works end-to-end for the simplest modules.
 
-- [ ] CLI: `ods validate branch|commit|pr` passes against real projects
-- [ ] GitHub Action runs reliably with Go-based CLI
-- [ ] One end-to-end example repo (branch → commit → PR → passing Action)
-- [ ] `.ods/` artifact directory convention documented
+- [x] CLI: `ods validate branch|commit|pr` passes against real projects
+- [x] GitHub Action runs reliably with Go-based CLI
+- [x] One end-to-end example repo (branch → commit → PR → passing Action)
+- [x] `.ods/` artifact directory convention documented
 
 ### M2 — CI Failure & AI Review (Q4 2026)
 

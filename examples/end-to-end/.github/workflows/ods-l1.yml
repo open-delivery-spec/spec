@@ -1,0 +1,15 @@
+name: ODS L1
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  ods:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: open-delivery-spec/validate-action@v1
+        with:
+          check: all
+          branch_name: ${{ github.head_ref }}
+          pr_body: ${{ github.event.pull_request.body }}
+          strict: "true"

@@ -74,44 +74,23 @@ ods validate pr --file PR_BODY.md
 
 ## Step 4 - GitHub Action
 
-```yaml
-name: ODS L1
-on:
-  pull_request:
-    types: [opened, edited, synchronize, reopened]
+Copy the workflow files into your repository:
 
-jobs:
-  ods:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: open-delivery-spec/validate-action@v1
-        with:
-          check: all
-          branch_name: ${{ github.head_ref }}
-          pr_body: ${{ github.event.pull_request.body }}
-          strict: "true"
+- [`.github/workflows/ods-l1.yml`](.github/workflows/ods-l1.yml) — Validates branch name and PR description on every PR
+- [`.github/workflows/ods-commit-message.yml`](.github/workflows/ods-commit-message.yml) — Validates commit messages on push
+
+```bash
+cp .github/workflows/ods-l1.yml ../your-repo/.github/workflows/
+cp .github/workflows/ods-commit-message.yml ../your-repo/.github/workflows/
 ```
 
-For push-time commit validation:
-
-```yaml
-name: ODS Commit Message
-on: [push]
-
-jobs:
-  ods-commit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: open-delivery-spec/validate-action@v1
-        with:
-          check: commit-message
-          commit_message: ${{ github.event.head_commit.message }}
-          strict: "true"
-```
+Both workflows use `open-delivery-spec/validate-action@v1` and the Go-based ODS CLI under the hood.
 
 ## Optional `.ods/` Artifact
 
-The draft release-governance modules use `.ods/` for evidence records. For L1, teams may optionally store PR metadata for demos or audits:
+The draft release-governance modules use `.ods/` for evidence records. For L1, teams may optionally store PR metadata for demos or audits. See the full [`.ods/` Convention](../../docs/ods-artifacts.md) for details.
+
+Example directory structure:
 
 ```text
 .ods/
