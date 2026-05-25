@@ -6,7 +6,7 @@ Real-world examples demonstrating each Open Delivery Spec module.
 
 | Demo | Description |
 |------|-------------|
-| [end-to-end/](end-to-end/) | Full lifecycle: branch → commit → PR → review → release readiness → evidence |
+| [end-to-end/](end-to-end/) | Production-ready M1 loop: branch -> commit -> PR -> GitHub Action pass |
 
 ## Modules
 

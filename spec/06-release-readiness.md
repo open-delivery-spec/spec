@@ -186,14 +186,14 @@ When AI contribution exceeds 20%, additional gates are checked:
 
 ### CLI
 ```bash
-# Generate release readiness report
-ods release readiness --version v1.4.0
+# Validate a release readiness report JSON
+ods validate release --file .ods/releases/v1.4.0/release-readiness.json
 
-# Check if release is ready
+# Experimental readiness command
 ods release check --version v1.4.0
 
-# Generate evidence summary
-ods release evidence --version v1.4.0 --output evidence.pdf
+# Experimental evidence summary
+ods release evidence --version v1.4.0
 ```
 
 ## Relationship to Other Specs
