@@ -5,6 +5,8 @@
 [![CI](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml/badge.svg)](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml)
 [![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](docs/levels.md)
 
+> **Dogfooding:** This repository uses ODS to validate its own PRs. [View the latest compliance report](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml).
+
 > **ODS does not prove the code is correct. It proves the delivery process contains the minimum structured evidence needed for humans and machines to review the change responsibly.**
 
 AI makes coding faster. Everything after coding — review, verification, audit — gets harder. Teams need structured answers to basic delivery governance questions:
