@@ -120,7 +120,7 @@ The validate-action outputs three surfaces by default:
 Add an ODS badge to your README:
 
 ```markdown
-[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](https://open-delivery-spec.dev)
+[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](https://github.com/open-delivery-spec/spec)
 ```
 
 **Success check:** Open a PR. The ODS bot posts a compliance comment. The Actions run shows the summary.
@@ -163,7 +163,7 @@ strict: "true"
 
 **Team communication template:**
 
-> We're adopting [Open Delivery Spec](https://open-delivery-spec.dev) (ODS) to make our PRs easier to review — especially for AI-assisted changes. Starting this week, CI will check that every PR has a structured description and follows branch/commit conventions. The ODS bot posts a compliance report on each PR. This week is observe-only; next week we'll require the check to pass. Questions? See [our adoption guide](.github/ODS-ADOPTION.md).
+> We're adopting [Open Delivery Spec](https://github.com/open-delivery-spec/spec) (ODS) to make our PRs easier to review — especially for AI-assisted changes. Starting this week, CI will check that every PR has a structured description and follows branch/commit conventions. The ODS bot posts a compliance report on each PR. This week is observe-only; next week we'll require the check to pass. Questions? See [our adoption guide](.github/ODS-ADOPTION.md).
 
 ---
 
@@ -320,6 +320,6 @@ policy:
 ## Next Steps
 
 - [Read the spec](https://github.com/open-delivery-spec/spec) to understand the schema details
-- [Explore scenarios](https://open-delivery-spec.dev/scenarios/) for your project type
+- [Explore scenarios](https://open-delivery-spec.github.io/spec/scenarios/) for your project type
 - [Check the roadmap](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md) for upcoming features
 - [Contribute](https://github.com/open-delivery-spec/spec/blob/main/CONTRIBUTING.md) — ODS is open source

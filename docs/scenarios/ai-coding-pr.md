@@ -237,7 +237,7 @@ Reviewer:
 ## Badge
 
 ```markdown
-[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](https://open-delivery-spec.dev)
+[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](https://github.com/open-delivery-spec/spec)
 ```
 
 ## Lessons learned
