@@ -15,8 +15,9 @@ AI coding tools make changes faster than delivery processes can explain them. Te
 Open Delivery Spec (ODS) defines a small set of **machine-readable metadata conventions** that CI tools and AI agents can validate before merge. The starting point is **ODS L1 + AI Disclosure**: branch, commit, and PR checks that run in CI today.
 
 > **Start here**: [Get Started](get-started) → [PR Template](../examples/ods-pr-template).  
+> **Adopting in a team**: [Adoption Guide](adoption-guide) — step-by-step rollout.  
 > **See the difference**: [Before & After](case-study).  
-> **Why this exists**: [Threats & Failure Modes](threats-and-failure-modes).  
+> **Real-world scenarios**: [Open-source](scenarios/open-source-project) · [Enterprise](scenarios/enterprise-service) · [AI coding team](scenarios/ai-coding-pr).  
 > **Why this exists**: [Threats & Failure Modes](threats-and-failure-modes).  
 > **How it fits**: [ODS and SLSA](comparison/slsa) — SLSA proves how artifacts were built; ODS proves how changes were delivered.  
 > **Artifact storage**: [`.ods/` Convention](ods-artifacts).
