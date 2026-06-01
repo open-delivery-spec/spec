@@ -6,7 +6,9 @@ policy:
   branch:
     allowed_types:
       - feature
+      - feat
       - bugfix
+      - fix
       - hotfix
       - release
       - chore
@@ -55,5 +57,5 @@ policy:
     pr_ai_disclosure: error
     pr_ai_tool: error
     commit_type: error
-    commit_scope: error
+    commit_format: error
     commit_ai: error

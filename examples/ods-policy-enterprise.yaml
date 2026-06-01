@@ -4,7 +4,7 @@
 
 # Profile: oss, enterprise, or regulated
 # - oss: Open-source friendly; AI disclosure optional, relaxed rules
-# - enterprise: Full ODS L1 enforcement; AI disclosure required, commit scope required
+# - enterprise: Full ODS L1 enforcement; AI disclosure required
 # - regulated: Maximum compliance; tickets required, all AI rules strictly enforced
 profile: enterprise
 
@@ -15,7 +15,9 @@ policy:
     # Allowed branch type prefixes
     allowed_types:
       - feature
+      - feat
       - bugfix
+      - fix
       - hotfix
       - release
       - chore
@@ -52,8 +54,8 @@ policy:
       - ci
       - chore
       - revert
-    # Require scope in parentheses
-    require_scope: true
+    # Require scope in parentheses (optional per Conventional Commits spec)
+    require_scope: false
     # Maximum subject line length
     max_subject_length: 72
 
@@ -76,5 +78,5 @@ policy:
     pr_ai_disclosure: error
     pr_ai_tool: error
     commit_type: error
-    commit_scope: warning
+    commit_format: warning
     commit_ai: error
