@@ -1,0 +1,61 @@
+# ODS Policy - Regulated Profile
+# Maximum compliance for regulated industries (finance, healthcare, etc.)
+profile: regulated
+
+policy:
+  branch:
+    allowed_types:
+      - feature
+      - feat
+      - bugfix
+      - fix
+      - hotfix
+      - release
+      - chore
+    require_ticket: true
+    max_description_length: 80
+
+  pr:
+    required_sections:
+      - "## Summary"
+      - "## Type"
+      - "## AI Disclosure"
+      - "## Related Issues"
+      - "## Changes"
+      - "## Testing"
+      - "## Risk Assessment"
+      - "## Checklist"
+    min_changes: 1
+
+  commit:
+    allowed_types:
+      - feat
+      - fix
+      - docs
+      - style
+      - refactor
+      - perf
+      - test
+      - build
+      - ci
+      - chore
+      - revert
+    require_scope: true
+    max_subject_length: 72
+
+  ai_disclosure:
+    required: true
+    strict_tool_name: true
+    require_human_review: true
+    ai_branch_naming: error
+
+  severity:
+    branch_type: error
+    branch_format: error
+    branch_ticket: error
+    pr_sections: error
+    pr_ai_disclosure: error
+    pr_ai_tool: error
+    commit_type: error
+    commit_format: error
+    commit_ai: error

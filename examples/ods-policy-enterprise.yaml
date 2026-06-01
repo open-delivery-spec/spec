@@ -1,0 +1,82 @@
+# ODS Compliance Policy Configuration
+# Place this file in your repository root as .ods.yaml
+# or in .github/.ods.yaml
+
+# Profile: oss, enterprise, or regulated
+# - oss: Open-source friendly; AI disclosure optional, relaxed rules
+# - enterprise: Full ODS L1 enforcement; AI disclosure required
+# - regulated: Maximum compliance; tickets required, all AI rules strictly enforced
+profile: enterprise
+
+# Optional: Override specific policy settings
+policy:
+  # Branch naming rules
+  branch:
+    # Allowed branch type prefixes
+    allowed_types:
+      - feature
+      - feat
+      - bugfix
+      - fix
+      - hotfix
+      - release
+      - chore
+    # Require ticket ID in branch names (PROJ-123)
+    require_ticket: false
+    # Maximum description length
+    max_description_length: 100
+
+  # Pull request description rules
+  pr:
+    # Required sections in PR body
+    required_sections:
+      - "## Summary"
+      - "## Type"
+      - "## AI Disclosure"
+      - "## Changes"
+      - "## Testing"
+      - "## Checklist"
+    # Minimum number of change entries
+    min_changes: 1
+
+  # Commit message rules
+  commit:
+    # Allowed conventional commit types
+    allowed_types:
+      - feat
+      - fix
+      - docs
+      - style
+      - refactor
+      - perf
+      - test
+      - build
+      - ci
+      - chore
+      - revert
+    # Require scope in parentheses (optional per Conventional Commits spec)
+    require_scope: false
+    # Maximum subject line length
+    max_subject_length: 72
+
+  # AI disclosure rules
+  ai_disclosure:
+    # Require AI disclosure in all PRs
+    required: true
+    # Require tool name when AI code is present
+    strict_tool_name: true
+    # Require human review documentation
+    require_human_review: true
+    # How to treat AI-prefixed branches: warning, error, allow, deny
+    ai_branch_naming: warning
+
+  # Severity overrides per rule ID
+  severity:
+    branch_type: error
+    branch_format: error
+    pr_sections: error
+    pr_ai_disclosure: error
+    pr_ai_tool: error
+    commit_type: error
+    commit_format: warning
+    commit_ai: error
