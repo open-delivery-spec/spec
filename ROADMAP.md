@@ -7,8 +7,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | Status | Meaning |
 |--------|---------|
 | **Experimental** | Direction-setting. Not recommended for production adoption. Breaking changes expected. |
-| **Draft** | Scope and schema still forming. Breaking changes expected. |
-| **Candidate** | Schema stable enough for tooling. Minor additions only. |
+| **Candidate** | Stable enough for tooling. Minor additions only. |
 | **Stable** | Production-ready. Semver applies. |
 | **Deprecated** | Being retired or replaced. |
 
@@ -16,75 +15,111 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 ## Current Status (June 2026)
 
-> **Strategy**: Narrow focus on ODS L1 + AI Disclosure as the primary adoption path. Modules 04-09 are direction-setting experiments. The wedge is: make AI-generated PRs easier to review, not to prove a full governance framework.
+> **Strategy**: ODS is an AI code quality gate. Detect AI-generated code, analyze its quality defects, score technical debt impact, and enforce enterprise policy — all before merge.
 
-| Module | Status | CLI Support |
-|--------|--------|-------------|
-| 01 — Branch Naming | 🟡 Candidate | ✅ validate |
-| 02 — Commit Message | 🟡 Candidate | ✅ validate |
-| 03 — PR Description | 🟡 Candidate | ✅ validate (section checks) |
-| 04 — AI Change Review | 🧪 Experimental | ✅ generate + validate |
-| 05 — CI Failure | 🧪 Experimental | ✅ parse + explain + fix-suggestions |
-| 06 — Release Readiness | 🧪 Experimental | ⬜ validate schema only |
-| 07 — Approval Workflow | 🧪 Experimental | ⬜ validate schema only |
-| 08 — Rollback Plan | 🧪 Experimental | ⬜ validate schema only |
-| 09 — Production Evidence | 🧪 Experimental | ⬜ validate schema only |
+### Core Pipeline
 
-### Enterprise Policy & Compliance Tooling
+| Command | What it does | Status |
+|---------|-------------|--------|
+| `ods detect` | Multi-source AI code detection | ✅ Stable |
+| `ods analyze` | AI code quality analysis (5 rule categories) | ✅ Stable |
+| `ods score` | 5-dimension technical debt scoring | ✅ Stable |
+| `ods check` | OPA Rego policy enforcement | ✅ Stable |
+| `ods hook install` | Pre-commit / prepare-commit-msg / pre-push hooks | ✅ Stable |
+| `ods init` | Scaffold CI workflow, AGENTS.md, Cursor rules | ✅ Candidate |
 
-These capabilities are now production-ready and run through the CLI and GitHub Action:
+### Detection Signals
 
-| Capability | Status |
-|--------|--------|
-| `.ods.yaml` enterprise policy with profiles (`oss` / `enterprise` / `regulated`) | ✅ Production |
-| HTML/JSON/SVG/Markdown compliance report with scores and fix suggestions | ✅ Production |
-| PR bot comment with copy-paste fix templates on failure | ✅ Production |
-| AI review record generation (L1/L2/L3) with reviewer attestation | ✅ Production |
-| `ods review validate` against AI Change Review schema | ✅ Production |
+| Signal | Source | Confidence | Status |
+|--------|--------|-----------|--------|
+| Git commit trailers | `AI-assisted: true`, `AI-tool: name` | 90% | ✅ Stable |
+| PR body AI disclosure | Checkbox and section parsing | 85% | ✅ Stable |
+| Branch name prefix | `ai-*` convention | 35–50% | ✅ Stable |
+| Diff heuristics | Comment ratio, verbose naming, error patterns | 40% | ✅ Candidate |
+
+### Analysis Rules
+
+| Rule | Severity | Status |
+|------|----------|--------|
+| `ai-redundant-error-handling` | medium | ✅ Stable |
+| `ai-over-commenting` | medium-high | ✅ Stable |
+| `ai-missing-edge-case` | low | ✅ Stable |
+| `ai-unsafe-deserialization` | high | ✅ Stable |
+| `ai-inconsistent-pattern` | medium-low | ✅ Candidate |
+
+### Scoring Dimensions
+
+| Dimension | Weight | Status |
+|-----------|--------|--------|
+| AI code ratio | 3.0 | ✅ Stable |
+| Defect density | 2.0 | ✅ Stable |
+| Critical issues | 1.5 each | ✅ Stable |
+| Test coverage gap | 1.0 | ✅ Candidate |
+| Code duplication rate | 1.0 | 🧪 Experimental |
+
+---
+
+## Deprecated Modules (v1.0.0)
+
+The original 01–09 module system has been **deprecated and removed** from the CLI as of June 2026. The modules below are retained in the spec repo for reference only. Tooling no longer supports them.
+
+| Module | Deprecation Date |
+|--------|-----------------|
+| 01 — Branch Naming | June 2026 |
+| 02 — Commit Message | June 2026 |
+| 03 — PR Description | June 2026 |
+| 04 — AI Change Review | June 2026 |
+| 05 — CI Failure | June 2026 |
+| 06 — Release Readiness | June 2026 |
+| 07 — Approval Workflow | June 2026 |
+| 08 — Rollback Plan | June 2026 |
+| 09 — Production Evidence | June 2026 |
 
 ---
 
 ## Milestones
 
-### M1 — First Trusted Checkpoint ✅
+### M1 — AI Detection & Analysis ✅
 
-**Status: Complete (May 2026)**
+**Status: Complete (June 2026)**
 
-- [x] CLI: `ods validate branch|commit|pr` passes against real projects
-- [x] GitHub Action runs reliably with Go-based CLI (validate-action@v1 published)
-- [x] End-to-end example with workflow files (see `examples/end-to-end/`)
-- [x] `.ods/` artifact directory convention documented
+- [x] CLI: `ods detect` with multi-source AI detection (commit trailers, PR body, branch prefix, diff heuristics)
+- [x] CLI: `ods analyze` with 5 rule categories for AI code quality defects
+- [x] CLI: `ods score` with 5-dimension weighted technical debt scoring
+- [x] CLI: `ods check` with OPA Rego policy engine and policy tests
+- [x] CLI: `ods hook install` and `ods init` for pre-commit governance
+- [x] Removal of legacy delivery governance code (modules 01–09)
 
-### M2 — AI-Native Tooling ✅
+### M2 — CI Integration & Enterprise Surface (Q3 2026)
 
-**Status: Complete (May 2026)**
+**Goal:** Make ODS seamless in CI and self-service for enterprise teams.
 
-- [x] CLI: `ods ci parse` with hallucination detection
-- [x] CLI: `ods review generate` producing L1/L2/L3 records
-- [x] JSON Schemas for modules 04-09 published
-- [x] Enterprise policy system: `.ods.yaml` with profiles, severity maps, configurable rules
-- [x] Compliance report: `ods report` outputting HTML, JSON, SVG badge, Markdown with fix suggestions
-- [x] PR bot comments with copy-paste fix templates on validation failure
-- [ ] Adoption signal: 2+ teams using ODS L1 with positive feedback
-
-### M3 — Enterprise Adoption Surface (Q3 2026)
-
-**Goal:** Reduce friction for enterprise teams adopting ODS. Make the onboarding experience self-service.
-
-- [ ] `ods init` command: one-command scaffolding of `.github/pull_request_template.md`, `.github/workflows/ods.yml`, `.ods.yaml`
-- [ ] Adoption mode in policy: `mode: observe | warn | enforce` for progressive roll-out
+- [ ] `validate-action@v2` aligned with new CLI command set (detect, analyze, score, check)
+- [ ] SARIF output for GitHub Code Scanning integration
 - [ ] Multi-platform CI examples: GitLab CI, Bitbucket Pipelines, Jenkins (copy-paste templates)
-- [ ] Agent instructions: `AGENTS.md` / `.claude.md` / Copilot instructions for ODS-compliant branch, commit, and PR creation
-- [ ] Modules 01-03 promoted to Stable (1.0.0)
+- [ ] `ods init` expanded: one-command scaffolding for any CI platform
+- [ ] Policy library: pre-built Rego policies for common enterprise requirements (regulated, fintech, healthcare)
+- [ ] `ods report` command: aggregate reports across repos / teams
 
-### M4 — Supply Chain & Compliance Bridge (Q3–Q4 2026)
+### M3 — Advanced Detection & Scoring (Q3–Q4 2026)
 
-**Goal:** Position ODS as the delivery-governance layer that complements SLSA and maps to AI regulations.
+**Goal:** Deepen AI code analysis and expand detection surface.
 
-- [ ] SLSA evidence bridge: JSON mapping from ODS PR evidence → SLSA provenance link and guidance doc
-- [ ] Control mapping doc: ODS fields → NIST AI RMF / EU AI Act / internal audit controls (traceability, human oversight, AI disclosure)
-- [ ] At least one evidence module (04-06) promoted to Candidate based on adopter needs
-- [ ] `ods-ai-review.json` artifact with AI tool, AI scope, human reviewer, review checklist, risk level
+- [ ] Additional analysis rules (hallucinated API detection, AI-generated config drift)
+- [ ] Language-specific analysis (Go, Python, TypeScript, Java in first wave)
+- [ ] `ods score` with repo-level trend tracking (PR-over-PR technical debt trajectory)
+- [ ] AI model attribution: detect which AI tool generated the code (Copilot vs. Cursor vs. Claude Code)
+- [ ] Test coverage gap analysis from actual coverage data (not just heuristics)
+
+### M4 — Compliance & Audit Trail (Q4 2026)
+
+**Goal:** Make ODS an auditable evidence system for AI governance.
+
+- [ ] Immutable audit log: every detection, analysis, and enforcement decision recorded
+- [ ] Compliance mapping: ODS checks → NIST AI RMF / EU AI Act controls
+- [ ] SLSA integration: ODS evidence as input to SLSA provenance
+- [ ] Signed attestations for AI code provenance
+- [ ] At least one scoring dimension promoted from Experimental to Stable
 
 ### M5 — Community & Governance (Q4 2026)
 
@@ -92,7 +127,8 @@ These capabilities are now production-ready and run through the CLI and GitHub A
 
 - [ ] Formal governance model operating (RFC process live)
 - [ ] 3+ external adopters listed in ADOPTERS.md
-- [ ] Remaining experimental modules promoted based on community demand
+- [ ] Community-contributed analysis rules and Rego policies
+- [ ] Experimental checks promoted based on community demand
 
 ---
 
@@ -100,11 +136,10 @@ These capabilities are now production-ready and run through the CLI and GitHub A
 
 - A hosted dashboard / SaaS offering — focus is on the spec + CLI + CI integration
 - Deep integrations with every CI platform — start with GitHub Actions, expand with copy-paste examples
-- Runtime monitoring / observability standards — out of scope; ODS covers pre-deployment and deployment artifacts
-- Replacing SLSA — ODS complements SLSA (delivery governance layer before build provenance layer)
+- Runtime monitoring / observability standards — out of scope; ODS covers pre-merge and CI gates
+- Replacing any existing tool (Scorecard, SLSA, linters) — ODS focuses on AI-specific code quality gaps
 
 ## How to Influence
 
 - Open a [GitHub Issue](https://github.com/open-delivery-spec/spec/issues) with a use case or proposal
 - See [CONTRIBUTING.md](CONTRIBUTING.md) for the full process
-- For new module proposals, use the [Module Proposal template](.github/ISSUE_TEMPLATE/module-proposal.md)
