@@ -1,219 +1,136 @@
 # Open Delivery Spec (ODS)
 
-**A lightweight, machine-readable standard for AI-aware pull request and delivery metadata.**
+> **Detect AI-generated code, analyze its quality, and prevent technical debt — before it reaches production.**
 
 [![CI](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml/badge.svg)](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml)
-[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](docs/levels.md)
 
-> **Dogfooding:** This repository uses ODS to validate its own PRs. [View the latest compliance report](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml).
+---
 
-> **ODS does not prove the code is correct. It proves the delivery process contains the minimum structured evidence needed for humans and machines to review the change responsibly.**
+## What ODS Does
 
-AI makes coding faster. Everything after coding — review, verification, audit — gets harder. Teams need structured answers to basic delivery governance questions:
-
-- What did AI generate or substantially modify?
-- Which human reviewed that work?
-- What evidence existed before merge?
-- Can CI/CD tools verify those answers automatically?
-
-ODS defines a small set of machine-readable metadata conventions — starting with branch names, commit messages, and PR descriptions — that CI tools and AI agents can validate before merge.
-
-> [!NOTE]
-> **The recommended starting point is ODS L1 + AI Disclosure**: structured branch names, Conventional-Commit-compatible messages, PR descriptions with explicit AI disclosure, and CI validation through the ODS GitHub Action. This takes ~5 minutes to adopt.
->
-> **How ODS fits**: SLSA proves how artifacts were built. ODS proves how changes were delivered — the delivery-governance layer before the build-provenance layer. See [ODS and SLSA](docs/comparison/slsa.md).
->
-> Modules 04-09 are experimental. They describe the direction for AI review records, CI failure reports, release readiness, and production evidence, but they are not the recommended adoption path today.
-
-## Why This Exists
-
-AI makes coding faster. Everything after coding gets harder:
-
-| Question | Why it matters |
-|---|---|
-| Was this code AI-assisted? | Reviewers need to know where to apply extra scrutiny. |
-| Was AI-generated code reviewed by a human? | Teams need accountability, not just fast diffs. |
-| Did the PR include the expected delivery metadata? | CI should catch missing context before merge. |
-| What evidence existed before release? | Audit and incident review need structured records. |
-
-These problems are real and documented: [Threats & Failure Modes](docs/threats-and-failure-modes.md).
-
-## Before / After
-
-**Before ODS — a typical AI-assisted PR:**
+Enterprises are adopting AI coding tools at speed — but AI-generated code increases technical debt in predictable, detectable ways. ODS is the CI gate that stops this.
 
 ```
-Title: fix stuff
-Branch: fix-bug
-PR body: (empty)
-
-Reviewer questions:
-  - "What does this fix?"
-  - "Which part did AI write?"
-  - "Was this tested?"
-  - "What's the rollback plan?"
+PR arrived
+   │
+   ▼
+① Detect  — Which code is AI-generated? (multi-source, no self-disclosure required)
+   │
+   ▼
+② Analyze — What quality defects does the AI code have? (5 rule categories)
+   │
+   ▼
+③ Score   — How much technical debt does this PR add? (5-dimension weighted score)
+   │
+   ▼
+④ Enforce — Should this PR be blocked? (OPA Rego policies)
+   │
+   ▼
+PASS / WARN / BLOCK
 ```
 
-**After ODS L1 + AI Disclosure:**
+---
 
-```
-Title: fix(auth): handle expired OAuth state parameter
-
-Branch: bugfix/expired-oauth-state
-
-PR body:
-  ## Summary
-  Fixes race condition where OAuth state parameter expires before callback.
-
-  ## AI Disclosure
-  - [x] This PR contains AI-generated code
-  - AI Tool: GitHub Copilot
-  - AI Scope: Token refresh logic, state validation
-  - Human Review: Verified OAuth spec compliance, PKCE flow, redirect URI handling
-
-  ## Changes
-  - Added state expiry check in callback handler
-  - Added token refresh fallback
-
-  ## Testing
-  - [x] Unit tests for state expiry
-  - [x] Integration test for full OAuth flow
-
-  ## Risk Assessment
-  - Deployment risk: Medium
-  - Rollback plan: Feature-flag gated
-
-  Reviewer: 0 clarification questions needed.
-```
-
-This is the core value proposition: structured metadata that answers reviewer questions before they need to ask. See the [PR Template](examples/ods-pr-template.md) for a copy-paste version.
-
-## Start With ODS L1
-
-ODS L1 is the minimum useful checkpoint — three checks that run in CI:
-
-| Module | What it checks | Status |
-|---|---|---|
-| 01 | [Branch Naming](spec/01-branch-naming.md) uses `<type>/<description>` | Candidate |
-| 02 | [Commit Message](spec/02-commit-message.md) uses Conventional Commits plus optional AI attribution | Candidate |
-| 03 | [PR Description](spec/03-pr-description.md) includes Summary, Type, AI Disclosure, Changes, Testing, Risk Assessment, Checklist | Candidate |
-
-Run the CLI locally:
+## Quick Start
 
 ```bash
+# Install CLI
 go install github.com/open-delivery-spec/cli/cmd/ods@latest
 
-ods validate branch feature/add-oauth-login
-ods validate commit --file commit-msg.txt
-ods validate pr --file PR_BODY.md
+# Detect AI code in your PR
+ods detect
+
+# Analyze AI code quality
+ods analyze
+
+# Score technical debt impact
+ods score
+
+# Enforce enterprise policy
+ods check
+
+# Install pre-commit hooks
+ods hook install
 ```
 
-Add the GitHub Action to PRs:
+---
 
-```yaml
-name: ODS L1
-on:
-  pull_request:
-    types: [opened, edited, synchronize, reopened]
+## The Four Commands
 
-jobs:
-  ods:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: open-delivery-spec/validate-action@v1
-        with:
-          check: all
-          branch_name: ${{ github.head_ref }}
-          pr_body: ${{ github.event.pull_request.body }}
-          strict: "true"
+### 1. Detect — AI Code Detection
+
+Finds AI-generated code without relying on developer self-disclosure.
+
+| Signal | Source |
+|---|---|
+| Git commit trailers | `AI-assisted: true`, `AI-tool: name` |
+| PR body AI disclosure | Checkbox and section parsing |
+| Branch name prefix | `ai-*` convention |
+| Diff heuristics | Comment ratio, verbose naming, error patterns |
+
+### 2. Analyze — Quality Defect Detection
+
+Checks AI code for known failure patterns:
+
+| Rule | What it detects |
+|---|---|
+| `ai-redundant-error-handling` | Dense clusters of if-err-nil blocks |
+| `ai-over-commenting` | Comment-to-code ratio >40% |
+| `ai-missing-edge-case` | if-statements without else branches |
+| `ai-unsafe-deserialization` | json.Unmarshal into interface{} |
+| `ai-inconsistent-pattern` | Mixed naming conventions / indentation |
+
+### 3. Score — Technical Debt Impact
+
+Computes a 5-dimension weighted score:
+
+| Dimension | Weight |
+|---|---|
+| AI code ratio | 3.0 |
+| Defect density | 2.0 |
+| Critical issues | 1.5 each |
+| Test coverage gap | 1.0 |
+| Code duplication | 1.0 |
+
+Verdict: **decrease** / **neutral** / **increase**
+
+### 4. Enforce — OPA Policy Engine
+
+Write enterprise policies in Rego:
+
+```rego
+# .ods/policy.rego
+package ods.policy
+
+default allow := true
+
+deny[msg] {
+    input.ai_confidence > 0.8
+    input.test_coverage < 0.3
+    msg = "AI code with low test coverage"
+}
 ```
 
-For commit-message checks:
-
-```yaml
-- uses: open-delivery-spec/validate-action@v1
-  with:
-    check: commit-message
-    commit_message: ${{ github.event.head_commit.message }}
-```
-
-## AI Disclosure
-
-The AI Disclosure section is the key differentiator. It makes AI involvement explicit and machine-checkable.
-
-Commit footer:
-
-```text
-feat(auth): add OAuth login flow
-
-AI-assisted: true
-AI-tool: GitHub Copilot
-AI-scope: auth module implementation
-AI-review: pending
-```
-
-PR section:
-
-```markdown
-## AI Disclosure
-- [x] This PR contains AI-generated code
-- **AI Tool:** GitHub Copilot
-- **AI Scope:** Provider abstraction, token exchange, session management
-- **Human Review:** Verified OAuth flow, redirect validation, and token handling
-```
-
-AI disclosure is intentionally **qualitative**, not percentage-based. The goal is to tell the reviewer *where* to look, not to compute a number.
-
-## Full Module Map
-
-| # | Module | Summary | Stage |
-|---|--------|---------|-------|
-| 01 | [Branch Naming](spec/01-branch-naming.md) | Standardized, machine-parseable branch names | 🟡 Candidate |
-| 02 | [Commit Message](spec/02-commit-message.md) | AI-attributable, semantically rich commit format | 🟡 Candidate |
-| 03 | [PR Description](spec/03-pr-description.md) | Structured PR body with AI disclosure | 🟡 Candidate |
-| 04 | [AI Change Review](spec/04-ai-change-review.md) | Protocol for reviewing AI-generated changes | 🧪 Experimental |
-| 05 | [CI Failure](spec/05-ci-failure.md) | Machine-parseable CI failure reports | 🧪 Experimental |
-| 06 | [Release Readiness](spec/06-release-readiness.md) | Evidence-based release gate checklist | 🧪 Experimental |
-| 07 | [Approval Workflow](spec/07-approval-workflow.md) | Declarative approval policy format | 🧪 Experimental |
-| 08 | [Rollback Plan](spec/08-rollback-plan.md) | Required rollback plan structure | 🧪 Experimental |
-| 09 | [Production Release Evidence](spec/09-prod-release-evidence.md) | Audit-ready deployment evidence | 🧪 Experimental |
-
-> **The wedge is ODS L1 + AI Disclosure.** Modules 04-09 are direction-setting. They exist as schemas and examples for teams that need them, but they are not the recommended adoption path today. See [ROADMAP.md](ROADMAP.md).
+---
 
 ## Tooling
 
-| Tool | Repository | Production surface |
-|------|------------|-------------------|
-| ODS CLI | [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) | `ods validate branch`, `commit`, `pr` |
-| GitHub Action | [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) | `branch-naming`, `commit-message`, `pr-description`, `all` |
-| PR Template | [examples/ods-pr-template.md](examples/ods-pr-template.md) | Copy-paste PR description template |
+| Tool | Repository |
+|------|------------|
+| ODS CLI | [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) |
+| GitHub Action | [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) |
 
-## ODS Artifacts
-
-ODS supports two modes:
-
-### Lightweight Validation (Recommended)
-
-Validate delivery metadata directly from CI context. No files written to the repository. This is the recommended L1 adoption mode — install the Action and you're done.
-
-### Evidence Artifacts (Experimental)
-
-For teams exploring release-governance modules, structured records can be stored in `.ods/`. See [`.ods/` Convention](docs/ods-artifacts.md).
+---
 
 ## Design Principles
 
-1. **Machine-first, human-readable.** Every artifact has a JSON Schema. Every schema has human docs.
-2. **AI-aware, not AI-obsessed.** Metadata records AI involvement where it helps reviewers, without over-indexing on percentage metrics.
-3. **Composable.** Start with one check or all L1 checks. Adopt experimental modules when they mature.
-4. **Tool-agnostic.** Works with any CI/CD, AI coding tool, or VCS.
-5. **Honest about scope.** ODS proves delivery metadata exists — it does not prove code correctness, architecture quality, or security. That's the reviewer's job.
+1. **Detect, don't rely on disclosure.** AI code detection uses multiple independent signal sources — not just developer checkboxes.
+2. **Deterministic rules, probabilistic signals.** Quality rules are yes/no. Detection confidence is a signal, not a verdict.
+3. **Tool-agnostic.** Works with GitHub, GitLab, Jenkins, or any CI/CD that can run a binary.
+4. **Policy as code.** Enterprise rules written in Rego, version-controlled alongside code.
+5. **Prevent, don't just report.** Pre-commit hooks block problems before they reach CI.
 
-## Inspiration
-
-- [Conventional Commits](https://www.conventionalcommits.org)
-- [Conventional Branch](https://conventional-branch.github.io)
-- [OpenAPI Specification](https://www.openapis.org)
-- [DORA 2025 Report](https://cloud.google.com/blog/products/devops-sre/dora-2025-report)
+---
 
 ## License
 
