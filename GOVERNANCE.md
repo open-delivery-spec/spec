@@ -11,7 +11,7 @@ ODS is **maintainer-led** as of May 2026. The project was initiated by [@sxp](ht
 The maintainer has decision-making authority over:
 
 - Specification changes (schema additions, modifications, deprecations)
-- Module maturity levels (Draft → Candidate → Stable → Deprecated)
+- Module maturity levels (Candidate → Stable → Deprecated)
 - Repository structure and tooling direction
 - Release versioning
 
@@ -19,14 +19,13 @@ The maintainer has decision-making authority over:
 
 ## Path to Community Governance
 
-ODS will evolve toward community governance as external contributors and adopters grow. The planned progression:
+ODS will evolve toward community governance as contributors and adopters grow.
 
 | Phase | Trigger | Governance Model |
-|-------|---------|-----------------|
+|-------|---------|------------------|
 | **Phase 1** (current) | Project initiated | Maintainer-led |
 | **Phase 2** | 3+ recurring external contributors | Lightweight steering group with maintainer as chair |
 | **Phase 3** | 5+ external adopters, multiple orgs represented | Community steering committee with formal charter |
-| **Phase 4** | Broad adoption, ecosystem tools exist | Foundation-hosted or independent community governance |
 
 ---
 
@@ -41,14 +40,11 @@ ODS will evolve toward community governance as external contributors and adopter
 
 ### Module Maturity
 
-Module maturity levels follow [ROADMAP.md](ROADMAP.md):
-
 | Stage | Criteria | Decision |
 |-------|----------|----------|
-| **Draft** | Initial specification, may change significantly | Maintainer |
-| **Candidate** | Stable specification, at least one reference implementation, open for feedback | Maintainer + community input |
+| **Candidate** | Stable specification, at least one reference implementation | Maintainer + community input |
 | **Stable** | Widely adopted, backward-compatible changes only, formal test suite | Community steering group |
-| **Deprecated** | Superseded by newer module, maintained for legacy compatibility | Community steering group |
+| **Deprecated** | Superseded or out of scope | Maintainer |
 
 ---
 
@@ -68,11 +64,9 @@ Key principles:
 ## Community Channels
 
 | Channel | Purpose |
-|---------|---------|
+|---------|--------|
 | [GitHub Issues](https://github.com/open-delivery-spec/spec/issues) | Bug reports, feature proposals, spec discussions |
 | [GitHub Discussions](https://github.com/orgs/open-delivery-spec/discussions) | General Q&A, adoption stories, ecosystem ideas |
-
-Additional channels (Slack, mailing list) will be added as the community grows.
 
 ---
 
@@ -88,4 +82,4 @@ All repositories under `github.com/open-delivery-spec` are [Apache 2.0](LICENSE)
 
 ---
 
-*This document was last updated May 2026. It will be revised as the project evolves toward community governance.*
+*This document was last updated June 2026.*
