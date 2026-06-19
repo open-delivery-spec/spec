@@ -1,7 +1,7 @@
 # This workflow validates delivery artifacts against Open Delivery Spec.
 # Submitted via PR from https://github.com/open-delivery-spec
 #
-# TODO: The validate-action@v2 currently only supports the AI detection pipeline.
+# TODO: The validate-action@v1 currently only supports the AI detection pipeline.
 # The planned `check: branch-naming` and `check: commit-message` inputs
 # are not yet implemented. Branch naming and commit message validation
 # are done via shell steps below.
@@ -47,7 +47,7 @@ jobs:
           fi
 
       - name: ODS AI code quality gate
-        uses: open-delivery-spec/validate-action@v2
+        uses: open-delivery-spec/validate-action@v1
         with:
           diff-base: ${{ github.event.pull_request.base.sha || 'origin/main' }}
           branch: ${{ github.head_ref }}
