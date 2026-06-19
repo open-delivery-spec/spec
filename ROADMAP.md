@@ -94,6 +94,7 @@ The original 01–09 module system has been **deprecated and removed** from the 
 
 **Goal:** Make ODS seamless in CI and self-service for enterprise teams.
 
+- [x] Adoption signal: 3+ ODS-org repos using ODS L1 (dogfooding completed June 2026)
 - [ ] `validate-action@v2` aligned with new CLI command set (detect, analyze, score, check)
 - [ ] SARIF output for GitHub Code Scanning integration
 - [ ] Multi-platform CI examples: GitLab CI, Bitbucket Pipelines, Jenkins (copy-paste templates)
@@ -104,6 +105,8 @@ The original 01–09 module system has been **deprecated and removed** from the 
 ### M3 — Advanced Detection & Scoring (Q3–Q4 2026)
 
 **Goal:** Deepen AI code analysis and expand detection surface.
+
+> **Next focus**: Promote Modules 01–03 to Stable. Build adoption outside the ODS org.
 
 - [ ] Additional analysis rules (hallucinated API detection, AI-generated config drift)
 - [ ] Language-specific analysis (Go, Python, TypeScript, Java in first wave)

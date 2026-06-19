@@ -1,0 +1,85 @@
+# ODS AI Change Review — Module 04
+#
+# Maps the ODS AI code quality gate pipeline (detect → analyze → score → check)
+# to the three Module 04 review levels (L1 / L2 / L3) at different CI trigger points.
+#
+# TODO: The original `ods review generate` command for Module 04 records has been
+# deprecated. This workflow uses the current `validate-action@v2` pipeline. The
+# resulting JSON reports (ods-report/*.json) can be mapped to Module 04 review
+# records using the templates in this directory (l1-review.json, l2-review.json, l3-review.json).
+
+name: ODS AI Change Review
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # L1 — Quick Scope Check (every PR on every push)
+  l1-scope-check:
+    name: L1 — Quick Scope Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: open-delivery-spec/validate-action@v2
+        with:
+          diff-base: ${{ github.event.pull_request.base.sha || 'origin/main' }}
+          branch: ${{ github.head_ref }}
+          summary: 'true'
+          comment: 'false'
+          artifact-name: ods-l1-report
+
+  # L2 — Detailed Review (PRs targeting main)
+  l2-detailed-review:
+    name: L2 — Detailed Review
+    if: github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Install CLI for extended analysis
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Install ODS CLI
+        run: go install github.com/open-delivery-spec/cli/cmd/ods@latest
+
+      - name: Run ODS detection
+        run: ods detect --diff-base ${{ github.event.pull_request.base.sha }} --branch ${{ github.head_ref }} --json | tee .ods/detect.json
+
+      - name: Run ODS quality analysis
+        run: ods analyze --json | tee .ods/analyze.json
+
+      - name: Run ODS scoring
+        run: ods score --json | tee .ods/score.json
+
+      - name: Upload ODS L2 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ods-l2-review
+          path: .ods/
+
+  # L3 — Full Audit (release PRs: PRs with "release" label or targeting release branch)
+  l3-full-audit:
+    name: L3 — Full Audit
+    if: contains(github.event.pull_request.labels.*.name, 'release') || startsWith(github.base_ref, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: open-delivery-spec/validate-action@v2
+        with:
+          diff-base: ${{ github.event.pull_request.base.sha || 'origin/main' }}
+          branch: ${{ github.head_ref }}
+          policy: .ods/policy.rego
+          summary: 'true'
+          comment: 'true'
+          artifact-name: ods-l3-audit

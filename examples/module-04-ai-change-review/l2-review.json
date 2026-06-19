@@ -1,0 +1,66 @@
+{
+  "pr_number": 142,
+  "review_level": "L2",
+  "ai_contribution_percentage": 75,
+  "reviewer": "jane-doe",
+  "timestamp": "2026-06-15T14:00:00Z",
+  "outcome": "approved_with_changes",
+  "checklist_results": {
+    "correctness": {
+      "passed": true,
+      "issues": 0
+    },
+    "security": {
+      "passed": false,
+      "issues": 1
+    },
+    "ai_specific": {
+      "passed": false,
+      "issues": 3
+    },
+    "quality": {
+      "passed": true,
+      "issues": 0
+    }
+  },
+  "issues_found": [
+    {
+      "category": "ai_specific",
+      "severity": "medium",
+      "file": "internal/scanner/sarif.go",
+      "line": 42,
+      "description": "High comment-to-code ratio (>40%) in AI-generated file: 47% of lines are comments — likely AI over-explaining",
+      "resolution": "Trimmed inline comments; kept only public API docstrings"
+    },
+    {
+      "category": "ai_specific",
+      "severity": "low",
+      "file": "internal/scanner/sarif.go",
+      "line": 88,
+      "description": "AI-generated code uses inconsistent error wrapping patterns: mixed fmt.Errorf and errors.New in the same function",
+      "resolution": "Standardized on fmt.Errorf for all error wrapping"
+    },
+    {
+      "category": "ai_specific",
+      "severity": "medium",
+      "file": "src/auth/token_refresh.go",
+      "description": "OUT-OF-SCOPE: file src/auth/token_refresh.go was modified in this PR but is unrelated to the SARIF feature. The change adds token expiry retry logic — a security-sensitive change that bypassed separate review.",
+      "resolution": "Reverted src/auth/token_refresh.go changes; moved to a dedicated PR with proper security review"
+    },
+    {
+      "category": "security",
+      "severity": "high",
+      "file": "internal/scanner/sarif.go",
+      "line": 134,
+      "description": "AI-generated SARIF output writes to user-specified path without directory traversal validation — potential path injection",
+      "resolution": "Added path sanitization and directory traversal check"
+    }
+  ],
+  "human_modifications": [
+    "Reverted src/auth/token_refresh.go (out-of-scope change moved to separate PR)",
+    "Trimmed excessive AI-generated comments in sarif.go",
+    "Standardized error wrapping in sarif.go",
+    "Added path traversal validation for --sarif output flag",
+    "Verified all AI-generated API references are real (no hallucinated endpoints)"
+  ]
+}

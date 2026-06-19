@@ -1,0 +1,56 @@
+{
+  "pr_number": 142,
+  "review_level": "L3",
+  "ai_contribution_percentage": 75,
+  "reviewer": "jane-doe",
+  "second_reviewer": "john-smith",
+  "timestamp": "2026-06-16T09:00:00Z",
+  "outcome": "approved",
+  "checklist_results": {
+    "correctness": {
+      "passed": true,
+      "issues": 0
+    },
+    "security": {
+      "passed": true,
+      "issues": 0
+    },
+    "ai_specific": {
+      "passed": true,
+      "issues": 0
+    },
+    "quality": {
+      "passed": true,
+      "issues": 0
+    }
+  },
+  "issues_found": [
+    {
+      "category": "ai_specific",
+      "severity": "info",
+      "file": "internal/scanner/sarif.go",
+      "line": 42,
+      "description": "L2 AI-specific issues resolved: comment ratio reduced from 47% to 22%, error wrapping standardized, out-of-scope change removed",
+      "resolution": "Verified all L2 findings are addressed"
+    },
+    {
+      "category": "security",
+      "severity": "info",
+      "file": "internal/scanner/sarif.go",
+      "line": 134,
+      "description": "L2 security finding resolved: path traversal validation added and tested",
+      "resolution": "Verified path sanitization and confirmed no regression in test suite"
+    },
+    {
+      "category": "compliance",
+      "severity": "info",
+      "description": "PR #142 meets ODS governance requirements: AI scope documented, review levels applied, second reviewer approved, audit trail complete"
+    }
+  ],
+  "human_modifications": [
+    "Second reviewer (john-smith) independently verified all L2 findings and resolutions",
+    "Confirmed scope drift from L2 is properly excluded from this PR",
+    "Verified test coverage meets project threshold (≥70%) — actual: 82%",
+    "Signed off on release readiness"
+  ]
+}

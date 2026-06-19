@@ -132,6 +132,16 @@ deny[msg] {
 
 ---
 
+## Ecosystem / Related Standards
+
+See [docs/ecosystem.md](docs/ecosystem.md) for how ODS relates to:
+- **APP / C2PA** — content provenance (complementary)
+- **SLSA** — supply chain integrity (co-deployable)
+- **Conventional Commits / Conventional Branch** — extended by ODS
+- **AI code linters and platform review** — augmented by ODS
+
+---
+
 ## License
 
 [Apache License 2.0](LICENSE)

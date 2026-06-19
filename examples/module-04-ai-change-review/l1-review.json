@@ -1,0 +1,45 @@
+{
+  "pr_number": 142,
+  "review_level": "L1",
+  "ai_contribution_percentage": 75,
+  "reviewer": "ods-ci[bot]",
+  "timestamp": "2026-06-15T10:30:00Z",
+  "outcome": "approved_with_changes",
+  "checklist_results": {
+    "correctness": {
+      "passed": true,
+      "issues": 0
+    },
+    "security": {
+      "passed": true,
+      "issues": 0
+    },
+    "ai_specific": {
+      "passed": false,
+      "issues": 2
+    },
+    "quality": {
+      "passed": true,
+      "issues": 0
+    }
+  },
+  "issues_found": [
+    {
+      "category": "ai_specific",
+      "severity": "medium",
+      "file": "internal/scanner/sarif.go",
+      "line": 42,
+      "description": "High comment-to-code ratio (>40%) in AI-generated file: 47% of lines are comments — likely AI over-explaining",
+      "resolution": "Verify comments add value; remove self-explanatory inline comments"
+    },
+    {
+      "category": "ai_specific",
+      "severity": "medium",
+      "file": "src/auth/token_refresh.go",
+      "description": "Detected scope drift: file is unrelated to SARIF output feature — review separately or move to own PR"
+    }
+  ],
+  "human_modifications": [
+    "Flagged scope drift in src/auth/token_refresh.go for separate review"
+  ]
+}
