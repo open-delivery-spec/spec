@@ -1,28 +1,40 @@
 # ODS Examples
 
-Real-world examples demonstrating each Open Delivery Spec module.
+Copy-paste resources for integrating Open Delivery Spec into your project.
 
-## End-to-End Demo
+## Policy Examples
 
-| Demo | Description |
-|------|-------------|
-| [end-to-end/](end-to-end/) | Production-ready M1 loop: branch -> commit -> PR -> GitHub Action pass |
+Save one of these as `.ods/policy.rego` in your repository.
+The ODS CLI evaluates this file using OPA (Open Policy Agent).
 
-## Modules
+| File | Use case |
+|------|----------|
+| [`ods-policy-oss.rego`](ods-policy-oss.rego) | Open-source project — permissive, blocks only critical issues |
+| [`ods-policy-enterprise.rego`](ods-policy-enterprise.rego) | Enterprise service — strict gates for production code |
 
-| Module | Example |
-|--------|---------|
-| 01 Branch Naming | [branch-naming/](branch-naming/) |
-| 02 Commit Message | [commit-message/](commit-message/) |
-| 03 PR Description | [pr-description/](pr-description/) |
-| 04 AI Change Review | [ai-review/](ai-review/) |
-| 05 CI Failure | [ci-failure/](ci-failure/) |
-| 06 Release Readiness | [release-readiness/](release-readiness/) |
-| 07 Approval Workflow | [approval-workflow/](approval-workflow/) |
-| 08 Rollback Plan | [rollback-plan/](rollback-plan/) |
-| 09 Production Release Evidence | [prod-evidence/](prod-evidence/) |
+The CLI ships with a built-in default policy (`ods check` with no `.ods/policy.rego`).
+These examples show how to customize it.
 
-Each example directory contains a `README.md` with:
-- Complete, valid examples in the target format
-- CLI usage demonstrations
-- Edge cases and validation expectations
+## PR Template
+
+[`ods-pr-template.md`](ods-pr-template.md) — A copy-paste PR template with structured AI disclosure.
+Save as `.github/pull_request_template.md` in your repository.
+
+## Quick Start
+
+```bash
+# Install ODS CLI
+go install github.com/open-delivery-spec/cli/cmd/ods@latest
+
+# Initialize your repo (creates workflow, AGENTS.md, Cursor rules)
+ods init
+
+# Copy a policy example
+mkdir -p .ods
+cp examples/ods-policy-enterprise.rego .ods/policy.rego
+
+# Run the pipeline locally
+ods detect && ods analyze && ods score && ods check
+```
+
+For CI integration, see the [Adoption Guide](../docs/adoption-guide.md).
