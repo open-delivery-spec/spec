@@ -1,57 +1,31 @@
+---
+title: Scenario: Open-Source Project
+nav_order: 11
+---
+
 # Scenario: Open-Source Project
 
-**Use case:** A maintainer of an open-source library wants cleaner PR reviews without adding overhead for casual contributors.
+**Use case:** A maintainer of an open-source library wants visibility into AI-generated contributions without adding friction for casual contributors.
 
 ## Profile
 
 - Team: 1-3 maintainers, 5-50 contributors
 - Repo: Public on GitHub
-- AI tools: Some contributors use Copilot, but it's not tracked
+- AI tools: Some contributors use Copilot or Cursor, but it's untracked
 - Regulation: None
-- Goal: Make PRs easier to review, not enforce compliance
+- Goal: See which PRs contain AI code and surface quality issues — without blocking newcomers
 
 ## Configuration
 
-### `.ods.yaml`
+### `.github/workflows/ods.yml`
+
+Observe-only — the gate reports but never blocks:
 
 ```yaml
-profile: oss
-
-policy:
-  branch:
-    allowed_types:
-      - feature
-      - bugfix
-      - hotfix
-      - docs
-      - chore
-
-  commit:
-    require_scope: false
-
-  pr:
-    required_sections:
-      - "## Summary"
-      - "## Changes"
-      - "## Testing"
-
-  ai_disclosure:
-    required: false
-
-  severity:
-    branch_type: warning
-    branch_format: warning
-    pr_sections: warning
-    commit_type: warning
-```
-
-### `.github/workflows/ods-l1.yml`
-
-```yaml
-name: ODS L1
+name: ODS AI Quality Gate
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
@@ -61,41 +35,39 @@ jobs:
   ods:
     runs-on: ubuntu-latest
     steps:
-      - uses: open-delivery-spec/validate-action@v1
+      - uses: actions/checkout@v7
         with:
-          check: all
-          branch_name: ${{ github.head_ref }}
-          pr_body: ${{ github.event.pull_request.body }}
-          strict: "false"
+          fetch-depth: 0
+      - uses: open-delivery-spec/validate-action@v1
 ```
 
-### `.github/PULL_REQUEST_TEMPLATE.md`
+With no `.ods/policy.rego`, the gate runs `detect → analyze → score` and posts a report, but only critical issues would ever block — so first-time contributors are never turned away by a red check.
 
-```markdown
-## Summary
-<!-- Brief description of what this PR does -->
+### Optional: a gentle policy
 
-## Changes
--
--
+If the project grows, add a minimal `.ods/policy.rego` that blocks only the truly dangerous:
 
-## Testing
-- [ ] Tests pass locally
-- [ ] New tests added (if applicable)
+```rego
+package ods.policy
 
-## Checklist
-- [ ] I have read the contributing guide
-- [ ] My changes don't break existing functionality
+default allow := true
+
+# Only block critical issues; everything else is informational
+deny[msg] {
+    issue := input.issues[_]
+    issue.severity == "critical"
+    msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
+}
 ```
 
 ## Why this approach
 
 | Principle | Implementation |
 |-----------|----------------|
-| **Low barrier** | No AI disclosure, no required scopes, no ticket references |
-| **Warnings only** | `strict: "false"` — CI shows issues but never blocks first-time contributors |
-| **Minimal template** | Only 3 sections. Contributors fill it in 30 seconds |
-| **Upgrade path** | If the project grows, switch `profile` from `oss` to `enterprise` and tighten rules |
+| **Low barrier** | No required disclosure, no blocking on style or debt |
+| **Visibility first** | The report shows AI involvement and quality findings as information |
+| **Newcomer-friendly** | Without a policy, only critical issues block — casual PRs sail through |
+| **Upgrade path** | Add `.ods/policy.rego` and require the check when the project is ready |
 
 ## What the maintainer sees
 
@@ -103,43 +75,31 @@ jobs:
 
 ```
 Title: fix bug
-Branch: patch-1
 PR body: (empty)
 
-Maintainer questions:
-  - "What bug?"
-  - "How was it tested?"
-  - "Is this safe to merge?"
+Maintainer: "What bug? Is any of this AI-generated? Is it tested?"
 ```
 
 **After ODS:**
 
 ```
-Title: fix(parser): handle empty input in JSON parser
-Branch: bugfix/empty-json-input
-PR body:
-  ## Summary
-  The JSON parser panics when given an empty string input.
+## ODS Compliance Report — PASS
 
-  ## Changes
-  - Added nil check before parsing
-  - Added test for empty input edge case
+AI detected: yes (confidence 0.79, source: diff heuristics)
+Technical-debt delta: +0.4
+Issues: 0 critical, 1 low (ai-over-commenting)
 
-  ## Testing
-  - [x] Tests pass locally
-  - [x] New tests added
-
-Maintainer: Merges immediately.
+Policy: PASS (observe-only)
 ```
 
-## Badge
-
-```markdown
-[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](https://github.com/open-delivery-spec/spec)
-```
+The maintainer immediately knows the change is AI-assisted, sees it's low-risk, and reviews the one flagged spot.
 
 ## Next steps after adoption
 
-1. If the project grows to 5+ regular contributors, switch to `profile: enterprise`
-2. If contributors start using AI tools, enable `ai_disclosure.required: true` as a warning first
-3. Add `ods-commit-message.yml` workflow for commit message validation on push
+1. If contributions grow, add the minimal `.ods/policy.rego` above and require the check in branch protection
+2. Add an ODS badge to the README to set contributor expectations:
+
+   ```markdown
+   [![ODS](https://img.shields.io/badge/ODS-AI%20Quality%20Gate-blue)](https://github.com/open-delivery-spec/spec)
+   ```
+3. See [ODS Levels](../levels.md) to plan the move from observe-only (L1) to enforcement (L3)

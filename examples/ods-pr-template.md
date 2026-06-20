@@ -1,6 +1,6 @@
 # ODS PR Template
 
-Copy this into `.github/PULL_REQUEST_TEMPLATE.md` or your PR description. It covers the minimum structured metadata for ODS L1 + AI Disclosure.
+Copy this into `.github/PULL_REQUEST_TEMPLATE.md` or your PR description. A structured PR body — especially the AI Disclosure section — is one of the signals the ODS `detect` stage reads to flag AI-assisted changes.
 
 ```markdown
 ## Summary
@@ -40,9 +40,9 @@ Copy this into `.github/PULL_REQUEST_TEMPLATE.md` or your PR description. It cov
 - **Breaking change:** <!-- Yes / No -->
 
 ## Checklist
-- [ ] Branch naming follows ODS (`<type>/<description>`)
-- [ ] Commit messages follow ODS (Conventional Commits + AI attribution if applicable)
+- [ ] AI involvement disclosed above (or `Co-Authored-By` trailer present on commits)
 - [ ] AI-generated code has been reviewed by a human
+- [ ] Tests cover AI-generated logic
 - [ ] No secrets or credentials included
 - [ ] Documentation updated (if applicable)
 ```
@@ -54,7 +54,7 @@ Copy this into `.github/PULL_REQUEST_TEMPLATE.md` or your PR description. It cov
 | "fix stuff" | `fix(auth): handle expired OAuth state parameter` |
 | Empty PR body | Summary, Changes, Testing, AI Disclosure |
 | Reviewer asks: "What does this do? Was it tested? Did AI write this?" | Reviewer has answers before opening the PR |
-| CI can't validate PR metadata | CI validates section presence, AI disclosure completeness |
+| `detect` has no PR-body signal to read | `detect` reads the AI Disclosure section as a detection source |
 | No audit trail for AI involvement | Machine-readable AI disclosure per PR |
 
 ## Usage
@@ -64,19 +64,10 @@ Copy this into `.github/PULL_REQUEST_TEMPLATE.md` or your PR description. It cov
 cp examples/ods-pr-template.md .github/PULL_REQUEST_TEMPLATE.md
 ```
 
-### CLI
-```bash
-ods generate pr --ai-tool "GitHub Copilot" > PR_BODY.md
-```
-
-### Validate
-```bash
-ods validate pr --file PR_BODY.md
-# ✅ conformant — all requirements satisfied
-```
+`ods init` also scaffolds this template automatically.
 
 ## Related
 
 - [ODS README](../README.md) — project overview
-- [03 — PR Description Spec](../spec/03-pr-description.md) — full specification
 - [Get Started](../docs/get-started.md) — adoption guide
+- [`.ods/` Convention](../docs/ods-artifacts.md) — policy and configuration

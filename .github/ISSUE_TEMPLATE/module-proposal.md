@@ -1,6 +1,6 @@
 ---
-name: New Module Proposal
-about: Propose a new ODS module for a delivery artifact
+name: New Check Proposal
+about: Propose a new detection signal, analysis rule, or scoring dimension
 title: "[Proposal] "
 labels: proposal
 assignees: ''
@@ -8,16 +8,16 @@ assignees: ''
 
 ## Problem
 
-What delivery governance problem does this solve?
+What gap in AI code quality governance does this address?
 
-## Proposed Module
+## Proposed Check
 
-What artifact would be standardized? What would the JSON Schema look like?
+Which stage does it belong to — `detect`, `analyze`, or `score`? What signal or defect does it capture, and how is it computed?
 
 ## Use Cases
 
-Who would use this? How would AI agents and CI tools consume it?
+Who would use this? What AI-generated code patterns does it catch that existing checks miss?
 
-## Relationship to Existing Modules
+## Maturity
 
-Does this build on or relate to existing ODS modules?
+Where should this start — Experimental, Candidate, or Stable? What would it take to promote it?

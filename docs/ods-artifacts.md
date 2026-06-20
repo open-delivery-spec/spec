@@ -6,135 +6,106 @@ parent: Home
 
 # `.ods/` Artifact Directory Convention
 
-ODS supports two complementary operating modes: **lightweight CLI/GitHub Action validation** for the production-ready L1 checks, and **file-based evidence artifacts** for draft (and future stable) release-governance modules.
-
-When teams adopt evidence-based delivery governance, structured records are stored under a `.ods/` directory at the repository root.
+ODS keeps its repository-local configuration under a `.ods/` directory at the repository root. The AI code quality gate works with **no configuration at all** — `.ods/` only exists when you want to customize policy or CLI behavior.
 
 ## Directory Layout
 
 ```
 repository-root/
 ├── .ods/
-│   ├── releases/
-│   │   └── v1.4.0/
-│   │       ├── release-readiness.json    # Module 06
-│   │       ├── rollback-plan.json        # Module 08
-│   │       └── evidence-bundle.json      # Module 09
-│   ├── reviews/
-│   │   └── pr-42/
-│   │       └── ai-review.json            # Module 04
-│   ├── approvals/
-│   │   └── ods-approval.json             # Module 07
-│   └── failures/
-│       └── build-12345/
-│           └── ci-failure.json           # Module 05
-├── .ods.yaml                             # Optional CLI configuration
+│   └── policy.rego          # OPA Rego enforcement policy (optional)
+├── .ods.yaml                # Optional CLI configuration (optional)
 └── ...
 ```
 
-## File Naming Conventions
+That's the whole convention. There are no required files. If `.ods/policy.rego` is absent, `ods check` applies a permissive default (only critical issues block).
 
-| Artifact | Path Pattern | Module |
-|----------|-------------|--------|
-| Branch metadata | `.ods/releases/<version>/branch-meta.json` | 01 |
-| PR description metadata | `.ods/releases/<version>/pr-description.json` | 03 |
-| AI review record | `.ods/reviews/pr-<number>/ai-review.json` | 04 |
-| CI failure report | `.ods/failures/<pipeline-id>/ci-failure.json` | 05 |
-| Release readiness | `.ods/releases/<version>/release-readiness.json` | 06 |
-| Approval policy | `.ods/approvals/ods-approval.json` | 07 |
-| Rollback plan | `.ods/releases/<version>/rollback-plan.json` | 08 |
-| Evidence bundle | `.ods/releases/<version>/evidence-bundle.json` | 09 |
+## `.ods/policy.rego` — Enforcement Policy
 
-## Modes of Operation
+The `check` stage evaluates each PR against an [OPA Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) policy. Place it at `.ods/policy.rego`:
 
-### L1: Lightweight Validation (Production)
+```rego
+package ods.policy
 
-For the current stable surface (Modules 01–03), **no `.ods/` directory is required**. The CLI and GitHub Action validate branch names, commit messages, and PR descriptions directly from CI context:
+default allow := true
 
-```yaml
-# .github/workflows/ods-l1.yml — No .ods/ directory needed
-- uses: open-delivery-spec/validate-action@v1
-  with:
-    check: all
-    branch_name: ${{ github.head_ref }}
-    pr_body: ${{ github.event.pull_request.body }}
-    strict: "true"
+# Block critical issues unconditionally
+deny[msg] {
+    issue := input.issues[_]
+    issue.severity == "critical"
+    msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
+}
+
+# Block AI code with low test coverage
+deny[msg] {
+    input.ai_confidence > 0.8
+    input.test_coverage < 0.3
+    msg := "AI code with low test coverage"
+}
+
+# Warn on high-confidence AI with multiple quality issues
+warn[msg] {
+    input.ai_generated == true
+    input.ai_confidence > 0.8
+    count(input.issues) > 2
+    msg := "High-confidence AI code with multiple quality issues"
+}
 ```
 
-### L2+: Evidence Artifacts (Draft → Future Stable)
+### Policy Input Fields
 
-As modules 04–09 mature beyond Draft, teams store structured JSON records in `.ods/`. These artifacts are:
+The pipeline feeds these fields to your policy:
 
-- **Schema-validated** — Every `.json` file conforms to the module's JSON Schema
-- **Immutable by convention** — Evidence bundles carry a content hash and `immutable: true`
-- **CI-checked** — Optional CI steps can validate `.ods/` artifacts against schemas
-- **Audit-trail ready** — Each artifact is timestamped and attributable
+| Field | Type | Description |
+|-------|------|-------------|
+| `input.ai_generated` | bool | Whether AI code was detected |
+| `input.ai_confidence` | float | Detection confidence (0.0–1.0) |
+| `input.issues` | array | Quality issues found by `analyze` (each has `rule`, `severity`, `file`, `line`) |
+| `input.technical_debt_delta` | float | Technical-debt impact score from `score` |
+| `input.test_coverage` | float | Test coverage ratio (0.0–1.0) |
+| `input.branch` | string | Branch name |
 
-## `.ods.yaml` Configuration
+> [!TIP]
+> Run `ods check` locally to evaluate the policy against the current diff before you push.
 
-An optional configuration file at the repository root controls CLI behavior:
+## `.ods.yaml` — Optional CLI Configuration
+
+An optional file at the repository root tunes CLI behavior. Every field is optional:
 
 ```yaml
 # .ods.yaml
-schemas:
-  spec_version: "1.0.0"
-  schema_base_url: "https://open-delivery-spec.dev/schemas"
+policy:
+  path: ".ods/policy.rego"   # override the default policy location
 
-policies:
-  approval: ".ods/approvals/ods-approval.json"
+detect:
+  branch_prefixes:           # treat these branch prefixes as AI-authored
+    - claude/
+    - copilot/
+    - cursor/
 
 ci:
   provider: github-actions
-
-artifacts:
-  root: ".ods"        # Override default artifact directory
-  releases: "releases"
-  reviews: "reviews"
 ```
 
-## Adding `.ods/` to `.gitignore`
+## Should I commit `.ods/` ?
 
-Evidence artifacts are designed to be committed for audit trails. However, if your workflow generates temporary or environment-specific artifacts, add those to `.gitignore`:
+Yes. `.ods/policy.rego` and `.ods.yaml` are part of your repository's quality configuration and should be version-controlled like any other CI config. If your workflow generates transient files, ignore those specifically:
 
 ```gitignore
-# ODS temporary artifacts
+# ODS transient artifacts
 .ods/tmp/
 .ods/cache/
 ```
 
-## Validating Artifacts with the CLI
-
-```bash
-# Validate a release readiness report
-ods validate release --file .ods/releases/v1.4.0/release-readiness.json
-
-# Validate a rollback plan
-ods validate rollback --file .ods/releases/v1.4.0/rollback-plan.json
-
-# Validate an evidence bundle
-ods validate evidence --file .ods/releases/v1.4.0/evidence-bundle.json
-
-# Validate an AI review record
-ods review validate --file .ods/reviews/pr-42/ai-review.json
-
-# Validate an approval policy
-ods validate approval-policy --file .ods/approvals/ods-approval.json
-
-# Validate a CI failure record
-ods ci parse --file .ods/failures/build-12345/ci-failure.json
-```
-
 ## Relationship to Other Standards
 
-| Standard | Scope | Overlap |
-|----------|-------|---------|
-| SLSA | Build provenance | ODS `.ods/` stores delivery evidence; SLSA stores build attestations |
-| in-toto | Supply chain metadata | Compatible; ODS artifacts could be wrapped as in-toto attestations |
-| SPDX | SBOM | ODS does not replace SBOM; the evidence bundle can reference an SBOM URL |
+| Standard | Scope | Relationship |
+|----------|-------|--------------|
+| SLSA | Build provenance | Complementary — SLSA secures the build; ODS gates the change |
+| in-toto | Supply-chain metadata | Complementary — different layer |
+| OPA / Rego | Policy language | ODS uses Rego directly for `ods check` |
 
 ---
 
 > [!NOTE]
-> The `.ods/` directory convention is **stable for L1** (optional artifact storage for demos and audits).  
-> Paths for modules 04-09 reflect the **draft schema design** and may evolve before those modules reach Candidate status.  
-> See [ROADMAP.md](../ROADMAP.md) for module maturity timelines.
+> ODS no longer defines per-module evidence artifacts (release readiness, rollback plans, approval records, etc.). Those concepts were deprecated in June 2026; see [ROADMAP.md](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md). The only ODS artifacts today are the optional `.ods/policy.rego` and `.ods.yaml`.

@@ -1,3 +1,8 @@
+---
+title: ODS and SLSA
+nav_order: 9
+---
+
 # ODS and SLSA
 
 **ODS complements SLSA. They address different layers of software delivery trust.**
@@ -7,7 +12,7 @@
 
 ## One Sentence
 
-> **SLSA proves how software artifacts were built. ODS proves how software changes were delivered.**
+> **SLSA proves how software artifacts were built. ODS proves the AI-generated code in a change was detected, vetted, and within policy before merge.**
 
 ---
 
@@ -15,15 +20,15 @@
 
 | Dimension | SLSA | ODS |
 |-----------|------|-----|
-| **Core concern** | Artifact integrity: was this artifact tampered with? | Delivery governance: was this change properly reviewed and evidenced? |
-| **Primary object** | Software artifact (binary, container, package) | Delivery artifact (branch name, commit, PR, review, release evidence) |
-| **Key evidence** | Provenance, attestation, signature | PR description, AI review record, release readiness report, evidence bundle |
-| **Lifecycle focus** | Source → Build → Distribution | Before merge → At merge → After merge → Release |
-| **Primary audience** | Security, platform, supply chain teams | DevOps, release, engineering governance teams |
-| **Threat model** | Supply chain tampering, build compromise | AI black-box delivery, missing review evidence, untracked releases |
-| **Output** | SLSA provenance, VSA | ODS JSON artifacts (.ods/ directory) |
-| **AI relationship** | Can protect build chain for AI-generated code | Directly records AI involvement and review obligations |
-| **Levels** | SLSA Build L1 / L2 / L3 | ODS L1 / L2 / L3 / L4 |
+| **Core concern** | Artifact integrity: was this artifact tampered with? | AI code quality: is the AI-generated code in this change safe to merge? |
+| **Primary object** | Software artifact (binary, container, package) | Pull request diff |
+| **Key evidence** | Provenance, attestation, signature | AI detection result, quality issues, technical-debt score, policy decision |
+| **Lifecycle focus** | Source → Build → Distribution | Pre-merge (every PR) |
+| **Primary audience** | Security, platform, supply-chain teams | Engineering teams shipping AI-assisted code |
+| **Threat model** | Supply-chain tampering, build compromise | Undisclosed AI code, AI-specific defects, silent technical debt |
+| **Output** | SLSA provenance, VSA | ODS report (JSON / Markdown / SVG) + policy pass/warn/block |
+| **AI relationship** | Can protect the build chain for AI-generated code | Directly detects and gates AI-generated code |
+| **Levels** | SLSA Build L1 / L2 / L3 | ODS L1 / L2 / L3 |
 
 ---
 
@@ -33,31 +38,24 @@
 ┌──────────────────────────────────────────────────────────┐
 │                     SOFTWARE DELIVERY                     │
 │                                                          │
-│  BEFORE MERGE           AT MERGE        AFTER MERGE       │
-│  ┌──────────┐       ┌──────────┐       ┌──────────┐      │
-│  │ Branch   │       │ PR Desc  │       │ Release  │      │
-│  │ Naming   │       │ AI Review│       │ Evidence │      │
-│  │ Commit   │       │ Approval │       │ Rollback │      │
-│  │ Message  │       │ CI Fail  │       │          │      │
-│  └──────────┘       └──────────┘       └──────────┘      │
-│       │                  │                  │            │
-│       └──────────────────┴──────────────────┘            │
-│                          │                               │
-│                    ODS governs                           │
-│                delivery artifacts                        │
+│   PRE-MERGE (every PR)                                   │
+│   ┌────────────────────────────────────┐                │
+│   │  ODS AI Code Quality Gate          │                │
+│   │  detect → analyze → score → check  │                │
+│   └────────────────────────────────────┘                │
+│                     │                                    │
+│                ODS gates the change                      │
 │                                                          │
 │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    │
-│                                                          │
-│                          ▼                               │
-│                     BUILD & RELEASE                      │
-│                   ┌──────────────┐                       │
-│                   │  Provenance  │                       │
-│                   │  Attestation │                       │
-│                   │  Signature   │                       │
-│                   └──────────────┘                       │
-│                          │                               │
-│                    SLSA secures                          │
-│                artifact integrity                        │
+│                     ▼                                    │
+│                BUILD & RELEASE                           │
+│              ┌──────────────┐                            │
+│              │  Provenance  │                            │
+│              │  Attestation │                            │
+│              │  Signature   │                            │
+│              └──────────────┘                            │
+│                     │                                    │
+│              SLSA secures the artifact                   │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -69,12 +67,12 @@
 | Scenario | SLSA | ODS |
 |----------|------|-----|
 | I need to prove my binary wasn't tampered with | ✅ | — |
-| I need structured PR descriptions with AI disclosure | — | ✅ |
+| I need to know which PRs contain AI-generated code | — | ✅ |
 | I need build provenance for compliance | ✅ | — |
-| I need to track which releases had rollback plans | — | ✅ |
+| I need to catch AI-specific quality defects before merge | — | ✅ |
 | I need to verify artifact signatures | ✅ | — |
-| I need evidence that a change was properly reviewed | — | ✅ |
-| I need both artifact integrity and delivery governance | ✅ | ✅ |
+| I need to block low-quality AI changes by policy | — | ✅ |
+| I need both artifact integrity and AI code governance | ✅ | ✅ |
 
 ---
 
@@ -89,13 +87,12 @@ ODS does not:
 
 ODS does:
 
-- Standardize delivery metadata before and during the build
-- Make AI involvement in code changes auditable
-- Provide structure for release readiness decisions
-- Create machine-readable evidence of delivery governance
+- Detect AI-generated code in a change
+- Analyze it for AI-specific quality defects and score its technical-debt impact
+- Enforce a policy-as-code gate before merge
 
 > [!TIP]
-> **Use SLSA when you need artifact integrity. Use ODS when you need delivery governance. Use both when you need both.**
+> **Use SLSA when you need artifact integrity. Use ODS when you need AI code governance. Use both when you need both.**
 
 ---
 
@@ -103,5 +100,5 @@ ODS does:
 
 - [SLSA specification](https://slsa.dev/spec/v1.2/)
 - [SLSA Get Started](https://slsa.dev/get-started)
-- [ODS Levels](levels.md)
-- [ODS Get Started](get-started.md)
+- [ODS Levels](../levels.md)
+- [ODS Get Started](../get-started.md)

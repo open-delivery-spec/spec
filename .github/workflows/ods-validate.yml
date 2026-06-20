@@ -1,10 +1,8 @@
 # ODS Validate — Dogfooding workflow for the spec repository
 #
-# Runs AI code quality gate on every PR to main.
-# TODO: The validate-action@v1 currently only supports the AI detection pipeline.
-# The planned `check: branch-naming` and `check: commit-message` inputs
-# are not yet implemented.
-# Branch naming and commit message validation are done via shell steps.
+# Runs the ODS AI code quality gate on every PR to main.
+# The conventional branch-name and commit-message checks below are optional
+# housekeeping done via shell steps; the ODS gate itself runs via validate-action.
 
 name: ODS Validate
 
@@ -16,7 +14,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 

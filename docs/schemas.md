@@ -1,70 +1,58 @@
 ---
-title: JSON Schemas
+title: Policy Input Schema
 layout: default
 nav_order: 10
 has_children: false
 ---
 
-# JSON Schemas
+# Policy Input Schema
 
-Each Open Delivery Spec module has a JSON Schema ([Draft 2020-12](https://json-schema.org/specification-links.html#2020-12)) that defines the canonical, machine-validatable structure for that artifact type.
+ODS's machine-readable contract is the **policy input** — the structured object the pipeline feeds to your OPA Rego policy at the `check` stage. Any policy you write reads from these fields.
 
-## Using Schemas
+> [!NOTE]
+> ODS previously published per-module JSON Schemas (branch naming, commit message, release evidence, etc.). Those modules were deprecated in June 2026 and their schemas removed. The pipeline's policy input below is the current machine contract. See [ROADMAP.md](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md).
 
-Tools and AI agents can validate artifacts against these schemas:
+## Policy Input Fields
 
-```bash
-# With ODS CLI
-ods validate branch feature/add-oauth-login
+| Field | Type | Produced by | Description |
+|-------|------|-------------|-------------|
+| `ai_generated` | bool | `detect` | Whether AI code was detected in the diff |
+| `ai_confidence` | float (0.0–1.0) | `detect` | Aggregate detection confidence |
+| `issues` | array | `analyze` | Quality issues found; each item has `rule`, `severity`, `file`, `line` |
+| `technical_debt_delta` | float | `score` | Weighted technical-debt impact of the PR |
+| `test_coverage` | float (0.0–1.0) | `score` | Test coverage ratio for the change |
+| `branch` | string | context | The PR's head branch name |
 
-# With any JSON Schema validator
-ajv validate -s schemas/branch-naming.json -d my-branch.json
+### `issues[]` item shape
 
-# With Python
-pip install jsonschema
-jsonschema -i my-branch.json schemas/branch-naming.json
-```
+| Field | Type | Description |
+|-------|------|-------------|
+| `rule` | string | Rule id, e.g. `ai-unsafe-deserialization` |
+| `severity` | string | `low` \| `medium` \| `high` \| `critical` |
+| `file` | string | Path to the affected file |
+| `line` | integer | Line number of the finding |
 
-## Schema Index
+## Using the Input in a Policy
 
-| # | Module | Schema | Raw |
-|---|--------|--------|-----|
-| 01 | Branch Naming | `branch-naming.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/branch-naming.json) |
-| 02 | Commit Message | `commit-message.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/commit-message.json) |
-| 03 | PR Description | `pr-description.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/pr-description.json) |
-| 04 | AI Change Review | `ai-change-review.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/ai-change-review.json) |
-| 05 | CI Failure | `ci-failure.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/ci-failure.json) |
-| 06 | Release Readiness | `release-readiness.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/release-readiness.json) |
-| 07 | Approval Workflow | `approval-workflow.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/approval-workflow.json) |
-| 08 | Rollback Plan | `rollback-plan.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/rollback-plan.json) |
-| 09 | Production Release Evidence | `prod-release-evidence.json` | [Download](https://raw.githubusercontent.com/open-delivery-spec/spec/main/schemas/prod-release-evidence.json) |
+```rego
+package ods.policy
 
-## Schema Structure
+default allow := true
 
-Every ODS schema follows this convention:
-
-```jsonc
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://open-delivery-spec.dev/schemas/<module>.json",
-  "title": "ODS <Module>",
-  "description": "...",
-  "required": ["..."],
-  "properties": {
-    // module-specific fields
-  }
+deny[msg] {
+    issue := input.issues[_]
+    issue.severity == "critical"
+    msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
 }
 ```
 
-Fields common across many schemas:
+See the [`.ods/` Convention](ods-artifacts.md) for where the policy lives and [Get Started](get-started.md) for the full setup.
 
-- **`ai_generated`** / **`ai_tool`** — AI attribution (required when AI was involved)
-- **`version`** / **`spec_version`** — Spec version for forward compatibility
-- **`timestamp`** — ISO 8601 timestamp of artifact creation
+## Inspecting the Input
 
-## Versioning
+To see the exact object for the current diff, run the pipeline locally:
 
-Schemas follow [SemVer](https://semver.org) aligned with [SPEC_VERSIONING.md](https://github.com/open-delivery-spec/spec/blob/main/SPEC_VERSIONING.md). The `$id` URI reflects the spec version:
-
-- `v1.0.0` schemas use `https://open-delivery-spec.dev/schemas/` (no version in path)
-- Future breaking changes will increment the major version in `$id`.
+```bash
+ods detect && ods analyze && ods score
+ods check   # evaluates input against .ods/policy.rego
+```

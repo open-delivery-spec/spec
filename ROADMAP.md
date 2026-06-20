@@ -61,7 +61,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 ## Deprecated Modules (v1.0.0)
 
-The original 01–09 module system has been **deprecated and removed** from the CLI as of June 2026. The modules below are retained in the spec repo for reference only. Tooling no longer supports them.
+The original 01–09 module system has been **deprecated and removed** as of June 2026 — from the CLI, the spec documents, and the JSON Schemas. Their definitions remain available in git history. Tooling no longer supports them.
 
 | Module | Deprecation Date |
 |--------|-----------------|
@@ -94,8 +94,7 @@ The original 01–09 module system has been **deprecated and removed** from the 
 
 **Goal:** Make ODS seamless in CI and self-service for enterprise teams.
 
-- [x] Adoption signal: 3+ ODS-org repos using ODS L1 (dogfooding completed June 2026)
-- [ ] `validate-action@v2` aligned with new CLI command set (detect, analyze, score, check)
+- [x] Adoption signal: 3+ ODS-org repos running the gate (dogfooding completed June 2026)
 - [ ] SARIF output for GitHub Code Scanning integration
 - [ ] Multi-platform CI examples: GitLab CI, Bitbucket Pipelines, Jenkins (copy-paste templates)
 - [ ] `ods init` expanded: one-command scaffolding for any CI platform
@@ -106,7 +105,7 @@ The original 01–09 module system has been **deprecated and removed** from the 
 
 **Goal:** Deepen AI code analysis and expand detection surface.
 
-> **Next focus**: Promote Modules 01–03 to Stable. Build adoption outside the ODS org.
+> **Next focus**: Deepen the analysis rules and scoring accuracy. Build adoption outside the ODS org.
 
 - [ ] Additional analysis rules (hallucinated API detection, AI-generated config drift)
 - [ ] Language-specific analysis (Go, Python, TypeScript, Java in first wave)

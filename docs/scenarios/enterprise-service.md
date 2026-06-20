@@ -1,211 +1,154 @@
+---
+title: Scenario: Enterprise Service
+nav_order: 12
+---
+
 # Scenario: Enterprise Internal Service
 
-**Use case:** A platform team owns 3 internal services. They want consistent delivery metadata across all repos, AI disclosure for Copilot-heavy development, and audit-ready PR records.
+**Use case:** A platform team owns 3 internal services. Their whole org uses GitHub Copilot, and internal audit requires evidence that AI-generated changes were quality-checked and human-reviewed before reaching production.
 
 ## Profile
 
 - Team: 8 engineers, 3 services
 - Repo: Private on GitHub Enterprise
-- AI tools: Entire team uses GitHub Copilot (organization-wide)
-- Regulation: Internal audit requires evidence of human review for all production changes
-- Goal: Full ODS L1 + AI Disclosure enforced before merge, with compliance reports archived
+- AI tools: Organization-wide GitHub Copilot
+- Regulation: Internal audit requires evidence of quality control for all production changes
+- Goal: Enforce the ODS AI quality gate before merge, with reports archived for audit
 
 ## Configuration
 
-### `.ods.yaml`
+### `.github/workflows/ods.yml`
 
 ```yaml
-profile: enterprise
-
-policy:
-  branch:
-    allowed_types:
-      - feature
-      - bugfix
-      - hotfix
-      - release
-      - chore
-    require_ticket: true
-    max_description_length: 80
-
-  commit:
-    require_scope: true
-    max_subject_length: 72
-
-  pr:
-    required_sections:
-      - "## Summary"
-      - "## Type"
-      - "## AI Disclosure"
-      - "## Changes"
-      - "## Testing"
-      - "## Risk Assessment"
-      - "## Checklist"
-    min_changes: 1
-
-  ai_disclosure:
-    required: true
-    strict_tool_name: true
-    require_human_review: true
-    ai_branch_naming: warning
-
-  severity:
-    branch_type: error
-    branch_format: error
-    pr_sections: error
-    pr_ai_disclosure: error
-    pr_ai_tool: error
-    commit_type: error
-    commit_scope: error
-    commit_ai: error
-```
-
-### `.github/workflows/ods-l1.yml`
-
-```yaml
-name: ODS L1
+name: ODS AI Quality Gate
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
   pull-requests: write
-  issues: write
 
 jobs:
   ods:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: open-delivery-spec/validate-action@v1
         with:
-          check: all
-          branch_name: ${{ github.head_ref }}
-          pr_body: ${{ github.event.pull_request.body }}
-          strict: "true"
+          comment: "true"
           artifact-retention-days: "90"
 ```
 
-### `.github/workflows/ods-commit-message.yml`
+### `.ods/policy.rego`
 
-```yaml
-name: ODS Commit Message
-on: [push]
+Enterprise policy — block critical issues, untested AI code, and large debt increases:
 
-jobs:
-  ods-commit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: open-delivery-spec/validate-action@v1
-        with:
-          check: commit-message
-          commit_message: ${{ github.event.head_commit.message }}
-          strict: "true"
+```rego
+package ods.policy
+
+default allow := true
+
+deny[msg] {
+    issue := input.issues[_]
+    issue.severity == "critical"
+    msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
+}
+
+deny[msg] {
+    input.ai_confidence > 0.8
+    input.test_coverage < 0.4
+    msg := "AI code below the 40% coverage bar"
+}
+
+deny[msg] {
+    input.technical_debt_delta > 5.0
+    some issue in input.issues
+    issue.severity == "high"
+    msg := sprintf("Technical-debt delta %.1f with high-severity issues", [input.technical_debt_delta * 1.0])
+}
 ```
 
-### `.github/PULL_REQUEST_TEMPLATE.md`
+### Branch protection
 
-Full template from [ods-pr-template.md](../examples/ods-pr-template.md).
-
-### Branch protection rules
-
-- Require `ODS L1` status check to pass before merge
+- Require the `ODS AI Quality Gate` status check before merge
 - Require at least 1 approving review
 - Require conversation resolution
 
 ## Rollout plan
 
-### Week 1-2: Template + Observe
+### Week 1-2: Observe
 
-- Add PR template and workflows
-- `strict: "false"` — CI reports but doesn't block
+- Add the workflow with no `.ods/policy.rego` (permissive default — only critical issues block)
 - Share the [adoption guide](../adoption-guide.md) in team Slack
+- Review the ODS report on each PR; note common findings
 
-### Week 3-4: Warn
+### Week 3-4: Tune
 
-- Team demo: show the ODS PR comment, job summary, and artifact
-- Review common failures from the first two weeks. Adjust `.ods.yaml` if needed
-- `strict: "true"` on `ods-l1.yml` for branch and PR checks only
+- Add `.ods/policy.rego` with `warn` rules first
+- Team demo: walk through the PR comment, job summary, and downloadable artifact
+- Adjust thresholds to the services' real coverage and debt levels
 
 ### Week 5+: Enforce
 
-- `strict: "true"` on both workflows
-- Enable branch protection requiring ODS check
-- Archive compliance reports for audit (90-day retention)
+- Promote the key `warn` rules to `deny`
+- Enable branch protection requiring the ODS check
+- Archive compliance artifacts for audit (90-day retention)
 
 ## What the team sees
 
 ### Passing PR
 
-The ODS bot posts a comment:
-
 ```
-## ODS Compliance Report
+## ODS Compliance Report — PASS
 
-Status: ✅ ODS L1 Compliant
-Score: 100 / 100
-Profile: L1 - AI-aware delivery metadata
+AI detected: yes (Copilot, confidence 0.84)
+Technical-debt delta: +1.1
+Issues: 0 critical, 1 medium
 
 Repository: acme-corp/user-service
 Ref: feature/PROJ-423-oauth-migration
-Commit: a1b2c3d4e5f6
-Pull request: #423
 
-| Check | Result | Notes |
-|---|---|---|
-| Branch naming | ✅ Pass | feature/PROJ-423-oauth-migration |
-| Commit message | ✅ Pass | feat(auth): migrate OAuth to PKCE flow |
-| PR description | ✅ Pass | - |
+Policy: PASS
 ```
 
-### Failing PR
+### Blocked PR
 
 ```
-## ODS Compliance Report
+## ODS Compliance Report — BLOCK
 
-Status: ❌ ODS L1 Non-Compliant
-Score: 33 / 100
+AI detected: yes (confidence 0.88)
+Test coverage: 0.22
 
-| Check | Result | Notes |
-|---|---|---|
-| Branch naming | ✅ Pass | bugfix/fix-token-expiry |
-| Commit message | ❌ Fail | fix stuff; missing scope |
-| PR description | ❌ Fail | missing section: AI Disclosure; missing section: Risk Assessment |
+Policy: BLOCK — AI code below the 40% coverage bar
 ```
 
 ## Audit trail
 
-For each release, the compliance team downloads:
+For each release window, the compliance team archives:
 
-1. **Workflow artifact** — `ods-compliance-report.zip` containing HTML, JSON, SVG, Markdown
-2. **PR comment** — permanent record of the ODS report at merge time
-3. **AI disclosure records** — structured evidence of what AI generated and who reviewed it
+1. **Workflow artifact** — the ODS report (HTML, JSON, SVG, Markdown), retained 90 days
+2. **PR comment** — a permanent record of the gate result at merge time
+3. **Policy file** — `.ods/policy.rego` in version control documents the enforced quality bar
 
-These satisfy internal audit requirements:
-- Traceability: which engineer reviewed which AI-generated change
-- Human oversight: documented per PR
-- Delivery governance: consistent metadata across all repos
-
-## Badge
-
-```markdown
-[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](https://github.com/open-delivery-spec/spec)
-```
+These satisfy internal audit requirements: every AI-assisted change has a recorded quality assessment, a documented enforcement policy, and a human approval on the PR.
 
 ## Multi-repo adoption
 
-For the platform team's 3 services, copy the same three files to each repo:
+For all 3 services, scaffold the same setup:
 
 ```bash
 # In each service repo:
-ods init github
-# Then customize .ods.yaml if any service has specific conventions
+ods init
+# Then commit a shared .ods/policy.rego from your engineering-standards repo
 ```
 
-Use a shared `.ods.yaml` template in your team's engineering standards repo and reference it from each service.
+Keep a canonical `.ods/policy.rego` in a shared standards repo and copy it into each service so the quality bar stays consistent.
 
 ## Next steps after adoption
 
-1. Integrate ODS report artifacts into your release checklist pipeline
-2. Map ODS AI Disclosure fields to your internal audit control framework
-3. When ready, explore [Module 06 (Release Readiness)](../spec/06-release-readiness.md) and [Module 09 (Production Evidence)](../spec/09-prod-release-evidence.md) for release-governance gates
+1. Map the ODS report fields to your internal audit control framework
+2. Track technical-debt delta trends across releases as a quality KPI
+3. See [ODS Levels](../levels.md) for the L1 → L3 enforcement progression

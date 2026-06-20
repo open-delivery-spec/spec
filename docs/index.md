@@ -12,11 +12,11 @@ nav_order: 1
 
 AI coding tools make changes faster than delivery processes can explain them. ODS defines a CI quality gate that answers: what did AI generate, how much risk does it add, and does it meet your policy before merge?
 
-> **Start here**: [Get Started](get-started) → [Adoption Guide](adoption-guide)  
-> **Real-world scenarios**: [Open-source](scenarios/open-source-project) · [Enterprise](scenarios/enterprise-service) · [AI coding team](scenarios/ai-coding-pr)  
-> **Policy customization**: [`.ods/` Convention](ods-artifacts)  
-> **How it fits**: [ODS and SLSA](comparison/slsa) — SLSA proves how artifacts were built; ODS proves how changes were delivered.  
-> **Threats & Failure Modes**: [Why this exists](threats-and-failure-modes)
+> **Start here**: [Get Started](get-started.md) → [Adoption Guide](adoption-guide.md)  
+> **Real-world scenarios**: [Open-source](scenarios/open-source-project.md) · [Enterprise](scenarios/enterprise-service.md) · [AI coding team](scenarios/ai-coding-pr.md)  
+> **Policy customization**: [`.ods/` Convention](ods-artifacts.md)  
+> **How it fits**: [ODS and SLSA](comparison/slsa.md) — SLSA proves how artifacts were built; ODS proves how changes were delivered.  
+> **Threats & Failure Modes**: [Why this exists](threats-and-failure-modes.md)
 
 ## Quick Start
 
@@ -34,7 +34,7 @@ ods detect && ods analyze && ods score && ods check
 Add the GitHub Action to your CI:
 
 ```yaml
-- uses: actions/checkout@v4
+- uses: actions/checkout@v7
   with:
     fetch-depth: 0
 - uses: open-delivery-spec/validate-action@v1
