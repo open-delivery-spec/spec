@@ -4,13 +4,13 @@ Projects running ODS on every pull request.
 
 ## Open Delivery Spec (dogfooding)
 
-The ODS org runs `validate-action@v2` on all its own repositories.
+The ODS org runs `validate-action@v1` on all its own repositories.
 
 | Project | What runs | Since |
 |---|---|---|
-| [open-delivery-spec/spec](https://github.com/open-delivery-spec/spec) | validate-action@v2 on every PR | June 2026 |
-| [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) | validate-action@v2 on every PR | June 2026 |
-| [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) | validate-action@v2 on every PR | June 2026 |
+| [open-delivery-spec/spec](https://github.com/open-delivery-spec/spec) | validate-action@v1 on every PR | June 2026 |
+| [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) | validate-action@v1 on every PR | June 2026 |
+| [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) | validate-action@v1 on every PR | June 2026 |
 
 ## Pending External Adoption
 
