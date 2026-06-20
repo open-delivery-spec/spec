@@ -2,7 +2,7 @@
 
 **For teams that want to adopt ODS without reading the spec first.**
 
-This guide walks through adopting ODS L1 in a real team, from zero to full enforcement. It is designed to be copied, adapted, and shared with your engineering organization.
+This guide walks through adopting ODS in a real team, from zero to full enforcement. It is designed to be copied, adapted, and shared with your engineering organization.
 
 ---
 
@@ -15,7 +15,7 @@ This guide walks through adopting ODS L1 in a real team, from zero to full enfor
 | [3](#step-3-make-the-report-visible) | Badge, report, PR comment | 5 min | One person |
 | [4](#step-4-team-rollout) | Progressive rollout | 1-2 weeks | Team lead |
 | [5](#step-5-add-ai-disclosure) | AI disclosure (optional) | 5 min | Team |
-| [6](#step-6-customize-policy) | Customize `.ods.yaml` | 15 min | Team lead |
+| [6](#step-6-customize-policy) | Customize `.ods/policy.rego` | 15 min | Team lead |
 
 ---
 
@@ -27,7 +27,7 @@ Run `ods init` to scaffold everything, or copy just the PR template:
 
 ```bash
 # One-command scaffold (recommended)
-ods init github
+ods init
 ```
 
 Or manually:
@@ -49,61 +49,44 @@ curl -o .github/PULL_REQUEST_TEMPLATE.md \
 
 ## Step 2: Add the validate-action
 
-**Goal:** CI validates that every PR has the required metadata before merge.
+**Goal:** CI runs the ODS AI quality gate on every PR before merge.
 
-Add these two workflow files to `.github/workflows/`:
+Add this workflow file to `.github/workflows/`:
 
-**`ods-l1.yml`** — validates branch name and PR description on every PR:
+**`ods-ai-quality.yml`** — runs the full ODS pipeline on every PR:
 
 ```yaml
-name: ODS L1
+name: ODS AI Quality Gate
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
   pull-requests: write
-  issues: write
 
 jobs:
   ods:
     runs-on: ubuntu-latest
     steps:
-      - uses: open-delivery-spec/validate-action@v1
+      - uses: actions/checkout@v7
         with:
-          check: all
-          branch_name: ${{ github.head_ref }}
-          pr_body: ${{ github.event.pull_request.body }}
-          strict: "true"
+          fetch-depth: 0  # required for git diff against base
+      - uses: open-delivery-spec/validate-action@v1
 ```
 
-**`ods-commit-message.yml`** — validates commit messages on push:
-
-```yaml
-name: ODS Commit Message
-on: [push]
-
-jobs:
-  ods-commit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: open-delivery-spec/validate-action@v1
-        with:
-          check: commit-message
-          commit_message: ${{ github.event.head_commit.message }}
-          strict: "true"
-```
-
-> [!TIP]
-> Start with `strict: "false"` to treat warnings as non-blocking. Switch to `"true"` after the team adjusts.
+The Action:
+1. **Detects** AI code from `Co-Authored-By` trailers, PR disclosure, branch names, and diff heuristics
+2. **Analyzes** code quality for AI-specific defects
+3. **Scores** technical debt impact
+4. **Enforces** your `.ods/policy.rego` policy (if present) — exits non-zero on `BLOCK`
 
 **What changes:**
-- Every PR gets validated for branch naming and PR description
-- Every push gets validated for commit message format
-- Failed checks block merge (if branch protection is configured)
+- Every PR gets the ODS quality gate
+- A compliance report is posted as a PR comment
+- Custom policy blocks (defined in `.ods/policy.rego`) prevent merge when branch protection is configured
 
-**Success check:** Open a PR with a branch like `fix-bug`. The check fails. Rename to `bugfix/fix-null-pointer`. The check passes.
+**Success check:** Open a PR. The ODS bot posts a compliance report comment. The Actions run shows detect → analyze → score → check steps.
 
 ---
 
@@ -120,7 +103,7 @@ The validate-action outputs three surfaces by default:
 Add an ODS badge to your README:
 
 ```markdown
-[![ODS L1](https://img.shields.io/badge/ODS-L1%20Structured%20Delivery-blue)](https://github.com/open-delivery-spec/spec)
+[![ODS](https://img.shields.io/badge/ODS-AI%20Quality%20Gate-blue)](https://github.com/open-delivery-spec/spec)
 ```
 
 **Success check:** Open a PR. The ODS bot posts a compliance comment. The Actions run shows the summary.
@@ -135,35 +118,38 @@ Use progressive enforcement:
 
 ### Week 1: Observe
 
-```yaml
-strict: "false"
-```
+- The ODS workflow runs but branch protection does not yet require it
+- Team gets used to the PR template and seeing the ODS report
+- Review the ODS compliance report in PR comments — note common patterns
 
-- All checks run but warnings don't block merge
-- Team gets used to the PR template and branch naming
-- Review the ODS compliance report in PR comments — note common failures
-
-### Week 2: Warn
+### Week 2: Require the check
 
 Enable branch protection:
 
-- Require the ODS L1 check to pass before merge
-- Team chat: share the most common failures and how to fix them
-- Keep `strict: "false"` so only hard errors block
+- Require the ODS workflow check to pass before merge
+- Team chat: share the most common ODS findings and how to address them
 
-### Week 3+: Enforce
+### Week 3+: Add blocking policy
 
-```yaml
-strict: "true"
+Create `.ods/policy.rego` for custom enforcement:
+
+```rego
+package ods.policy
+
+default allow := true
+
+# Block AI code with insufficient test coverage
+deny[msg] {
+    input.ai_generated == true
+    input.ai_confidence > 0.8
+    input.test_coverage < 0.3
+    msg = "AI code with low test coverage"
+}
 ```
-
-- Warnings become errors
-- AI disclosure becomes mandatory (if enabled)
-- All PRs are fully ODS L1 compliant before merge
 
 **Team communication template:**
 
-> We're adopting [Open Delivery Spec](https://github.com/open-delivery-spec/spec) (ODS) to make our PRs easier to review — especially for AI-assisted changes. Starting this week, CI will check that every PR has a structured description and follows branch/commit conventions. The ODS bot posts a compliance report on each PR. This week is observe-only; next week we'll require the check to pass. Questions? See [our adoption guide](.github/ODS-ADOPTION.md).
+> We're adopting [Open Delivery Spec](https://github.com/open-delivery-spec/spec) (ODS) to make our PRs easier to review — especially for AI-assisted changes. Starting this week, CI will run an AI quality check on every PR. The ODS bot posts a report on each PR. This week is observe-only; next week we'll require the check to pass. Questions? See [our adoption guide](.github/ODS-ADOPTION.md).
 
 ---
 
@@ -171,17 +157,16 @@ strict: "true"
 
 **Goal:** Make AI involvement in code changes explicit and machine-checkable.
 
-If your team uses AI coding tools (Copilot, Cursor, Claude, etc.), enable AI disclosure:
-
 ### Commit messages
 
-Add AI attribution trailers to commit messages:
+The easiest path: use a tool that emits `Co-Authored-By` automatically (Claude Code, GitHub Copilot, Cursor). ODS detects these without any configuration.
+
+For tools that don't emit `Co-Authored-By`, add it manually:
 
 ```text
 feat(auth): add OAuth login
 
-AI-assisted: true
-AI-tool: GitHub Copilot
+Co-Authored-By: GitHub Copilot <175728472+github-copilot[bot]@users.noreply.github.com>
 AI-scope: token exchange, session management
 AI-review: pending
 ```
@@ -193,126 +178,106 @@ The PR template already includes the AI Disclosure section:
 ```markdown
 ## AI Disclosure
 - [x] This PR contains AI-generated code
-- **AI Tool:** GitHub Copilot
-- **AI Scope:** Provider abstraction, token exchange
-- **Human Review:** Verified OAuth flow, redirect validation
+- AI Tool: GitHub Copilot
+- AI Scope: Provider abstraction, token exchange
+- Human Review: Verified OAuth flow, redirect validation
 ```
 
-### Configure enforcement
-
-In `.ods.yaml`:
-
-```yaml
-policy:
-  ai_disclosure:
-    required: true
-    strict_tool_name: true
-    require_human_review: true
-```
-
-**Success check:** Create a PR with AI-generated code but no disclosure. The check warns or fails.
+**Success check:** Open a PR where commits have `Co-Authored-By` with a recognized AI tool name. The ODS report shows AI detected.
 
 ---
 
 ## Step 6: Customize Policy
 
-**Goal:** Tune ODS to your team's conventions.
+**Goal:** Tune enforcement to your team's conventions using OPA Rego.
 
-Create or edit `.ods.yaml` in your repo root:
+Create or edit `.ods/policy.rego` in your repo root:
 
-```yaml
-profile: enterprise
+```rego
+package ods.policy
 
-policy:
-  branch:
-    allowed_types:
-      - feature
-      - bugfix
-      - hotfix
-      - release
-      - chore
-      - docs       # add your team's types
-    require_ticket: false   # set true if you use Jira tickets in branch names
-    max_description_length: 100
+default allow := true
 
-  commit:
-    allowed_types:
-      - feat
-      - fix
-      - docs
-      - refactor
-      - test
-      - chore
-    require_scope: true
-    max_subject_length: 72
+# Block critical issues unconditionally
+deny[msg] {
+    issue := input.issues[_]
+    issue.severity == "critical"
+    msg = sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
+}
 
-  pr:
-    required_sections:
-      - "## Summary"
-      - "## Changes"
-      - "## Testing"
-      - "## Checklist"
-      # remove sections your team doesn't need
+# Block AI code with low test coverage
+deny[msg] {
+    input.ai_confidence > 0.8
+    input.test_coverage < 0.3
+    msg = "AI code with low test coverage"
+}
 
-  severity:
-    branch_type: error
-    branch_format: error
-    pr_sections: error
-    commit_type: error
-    commit_scope: warning    # treat missing scope as a warning
+# Block large tech debt increase with serious issues present
+deny[msg] {
+    input.technical_debt_delta > 5.0
+    some issue in input.issues
+    issue.severity == "critical"
+    msg = sprintf("Technical debt delta %.1f with critical issues", [input.technical_debt_delta])
+}
+
+# Warn on high-confidence AI with multiple quality issues
+warn[msg] {
+    input.ai_generated == true
+    input.ai_confidence > 0.8
+    count(input.issues) > 2
+    msg = "High-confidence AI code with multiple quality issues"
+}
 ```
 
-Available profiles:
-- `oss` — no AI disclosure required, relaxed rules
-- `enterprise` — full L1 + AI disclosure (recommended)
-- `regulated` — maximum enforcement with ticket requirements
+Available policy input fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `input.ai_generated` | bool | Whether AI code was detected |
+| `input.ai_confidence` | float | Detection confidence (0.0–1.0) |
+| `input.issues` | array | Quality issues found |
+| `input.technical_debt_delta` | float | Technical debt impact score |
+| `input.test_coverage` | float | Test coverage ratio (0.0–1.0) |
+| `input.branch` | string | Branch name |
 
 ---
 
 ## Troubleshooting
 
-### "My branch name fails but our convention uses a different prefix"
+### "My PR comment is too noisy"
 
-Add your prefix to `.ods.yaml`:
-
-```yaml
-policy:
-  branch:
-    allowed_types: [feature, bugfix, hotfix, release, chore, exp]
-```
-
-### "My commit messages don't use scopes"
-
-Either add scopes, or relax the rule:
-
-```yaml
-policy:
-  commit:
-    require_scope: false
-  severity:
-    commit_scope: warning
-```
-
-### "The PR template has too many sections"
-
-Remove sections from `required_sections` in `.ods.yaml`:
-
-```yaml
-policy:
-  pr:
-    required_sections:
-      - "## Summary"
-      - "## Changes"
-      - "## Testing"
-```
-
-### "I want to disable PR comments (too noisy)"
+Turn off PR comments:
 
 ```yaml
 - uses: open-delivery-spec/validate-action@v1
   with:
-    check: all
     comment: "false"
+```
+
+### "I want to diff against a different base"
+
+By default the Action diffs against `origin/main`. Override it:
+
+```yaml
+- uses: open-delivery-spec/validate-action@v1
+  with:
+    diff-base: origin/develop
+```
+
+### "I want to use a specific ODS CLI version"
+
+```yaml
+- uses: open-delivery-spec/validate-action@v1
+  with:
+    cli-ref: v1.2.0
+```
+
+### "I want to provide the PR body explicitly"
+
+```yaml
+- uses: open-delivery-spec/validate-action@v1
+  with:
+    pr-body: ${{ github.event.pull_request.body }}
 ```
 
 ---

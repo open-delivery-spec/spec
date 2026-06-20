@@ -19,13 +19,30 @@ AI-attributable, semantically rich commit format, extending [Conventional Commit
 [footer]
 ```
 
-## ODS AI Footer Fields
+## Primary Signal — `Co-Authored-By`
+
+AI coding tools already emit `Co-Authored-By` trailers automatically. ODS treats these as first-class AI attribution — no additional fields required:
 
 ```
 feat(auth): add OAuth 2.0 login flow
 
-AI-assisted: true
-AI-tool: GitHub Copilot
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+| Tool | Example trailer |
+|------|----------------|
+| Claude / Claude Code | `Co-Authored-By: Claude <noreply@anthropic.com>` |
+| GitHub Copilot | `Co-Authored-By: GitHub Copilot <175728472+github-copilot[bot]@users.noreply.github.com>` |
+| Cursor | `Co-Authored-By: Cursor <cursor@cursor.sh>` |
+
+## ODS Supplemental Footer Fields (Optional)
+
+For richer attribution metadata beyond `Co-Authored-By`, ODS defines optional supplemental footers:
+
+```
+feat(auth): add OAuth 2.0 login flow
+
+Co-Authored-By: GitHub Copilot <175728472+github-copilot[bot]@users.noreply.github.com>
 AI-scope: auth module, token refresh logic
 AI-review: pending
 AI-confidence: high
@@ -34,11 +51,12 @@ Risk: medium
 ```
 
 | Field | Required | Values |
-|-------|----------|--------|
-| `AI-assisted` | Yes | `true` / `false` |
-| `AI-tool` | If AI true | e.g., `GitHub Copilot` |
+|-------|----------|---------|
+| `Co-Authored-By` | **Yes, when AI used** | `<name> <email>` |
+| `AI-assisted` | Optional | `true` / `false` |
+| `AI-tool` | Optional | e.g., `GitHub Copilot` |
 | `AI-scope` | Recommended | Free text |
-| `AI-review` | If AI true | `pending` / `passed` / `failed` |
+| `AI-review` | Recommended | `pending` / `passed` / `failed` |
 | `AI-confidence` | Optional | `low` / `medium` / `high` |
 | `Ticket` | Recommended | Issue ID |
 | `Risk` | Optional | `low` / `medium` / `high` |
@@ -46,11 +64,8 @@ Risk: medium
 ## CLI Usage
 
 ```bash
-# Validate
-git log -1 --format=%B | ods validate commit --stdin
-
-# Generate
-ods generate commit --type feat --scope auth --ai-tool "Copilot"
+# Detect AI code (reads Co-Authored-By from recent commits automatically)
+ods detect --commits 5
 ```
 
 [View full spec →](https://github.com/open-delivery-spec/spec/blob/main/spec/02-commit-message.md)

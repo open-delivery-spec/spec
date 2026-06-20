@@ -1,17 +1,17 @@
 # Get Started
 
-Start with the smallest production-ready loop: **ODS L1 + AI Disclosure**. This takes ~5 minutes and runs in CI.
+Start with the smallest production-ready loop: **ODS AI Quality Gate**. This takes ~5 minutes and runs in CI.
 
 > [!TIP]
 > Want to see what an ODS-compliant PR looks like? Copy the [PR Template](../examples/ods-pr-template.md) into `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ---
 
-## Path A: Structured Delivery _(ODS L1)_
+## Path A: AI Quality Gate
 
-**For**: Individual maintainers, open source projects, any team that wants cleaner delivery metadata.
+**For**: Individual maintainers, open source projects, any team that wants automated AI code quality checks in CI.
 
-**Goal**: Make branches, commits, and PRs machine-readable.
+**Goal**: Detect AI-generated code, analyze quality, score technical debt, and enforce policy — on every PR.
 
 ### 1. Install the CLI
 
@@ -22,62 +22,65 @@ go install github.com/open-delivery-spec/cli/cmd/ods@main
 ### 2. Add to your CI
 
 ```yaml
-name: ODS L1
+name: ODS AI Quality Gate
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
-  validate:
+  ods:
     runs-on: ubuntu-latest
     steps:
-      - uses: open-delivery-spec/validate-action@v1
+      - uses: actions/checkout@v7
         with:
-          check: all
-          branch_name: ${{ github.head_ref }}
-          pr_body: ${{ github.event.pull_request.body }}
-          strict: "true"
+          fetch-depth: 0  # required for git diff against base
+      - uses: open-delivery-spec/validate-action@v1
 ```
 
-### 3. Add commit-message validation where the message is available
+The Action automatically:
+1. **Detects** AI code (`Co-Authored-By` trailers, PR disclosure, branch names, diff heuristics)
+2. **Analyzes** code quality (5 rule categories for AI-specific defects)
+3. **Scores** technical debt impact (5-dimension weighted model)
+4. **Enforces** policy (OPA Rego — optional, place at `.ods/policy.rego`)
 
-```yaml
-name: ODS Commit Message
-on: [push]
-
-jobs:
-  validate-commit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: open-delivery-spec/validate-action@v1
-        with:
-          check: commit-message
-          commit_message: ${{ github.event.head_commit.message }}
-          strict: "true"
-```
-
-### 4. Check your first change
+### 3. Run the pipeline locally
 
 ```bash
-ods validate branch feature/add-oauth
-ods validate commit --stdin <<< "feat(auth): add OAuth login"
+ods detect    # Is there AI code? (reads Co-Authored-By, PR body, branch, diff)
+ods analyze   # What quality issues exist?
+ods score     # How much technical debt does this add?
+ods check     # Does the OPA policy allow this change?
 ```
 
-**You're L1 compliant** when these checks pass on every PR.
+**You're ready** when `ods check` passes and the validate-action reports `PASS` on every PR.
 
 ---
 
 ## Path B: AI Disclosure
 
-**For**: Teams using GitHub Copilot, Cursor, or other AI coding tools.
+**For**: Teams using GitHub Copilot, Cursor, Claude Code, or other AI coding tools.
 
-**Goal**: Record AI involvement in the L1 artifacts before adopting draft review workflows.
+**Goal**: Make AI involvement explicit and machine-detectable.
 
 ### 1. Complete Path A first
 
-AI disclosure builds on L1 checks.
+AI disclosure builds on the quality gate checks.
 
-### 2. Add AI disclosure to commit messages
+### 2. Use `Co-Authored-By` trailers (automatic with most tools)
+
+Claude Code, GitHub Copilot, and Cursor automatically add `Co-Authored-By` trailers to commits. ODS detects these without any configuration:
+
+```text
+feat(auth): add OAuth login
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+For tools that don't emit `Co-Authored-By` automatically, add it manually or use the ODS supplemental trailer fields:
 
 ```text
 feat(auth): add OAuth login
@@ -98,7 +101,7 @@ AI-confidence: high
 - Human Review: Verified OAuth flow and redirect validation
 ```
 
-**You're AI-disclosure ready** when every AI-assisted change says what AI touched and what a human reviewed.
+**You're AI-disclosure ready** when every AI-assisted change records what AI touched and what a human reviewed.
 
 ---
 
@@ -108,30 +111,27 @@ AI-confidence: high
 
 **Goal**: Explore the draft release-governance schemas before enforcing them.
 
+> [!WARNING]
+> Modules 06–09 (Release Readiness, Approval Workflow, Rollback Plan, Production Evidence) are experimental and CLI commands for these modules are not yet implemented. See [ROADMAP.md](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md) for status.
+
 > See [`.ods/` Convention](ods-artifacts) for the artifact directory layout and naming conventions.
 
 ### 1. Complete Paths A and B first
 
-### 2. Validate draft evidence files directly
+### 2. Validate draft evidence files against the JSON schemas
 
-```bash
-ods validate release --file .ods/releases/v1.4.0/release-readiness.json
-ods validate rollback --file .ods/releases/v1.4.0/rollback-plan.json
-ods validate evidence --file .ods/releases/v1.4.0/evidence-bundle.json
-```
-
-These modules are not yet recommended as production Action gates.
+Use any JSON Schema validator with the schemas in [schemas/](https://github.com/open-delivery-spec/spec/tree/main/schemas). CLI support for evidence validation commands is on the roadmap.
 
 ---
 
 ## Quick Reference
 
 | If you want... | Start with |
-|----------------|-----------|
-| Clean branch/commit/PR conventions | [Path A](#path-a-structured-delivery-ods-l1) |
-| AI disclosure and review | [Path B](#path-b-ai-disclosure) |
-| Release audit trails | [Path C](#path-c-draft-evidence-modules) |
-| The simplest possible check | `ods validate branch feature/my-feature` |
+|----------------|----------|
+| Automated AI quality checks in CI | [Path A](#path-a-ai-quality-gate) |
+| AI disclosure and attribution | [Path B](#path-b-ai-disclosure) |
+| Release audit trails | [Path C](#path-c-experimental-evidence-modules) |
+| The simplest possible setup | Add `open-delivery-spec/validate-action@v1` to your PR workflow |
 
 > [!TIP]
-> Not sure where to start? [Path A](#path-a-structured-delivery-ods-l1) takes 5 minutes.
+> Not sure where to start? [Path A](#path-a-ai-quality-gate) takes 5 minutes.

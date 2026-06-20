@@ -7,15 +7,35 @@ parent: Modules
 
 # 04 — AI Change Review
 
-Three-level review protocol for AI-generated code changes.
+> **Status:** Experimental — see [spec/04](https://github.com/open-delivery-spec/spec/blob/main/spec/04-ai-change-review.md) for the full specification.
+
+Review protocol for AI-generated code changes, using qualitative assistance levels rather than unreliable contribution percentages.
+
+## AI Assistance Levels
+
+| Level | Meaning | Typical scenario |
+|-------|---------|------------------|
+| `none` | No AI involvement | Traditional human-authored PR |
+| `assisted` | AI suggested snippets, human drove the change | Copilot completions |
+| `generated` | AI generated substantial portions, human reviewed | Claude/Cursor wrote functions |
+| `agentic` | AI agent drove the change autonomously | AI agent opened PR end-to-end |
 
 ## Review Levels
 
-| Level | AI % | Review Type | Requirements |
-|-------|------|-------------|-------------|
-| **L1 — Quick Scan** | < 20% | Standard review | Normal PR review |
-| **L2 — Enhanced** | 20-80% | Additional checklist | Verify correctness, security, AI specifics |
-| **L3 — Full Audit** | > 80% | Mandatory 2nd reviewer | L2 + architecture, testing, compliance |
+| Review Level | When Required | Description |
+|-------------|--------------|-------------|
+| **L1 — Standard Review** | `none` or `assisted` | Normal human code review |
+| **L2 — Enhanced Review** | `generated` | Additional AI-specific checklist required |
+| **L3 — Full Audit** | `agentic` | Mandatory second reviewer, full audit trail |
+
+## Why Not AI Percentage?
+
+`AI% = AI-attributed lines / Total changed lines × 100` is unreliable:
+- AI writes code, humans edit it — attribution is fuzzy
+- Line count ≠ risk (one security-sensitive line matters more than 100 docs lines)
+- Most AI tools don’t provide reliable line-level attribution
+
+ODS uses qualitative assistance levels and scope instead. See [spec/04](https://github.com/open-delivery-spec/spec/blob/main/spec/04-ai-change-review.md) for full details.
 
 ## L2 Checklist
 
@@ -29,21 +49,16 @@ Three-level review protocol for AI-generated code changes.
 - Architecture fit, circular deps
 - Test coverage and quality
 - License and compliance
-
-## AI Contribution Detection
-
-```
-AI% = AI-attributed lines / Total changed lines × 100
-```
+- Independent reviewer required
 
 ## CLI Usage
 
 ```bash
-# Detect AI percentage
-ods review ai-percentage --pr 42
+# Detect AI code in the current change
+ods detect
 
-# Generate review record
-ods review generate --pr 42
+# Analyze AI code quality (quality issues, defect density)
+ods analyze
 ```
 
 [View full spec →](https://github.com/open-delivery-spec/spec/blob/main/spec/04-ai-change-review.md)
