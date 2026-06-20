@@ -2,7 +2,6 @@
 # Submitted via PR from https://github.com/open-delivery-spec
 #
 # Targets master (default branch of shenxianpeng/shenxianpeng.github.io).
-# TODO: The validate-action@v1 currently only supports the AI detection pipeline.
 
 name: ODS Validate
 
@@ -21,8 +20,8 @@ jobs:
       - name: Validate branch naming
         run: |
           BRANCH="${{ github.head_ref }}"
-          if echo "$BRANCH" | grep -qE '^(feature|bugfix|hotfix|release|chore)/'; then
-            echo "✅ Branch naming: $BRANCH (conventional)"
+          if echo "$BRANCH" | grep -qE '^(feature|bugfix|hotfix|release|chore)/';
+            then echo "✅ Branch naming: $BRANCH (conventional)"
           else
             echo "⚠️  Branch naming: $BRANCH (not conventional — consider feature/, bugfix/, etc.)"
           fi
@@ -36,8 +35,8 @@ jobs:
             echo "No commits to validate"
           else
             echo "$COMMITS" | while IFS= read -r line; do
-              if echo "$line" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build)(\(.+\))?:'; then
-                echo "✅ $line"
+              if echo "$line" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build)(\(.+\))?:';
+                then echo "✅ $line"
               else
                 echo "⚠️  $line"
               fi

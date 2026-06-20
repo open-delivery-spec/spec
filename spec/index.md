@@ -5,98 +5,88 @@
 
 ## Introduction
 
-Open Delivery Spec (ODS) defines standards for software delivery artifacts in the AI era. Each module below specifies a **format**, provides a **JSON Schema**, and includes **examples** that tools can validate against.
+Open Delivery Spec (ODS) defines the AI code quality gate for software delivery. Each module specifies a **format**, provides a **JSON Schema**, and includes **examples** that tools can validate against.
 
 ## Module Status
 
-| Acronym | Meaning | Description |
-|---------|---------|-------------|
-| **Draft** | Work in progress | Scope and schema may change. Feedback welcome. |
-| **Candidate** | Implementation-validated | Schema is stable enough for tooling. Minor additions only. |
-| **Stable** | Production-ready | Schema follows semver. Breaking changes require a new major version. |
-| **Deprecated** | To be removed | Superseded by another module or retired. |
+| Status | Meaning |
+|--------|--------|
+| **Candidate** | Implementation-validated. Schema stable enough for tooling. Minor additions only. |
+| **Deprecated** | Retired. Schemas remain in `schemas/` for reference; no new tooling. |
 
-## Modules
+## Active Modules
 
 | # | Module | Schema | Status |
 |---|--------|--------|--------|
 | 01 | [Branch Naming](01-branch-naming.md) | [`branch-naming.json`](../schemas/branch-naming.json) | 🟡 Candidate |
 | 02 | [Commit Message](02-commit-message.md) | [`commit-message.json`](../schemas/commit-message.json) | 🟡 Candidate |
 | 03 | [PR Description](03-pr-description.md) | [`pr-description.json`](../schemas/pr-description.json) | 🟡 Candidate |
-| 04 | [AI Change Review](04-ai-change-review.md) | [`ai-change-review.json`](../schemas/ai-change-review.json) | 🔵 Draft |
-| 05 | [CI Failure](05-ci-failure.md) | [`ci-failure.json`](../schemas/ci-failure.json) | 🔵 Draft |
-| 06 | [Release Readiness](06-release-readiness.md) | [`release-readiness.json`](../schemas/release-readiness.json) | 🔵 Draft |
-| 07 | [Approval Workflow](07-approval-workflow.md) | [`approval-workflow.json`](../schemas/approval-workflow.json) | 🔵 Draft |
-| 08 | [Rollback Plan](08-rollback-plan.md) | [`rollback-plan.json`](../schemas/rollback-plan.json) | 🔵 Draft |
-| 09 | [Production Release Evidence](09-prod-release-evidence.md) | [`prod-release-evidence.json`](../schemas/prod-release-evidence.json) | 🔵 Draft |
 
-## The Delivery Lifecycle
+## Deprecated Modules
+
+The following modules are retired as of June 2026. Schemas remain in `schemas/` for reference only.
+
+| # | Module | Reason |
+|---|--------|-------|
+| 04 | [AI Change Review](04-ai-change-review.md) | Recommendations folded into Module 03 PR Description |
+| 05 | [CI Failure](05-ci-failure.md) | Tool feature, not a delivery metadata spec; out of scope |
+| 06 | [Release Readiness](06-release-readiness.md) | Overlaps with SLSA / in-toto; out of scope |
+| 07 | [Approval Workflow](07-approval-workflow.md) | Overlaps with SLSA / in-toto; out of scope |
+| 08 | [Rollback Plan](08-rollback-plan.md) | Overlaps with SLSA / in-toto; out of scope |
+| 09 | [Production Release Evidence](09-prod-release-evidence.md) | Overlaps with SLSA / in-toto; out of scope |
+
+See [ROADMAP.md](../ROADMAP.md) for context on the deprecations.
+
+---
+
+## The AI Code Quality Pipeline
 
 ```
-Developer / AI Agent
-    │
-    ▼
-┌─ 01 Branch Naming ──────────────────────────────┐
-│  feature/ai-add-oauth                            │
-└──────────────────────┬───────────────────────────┘
-                       ▼
-┌─ 02 Commit Message ─────────────────────────────┐
-│  feat(auth): add OAuth flow                     │
-│  AI-assisted: true | AI-tool: Copilot            │
-└──────────────────────┬───────────────────────────┘
-                       ▼
-┌─ 03 PR Description ─────────────────────────────┐
-│  Summary, AI Disclosure, Risk Assessment         │
-└──────────────────────┬───────────────────────────┘
-                       ▼
-┌─ 04 AI Change Review ───────────────────────────┐
-│  L2 Enhanced / L3 Full Audit                     │
-└──────────────────────┬───────────────────────────┘
-           ┌───────────┴───────────┐
-           ▼                       ▼
-┌─ 05 CI Failure ───┐   ┌─ 07 Approval Workflow ──┐
-│  Failure reports   │   │  Who approves what?     │
-│  AI explanations   │   │  AI-aware policies      │
-└────────┬───────────┘   └───────────┬─────────────┘
-         └───────────┬───────────────┘
-                     ▼
-┌─ 06 Release Readiness ──────────────────────────┐
-│  Gates, Scores, AI Risk Assessment               │
-└──────────────────────┬───────────────────────────┘
-         ┌─────────────┼─────────────┐
-         ▼             ▼             ▼
-┌─ 08 Rollback ─┐ ┌─ 09 Evidence ─┐  Deploy
-│  Plan, test   │ │  Audit trail  │──────▶ Production
-└───────────────┘ └───────────────┘
+PR arrives
+   │
+   ▼
+① Detect  — Is there AI code? (Co-Authored-By, PR disclosure, branch prefix, diff heuristics)
+   │
+   ▼
+② Analyze — What quality issues does it have? (5 rule categories)
+   │
+   ▼
+③ Score   — How much technical debt does this PR add? (5-dimension weighted score)
+   │
+   ▼
+④ Enforce — Should this PR be blocked? (OPA Rego policy)
+   │
+   ▼
+PASS / WARN / BLOCK
 ```
+
+---
 
 ## Key Concepts
 
 ### AI Attribution
 
-Every artifact carries an **AI attribution flag** that indicates whether AI contributed. This enables automated workflows to apply appropriate scrutiny levels without requiring human triage.
+ODS reads `Co-Authored-By` trailers — already emitted by Claude Code, GitHub Copilot, and Cursor — as the **primary** AI attribution signal. A commit with a recognized AI tool in `Co-Authored-By` is an ODS-compliant disclosure without any additional fields.
+
+ODS-specific trailer fields (`AI-assisted:`, `AI-tool:`) are supplemental and optional. Teams using AI tools that already emit `Co-Authored-By` are already compliant with Module 02.
 
 ### Machine-Parseable Schemas
 
-Each module defines a JSON Schema. Tools can validate artifacts without understanding the semantics — just validate against the schema. This makes ODS compatible with any language, any CI/CD, any AI tool.
+Each active module defines a JSON Schema. Tools can validate artifacts without understanding the semantics — just validate against the schema.
 
 ### Composable Design
 
-Use one module or all nine. Each schema is independently useful:
-- Need better branch names? → Use only Module 01
-- Want AI review standards? → Add Module 04
-- Need SOC2 compliance evidence? → Adopt Module 09
-
-### Governance as Code
-
-Approval policies (Module 07) are declarative JSON. They're stored in version control, reviewed like code, and enforced by automation — not by remembering who needs to approve what.
+Use one module or all three:
+- Branch names with AI context? → Module 01
+- AI-attributed commit messages? → Module 02
+- Structured AI disclosure in PRs? → Module 03
 
 ## Versioning
 
 ODS follows [Semantic Versioning](https://semver.org):
 
 - **MAJOR** — Breaking changes to schema structure or required fields
-- **MINOR** — New modules, new optional fields, new enum values
+- **MINOR** — New optional fields, new enum values
 - **PATCH** — Documentation fixes, example updates, clarifications
 
 ## Conformance

@@ -1,10 +1,5 @@
 # This workflow validates delivery artifacts against Open Delivery Spec.
 # Submitted via PR from https://github.com/open-delivery-spec
-#
-# TODO: The validate-action@v1 currently only supports the AI detection pipeline.
-# The planned `check: branch-naming` and `check: commit-message` inputs
-# are not yet implemented. Branch naming and commit message validation
-# are done via shell steps below.
 
 name: ODS Validate
 
@@ -23,8 +18,8 @@ jobs:
       - name: Validate branch naming
         run: |
           BRANCH="${{ github.head_ref }}"
-          if echo "$BRANCH" | grep -qE '^(feature|bugfix|hotfix|release|chore)/'; then
-            echo "✅ Branch naming: $BRANCH (conventional)"
+          if echo "$BRANCH" | grep -qE '^(feature|bugfix|hotfix|release|chore)/';
+            then echo "✅ Branch naming: $BRANCH (conventional)"
           else
             echo "⚠️  Branch naming: $BRANCH (not conventional — consider feature/, bugfix/, etc.)"
           fi
@@ -38,8 +33,8 @@ jobs:
             echo "No commits to validate"
           else
             echo "$COMMITS" | while IFS= read -r line; do
-              if echo "$line" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build)(\(.+\))?:'; then
-                echo "✅ $line"
+              if echo "$line" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build)(\(.+\))?:';
+                then echo "✅ $line"
               else
                 echo "⚠️  $line"
               fi
