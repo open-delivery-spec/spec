@@ -5,35 +5,25 @@
 
 ## Introduction
 
-Open Delivery Spec (ODS) defines the AI code quality gate for software delivery. Each module specifies a **format**, provides a **JSON Schema**, and includes **examples** that tools can validate against.
+Open Delivery Spec (ODS) defines the AI code quality gate for software delivery. The core pipeline (`detect → analyze → score → check`) runs in CI to validate AI-generated code before merge.
 
-## Module Status
-
-| Status | Meaning |
-|--------|--------|
-| **Candidate** | Implementation-validated. Schema stable enough for tooling. Minor additions only. |
-| **Deprecated** | Retired. Schemas remain in `schemas/` for reference; no new tooling. |
-
-## Active Modules
-
-| # | Module | Schema | Status |
-|---|--------|--------|--------|
-| 01 | [Branch Naming](01-branch-naming.md) | [`branch-naming.json`](../schemas/branch-naming.json) | 🟡 Candidate |
-| 02 | [Commit Message](02-commit-message.md) | [`commit-message.json`](../schemas/commit-message.json) | 🟡 Candidate |
-| 03 | [PR Description](03-pr-description.md) | [`pr-description.json`](../schemas/pr-description.json) | 🟡 Candidate |
+See [ROADMAP.md](../ROADMAP.md) for the current milestone plan.
 
 ## Deprecated Modules
 
-The following modules are retired as of June 2026. Schemas remain in `schemas/` for reference only.
+The original ODS module concept (branch naming, commit message, and PR description conventions) is retired as of June 2026. All 9 modules are deprecated. Schemas remain in `schemas/` for reference only.
 
 | # | Module | Reason |
 |---|--------|-------|
-| 04 | [AI Change Review](04-ai-change-review.md) | Recommendations folded into Module 03 PR Description |
-| 05 | [CI Failure](05-ci-failure.md) | Tool feature, not a delivery metadata spec; out of scope |
-| 06 | [Release Readiness](06-release-readiness.md) | Overlaps with SLSA / in-toto; out of scope |
-| 07 | [Approval Workflow](07-approval-workflow.md) | Overlaps with SLSA / in-toto; out of scope |
-| 08 | [Rollback Plan](08-rollback-plan.md) | Overlaps with SLSA / in-toto; out of scope |
-| 09 | [Production Release Evidence](09-prod-release-evidence.md) | Overlaps with SLSA / in-toto; out of scope |
+| 01 | Branch Naming | Superseded by the detect pipeline; not implemented in CLI |
+| 02 | Commit Message | `Co-Authored-By` trailers (auto-emitted by Claude Code, Copilot, Cursor) are the attribution standard; custom fields are optional supplemental |
+| 03 | PR Description | Superseded by the detect pipeline |
+| 04 | AI Change Review | Recommendations folded into the score/check stages |
+| 05 | CI Failure | Tool feature, not a delivery metadata spec; out of scope |
+| 06 | Release Readiness | Overlaps with SLSA / in-toto; out of scope |
+| 07 | Approval Workflow | Overlaps with SLSA / in-toto; out of scope |
+| 08 | Rollback Plan | Overlaps with SLSA / in-toto; out of scope |
+| 09 | Production Release Evidence | Overlaps with SLSA / in-toto; out of scope |
 
 See [ROADMAP.md](../ROADMAP.md) for context on the deprecations.
 
@@ -68,18 +58,11 @@ PASS / WARN / BLOCK
 
 ODS reads `Co-Authored-By` trailers — already emitted by Claude Code, GitHub Copilot, and Cursor — as the **primary** AI attribution signal. A commit with a recognized AI tool in `Co-Authored-By` is an ODS-compliant disclosure without any additional fields.
 
-ODS-specific trailer fields (`AI-assisted:`, `AI-tool:`) are supplemental and optional. Teams using AI tools that already emit `Co-Authored-By` are already compliant with Module 02.
+ODS-specific trailer fields (`AI-assisted:`, `AI-tool:`) are supplemental and optional. Teams using AI tools that already emit `Co-Authored-By` are already compliant.
 
 ### Machine-Parseable Schemas
 
-Each active module defines a JSON Schema. Tools can validate artifacts without understanding the semantics — just validate against the schema.
-
-### Composable Design
-
-Use one module or all three:
-- Branch names with AI context? → Module 01
-- AI-attributed commit messages? → Module 02
-- Structured AI disclosure in PRs? → Module 03
+Deprecated module schemas remain in `schemas/` for reference. Tools can validate artifacts without understanding the semantics — just validate against the schema.
 
 ## Versioning
 
