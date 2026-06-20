@@ -1,76 +1,57 @@
 # Contributing to Open Delivery Spec
 
-Thank you for your interest in contributing! ODS is an open specification for AI-era delivery governance, and we welcome contributions from everyone.
+Thank you for your interest in contributing! ODS is an open specification for the **AI code quality gate** — detecting AI-generated code, analyzing its quality, scoring its technical-debt impact, and enforcing policy in CI. We welcome contributions from everyone.
 
 ## How to Contribute
 
 ### Proposing Changes
 
-1. **Open an Issue** — Describe the problem, use case, and proposed solution. For new modules, explain what delivery artifact needs standardization and why.
+1. **Open an Issue** — Describe the problem, use case, and proposed change. For a new check, explain what AI-code signal or defect it captures and why.
 2. **Discuss** — The community and maintainers will provide feedback.
 3. **Submit a PR** — Once there's rough consensus, implement the change.
 
+### What You Can Contribute
+
+ODS is the pipeline `detect → analyze → score → check`. Contributions usually fall into one of these:
+
+| Contribution | Where it lands | Example |
+|--------------|----------------|---------|
+| **Detection signal** | `detect` | A new way to identify AI-generated code |
+| **Analysis rule** | `analyze` | A new AI-specific defect pattern to flag |
+| **Scoring dimension** | `score` | A new factor in the technical-debt score |
+| **Rego policy example** | `examples/` | A reusable enforcement policy for a common need |
+| **Documentation** | `docs/` | Clearer guides, scenarios, comparisons |
+
+Each new check carries a maturity status (**Experimental → Candidate → Stable**); see [ROADMAP.md](ROADMAP.md) and [SPEC_VERSIONING.md](SPEC_VERSIONING.md).
+
 ### PR Requirements
 
-- [ ] Changes follow the [ODS PR Description spec](spec/03-pr-description.md)
-- [ ] If the change adds or modifies a spec module, the corresponding JSON Schema is updated
+- [ ] The change is described clearly, with a use case
+- [ ] New checks state their maturity status and rationale
 - [ ] Examples are provided for new functionality
 - [ ] Breaking changes are called out explicitly
-- [ ] CHANGELOG.md is updated
-
-### Spec Module Template
-
-When proposing a new module, follow this structure:
-
-```markdown
-# XX — Module Name
-
-**Version:** 1.0.0
-**Schema:** `schemas/module-name.json`
-
-## Overview
-[1-2 paragraphs explaining the problem this module solves]
-
-## Specification
-[Detailed spec with tables, examples, rules]
-
-## JSON Schema Validation
-[What the schema enforces]
-
-## Tooling
-[CLI and CI integration examples]
-
-## Relationship to Other Specs
-[Cross-references]
-```
+- [ ] [CHANGELOG.md](CHANGELOG.md) is updated
 
 ## Design Principles
 
 When contributing, keep these principles in mind:
 
-1. **Machine-first, human-readable.** Every spec must have a JSON Schema. Every schema must have docs.
-2. **AI-native.** Include AI attribution metadata. Design for AI agents as first-class participants.
-3. **Composable.** Each module must work independently.
+1. **Machine-first, human-readable.** Every pipeline stage emits structured JSON; every output has human docs.
+2. **AI-native.** ODS exists to govern AI-generated code. Design checks around how AI actually writes code.
+3. **Honest about scope.** ODS proves AI code was detected, vetted, and within policy — it does not prove correctness.
 4. **Tool-agnostic.** Don't assume a specific CI/CD, AI tool, or VCS.
-5. **Audit-ready.** Every artifact should carry evidence for compliance.
+5. **Policy-driven.** Enforcement decisions belong in OPA Rego, not hardcoded in tooling.
 
 ## Development
 
-### Validating Schemas
-
-```bash
-# Validate all schemas against JSON Schema Draft 2020-12
-find schemas/ -name "*.json" -exec ajv validate -s meta-schema.json -d {} \;
-
-# Validate example against a schema
-ajv validate -s schemas/branch-naming.json -d examples/branch-naming-example.json
-```
+The reference implementation lives in the [CLI repo](https://github.com/open-delivery-spec/cli). Detection signals, analysis rules, scoring dimensions, and the policy engine are implemented and tested there.
 
 ### Previewing Documentation
 
 ```bash
-# Use any Markdown previewer
-# The spec is pure Markdown with JSON examples
+cd docs
+bundle install
+bundle exec jekyll serve
 ```
 
 ## Code of Conduct

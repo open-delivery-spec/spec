@@ -1,3 +1,8 @@
+---
+title: Adoption Guide
+nav_order: 5
+---
+
 # ODS Adoption Guide
 
 **For teams that want to adopt ODS without reading the spec first.**
@@ -149,7 +154,7 @@ deny[msg] {
 
 **Team communication template:**
 
-> We're adopting [Open Delivery Spec](https://github.com/open-delivery-spec/spec) (ODS) to make our PRs easier to review — especially for AI-assisted changes. Starting this week, CI will run an AI quality check on every PR. The ODS bot posts a report on each PR. This week is observe-only; next week we'll require the check to pass. Questions? See [our adoption guide](.github/ODS-ADOPTION.md).
+> We're adopting [Open Delivery Spec](https://github.com/open-delivery-spec/spec) (ODS) to make our PRs easier to review — especially for AI-assisted changes. Starting this week, CI will run an AI quality check on every PR. The ODS bot posts a report on each PR. This week is observe-only; next week we'll require the check to pass. Questions? See the [ODS adoption guide](https://open-delivery-spec.github.io/spec/adoption-guide.html).
 
 ---
 

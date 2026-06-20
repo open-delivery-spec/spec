@@ -1,68 +1,57 @@
+---
+title: Threats & Failure Modes
+nav_order: 8
+---
+
 # Threats and Failure Modes
 
 > [!IMPORTANT]
-> ODS exists because software delivery has predictable failure modes — and they get worse when AI generates code at speed. This page maps each ODS module to the governance failure it prevents.
+> ODS exists because AI now generates code faster than review processes can vet it. This page maps the failure modes of AI-assisted delivery to the part of the ODS pipeline (`detect → analyze → score → check`) that addresses each one.
 
 ---
 
-## Failure Modes
+## AI-Specific Failure Modes
 
 | # | Failure Mode | What Goes Wrong | ODS Mitigation |
 |---|-------------|-----------------|----------------|
-| 01 | **Unstructured branch names** | Can't categorize branches for CI workflows, auto-deploy, or changelog generation | Branch Naming enforces `<type>/<description>` format |
-| 02 | **Commit messages lack intent** | Can't determine if a change was a fix, feature, or breaking change from the commit alone | Commit Message requires Conventional Commits with optional AI attribution |
-| 03 | **PR descriptions are inconsistent** | Reviewers can't quickly find Summary, Changes, or Testing sections; AI disclosures are missing | PR Description mandates structured sections including AI Disclosure |
-| 04 | **AI-generated code is invisible** | No record of which PRs contain AI-generated code, making review and liability tracking impossible | AI Change Review requires disclosure protocol: L1 (AI-assisted), L2 (AI-generated, human-reviewed), L3 (AI-generated with mandatory human review) |
-| 05 | **CI failures are opaque** | Failures produce unstructured logs; can't programmatically determine if failure is AI-related or infrastructure-related | CI Failure produces machine-parseable reports with AI explanation |
-| 06 | **Release readiness is gut-feel** | "Is this release ready?" answered orally or via Slack, with no evidence trail | Release Readiness requires evidence-based gates with scoring |
-| 07 | **Approval rules are informal** | Who needs to approve what is tribal knowledge, not documented policy | Approval Workflow makes approval rules declarative and version-controlled |
-| 08 | **No rollback plan exists** | Production incident occurs; no documented path to revert | Rollback Plan requires structured rollback plans with verification steps |
-| 09 | **No deployment evidence** | After a release, no immutable record of what was deployed, when, or whether gates were met | Production Release Evidence creates auditable, timestamped bundles |
+| 1 | **AI code ships with no disclosure** | Reviewers can't tell which changes were AI-generated, so they can't target scrutiny | `detect` surfaces AI involvement from `Co-Authored-By` trailers, PR-body disclosure, branch prefixes, and diff heuristics |
+| 2 | **High-volume AI PRs go under-reviewed** | "AI wrote it, it's probably fine" — large diffs are skimmed and merged | `detect` + `analyze` flag AI-touched code and its defect patterns so review effort goes where the risk is |
+| 3 | **AI introduces subtle quality defects** | Hallucinated APIs, unsafe deserialization, missing edge cases pass CI but rot the codebase | `analyze` applies AI-specific rule categories that generic linters don't check for |
+| 4 | **Technical debt accumulates invisibly** | Each AI PR looks fine alone; the aggregate quality slide is never measured | `score` produces a weighted technical-debt delta per PR |
+| 5 | **No consistent quality bar** | Whether risky AI code merges depends on which reviewer happened to look | `check` enforces an OPA Rego policy identically on every PR |
+| 6 | **No audit trail for AI-era changes** | Compliance asks "how do you control AI risk?" and there's no structured answer | Every detection, analysis, score, and policy decision is emitted as structured JSON |
 
 ---
 
-## AI-Specific Threats
+## Why Generic Tooling Isn't Enough
 
-AI coding tools introduce new failure modes that ODS directly addresses:
+AI-generated code fails in ways traditional checks miss:
 
-| AI Threat | Why It Matters | ODS Response |
-|-----------|---------------|--------------|
-| **AI writes code with no disclosure** | Team can't distinguish human-written from AI-generated changes | PR Description: mandatory AI Disclosure section; Commit Message: `AI-assisted: true` footer |
-| **AI changes are never reviewed** | High-volume AI PRs go unreviewed because "AI wrote it, it's probably fine" | AI Change Review L1/L2/L3 protocol; review records are machine-verifiable |
-| **AI introduces subtle bugs** | AI-generated code passes CI but contains logic errors | CI Failure: structured reports flag AI-related failures; release readiness gates catch patterns |
-| **AI makes deployment decisions** | Without evidence gates, AI-assisted deployments are opaque | Release Readiness: scored gates prevent unverified deployments |
-| **No audit trail for AI-era releases** | Compliance auditors ask "how do you control AI risks?" but no structured answer exists | Production Release Evidence: immutable deployment bundles include AI review records |
+| Generic tool | What it catches | What it misses |
+|--------------|-----------------|----------------|
+| **Linters / formatters** | Style, syntax, obvious bugs | AI-specific patterns (over-commenting, redundant error handling, hallucinated APIs) |
+| **Test coverage gates** | Untested lines | Whether the *AI-generated* portion is the untested part |
+| **Code review** | Whatever the human notices | Which changes were AI-generated, at scale, consistently |
+| **SLSA / provenance** | Build-chain integrity | The quality and review status of the change itself |
 
----
-
-## Governance Failures (Non-AI)
-
-Traditional delivery governance also has well-known failures:
-
-| Failure | Example | ODS Module |
-|---------|---------|------------|
-| **Branch naming chaos** | 47 branches named `fix`, `test`, `wip` | 01 Branch Naming |
-| **Meaningless commits** | `"fix stuff"`, `"update"` as commit messages | 02 Commit Message |
-| **Unreviewed changes** | 300-line PR merged with no description | 03 PR Description |
-| **Undocumented releases** | "We deployed last Tuesday, I think" | 09 Production Evidence |
-| **Absent rollback plans** | 4-hour outage because no one knew how to revert | 08 Rollback Plan |
+ODS sits at the **pre-merge change layer** and answers the AI-specific questions: *was this AI-generated, what's wrong with it, how much debt does it add, and does it meet policy?*
 
 ---
 
 ## Threat Model Principles
 
-ODS's threat model is not about security vulnerabilities. It's about **delivery governance failures**:
+ODS's threat model is not about security vulnerabilities. It's about **AI code quality governance failures**:
 
-1. **Opacity**: Changes happen without structured records.
-2. **Inconsistency**: Every team uses different conventions.
-3. **Untraceability**: Can't answer "was this reviewed?" or "what evidence existed for this release?"
-4. **AI blind spots**: Can't tell if AI wrote code, reviewed it, or influenced a deployment decision.
+1. **Opacity**: AI involvement is invisible, so review can't be targeted.
+2. **Volume**: AI produces more code than humans can carefully review.
+3. **Silent debt**: Quality erodes one acceptable-looking PR at a time.
+4. **Inconsistency**: The quality bar varies by reviewer instead of being enforced as policy.
 
-ODS mitigates these by requiring **machine-readable evidence** at each governance checkpoint.
+ODS mitigates these by producing **machine-readable evidence at every stage of the gate** and enforcing a **policy as code** before merge.
 
 ---
 
 ## Further Reading
 
 - [ODS Levels](levels.md) — progressive adoption model
-- [SLSA Comparison](comparison/slsa.md) — how ODS and SLSA address different threats
+- [SLSA Comparison](comparison/slsa.md) — how ODS and SLSA address different layers

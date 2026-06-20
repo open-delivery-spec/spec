@@ -1,9 +1,14 @@
+---
+title: Get Started
+nav_order: 2
+---
+
 # Get Started
 
 Start with the smallest production-ready loop: **ODS AI Quality Gate**. This takes ~5 minutes and runs in CI.
 
 > [!TIP]
-> Want to see what an ODS-compliant PR looks like? Copy the [PR Template](../examples/ods-pr-template.md) into `.github/PULL_REQUEST_TEMPLATE.md`.
+> Want to see what an ODS-compliant PR looks like? Copy the [PR Template](https://github.com/open-delivery-spec/spec/blob/main/examples/ods-pr-template.md) into `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ---
 
@@ -105,22 +110,43 @@ AI-confidence: high
 
 ---
 
-## Path C: Experimental Evidence Modules
+## Path C: Customize Enforcement Policy
 
-**For**: Release managers, compliance teams exploring the direction (not production-ready).
+**For**: Teams that want a hard gate tuned to their own quality bar.
 
-**Goal**: Explore the draft release-governance schemas before enforcing them.
+**Goal**: Decide exactly which PRs block, using OPA Rego.
 
-> [!WARNING]
-> Modules 06–09 (Release Readiness, Approval Workflow, Rollback Plan, Production Evidence) are experimental and CLI commands for these modules are not yet implemented. See [ROADMAP.md](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md) for status.
+### 1. Complete Path A first
 
-> See [`.ods/` Convention](ods-artifacts) for the artifact directory layout and naming conventions.
+The policy runs as the `check` stage of the pipeline.
 
-### 1. Complete Paths A and B first
+### 2. Add `.ods/policy.rego`
 
-### 2. Validate draft evidence files against the JSON schemas
+```rego
+package ods.policy
 
-Use any JSON Schema validator with the schemas in [schemas/](https://github.com/open-delivery-spec/spec/tree/main/schemas). CLI support for evidence validation commands is on the roadmap.
+default allow := true
+
+# Block critical issues unconditionally
+deny[msg] {
+    issue := input.issues[_]
+    issue.severity == "critical"
+    msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
+}
+
+# Block high-confidence AI code with low test coverage
+deny[msg] {
+    input.ai_confidence > 0.8
+    input.test_coverage < 0.3
+    msg := "AI code with low test coverage"
+}
+```
+
+See the [`.ods/` Convention](ods-artifacts.md) for the full list of policy input fields.
+
+### 3. Require the check in branch protection
+
+Once `ods check` blocks the changes you care about, make the ODS workflow a required status check so violations can't merge.
 
 ---
 
@@ -130,7 +156,7 @@ Use any JSON Schema validator with the schemas in [schemas/](https://github.com/
 |----------------|----------|
 | Automated AI quality checks in CI | [Path A](#path-a-ai-quality-gate) |
 | AI disclosure and attribution | [Path B](#path-b-ai-disclosure) |
-| Release audit trails | [Path C](#path-c-experimental-evidence-modules) |
+| A hard gate tuned to your policy | [Path C](#path-c-customize-enforcement-policy) |
 | The simplest possible setup | Add `open-delivery-spec/validate-action@v1` to your PR workflow |
 
 > [!TIP]

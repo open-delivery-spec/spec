@@ -1,3 +1,8 @@
+---
+title: Ecosystem
+nav_order: 7
+---
+
 # ODS Ecosystem Positioning
 
 This document clarifies how Open Delivery Spec relates to other standards and tools in the software delivery landscape.
@@ -36,10 +41,10 @@ These are different questions with different audiences, and they are often co-de
 
 | Standard | ODS Relationship |
 |---|---|
-| **Conventional Commits** | ODS Module 02 extends Conventional Commits with AI attribution trailers (`AI-assisted`, `AI-tool`, `AI-review`). The commit format remains fully compatible — ODS adds machine-parseable metadata on top of what Conventional Commits already defines. |
-| **Conventional Branch** | ODS Module 01 formalizes branch naming around the same prefixes (`feature/`, `bugfix/`, `hotfix/`, `release/`, `chore/`). ODS adds automated validation and reporting. |
+| **Conventional Commits** | ODS reads commit metadata — especially `Co-Authored-By` trailers — as an AI-attribution signal during `detect`. The commit format is unchanged; ODS consumes what tools already emit rather than mandating a new format. |
+| **Conventional Branch** | ODS recognizes AI-tool branch prefixes (`claude/`, `copilot/`, `cursor/`) and conventional prefixes (`feature/`, `bugfix/`, …) as detection signals. It reads them, it doesn't require them. |
 
-ODS does not compete with these standards — it **extends them** with AI-specific metadata and automated enforcement. A repository can use Conventional Commits and ODS together without conflict.
+ODS does not compete with these standards — it **builds on them** by treating their metadata as AI-detection input. A repository can use Conventional Commits and ODS together without conflict.
 
 ## ODS vs AI Code Linters
 
@@ -48,7 +53,7 @@ AI-focused linters (e.g., specialized Copilot review tools) detect code quality 
 - **Multi-source AI detection** without relying on developer self-disclosure
 - **Technical debt scoring** that combines detection confidence, defect density, and test coverage
 - **Policy enforcement** via OPA Rego, allowing enterprise-specific rules
-- **Standardized review records** (Module 04) for audit trail
+- **Policy decisions recorded as structured JSON** for an audit trail of what was gated and why
 
 ## ODS vs GitHub Code Review / GitLab MR
 

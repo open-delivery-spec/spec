@@ -28,7 +28,7 @@ Each workflow runs on every pull request to the default branch and performs:
 
 1. **Branch naming check** — validates against conventional branch prefixes (`feature/`, `bugfix/`, `hotfix/`, `release/`, `chore/`)
 2. **Commit message check** — validates against Conventional Commits format (`feat:`, `fix:`, `docs:`, etc.)
-3. **ODS AI code quality gate** — detects AI-generated code, analyzes quality, scores technical debt, and enforces policy (using `validate-action@v2`)
+3. **ODS AI code quality gate** — detects AI-generated code, analyzes quality, scores technical debt, and enforces policy (using `validate-action@v1`)
 
 ## Note
 

@@ -1,22 +1,22 @@
 ---
-name: Schema Change
-about: Propose a change to an existing JSON Schema
-title: "[Schema] "
-labels: schema
+name: Spec Change
+about: Propose a change to the pipeline or the policy input contract
+title: "[Spec] "
+labels: spec
 assignees: ''
 ---
 
-## Module Affected
+## Area Affected
 
-Which module's schema? (link to spec)
+Which part of the spec? (e.g. a `detect` signal, an `analyze` rule, a `score` dimension, or the policy input fields)
 
 ## Change Description
 
-What field is being added, removed, or modified?
+What is being added, removed, or modified?
 
 ## Breaking?
 
-Is this a breaking change? If yes, what's the migration path?
+Is this a breaking change to the policy input contract or CLI behavior? If yes, what's the migration path?
 
 ## Rationale
 

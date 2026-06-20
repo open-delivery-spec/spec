@@ -113,8 +113,8 @@ This is the same philosophy behind checklists in surgery and aviation: the check
 
 ## Try It
 
-1. Copy the [PR Template](../examples/ods-pr-template.md) into `.github/PULL_REQUEST_TEMPLATE.md`
+1. Copy the [PR Template](https://github.com/open-delivery-spec/spec/blob/main/examples/ods-pr-template.md) into `.github/PULL_REQUEST_TEMPLATE.md`
 2. Add the [ODS L1 GitHub Action](https://github.com/open-delivery-spec/validate-action) to your CI
 3. Compare your next 5 PRs to the previous 5
 
-See [Get Started](get-started) for the full adoption guide.
+See [Get Started](get-started.md) for the full adoption guide.

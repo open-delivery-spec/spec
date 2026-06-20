@@ -64,18 +64,16 @@ The spec as a whole carries a single aggregate version. This is the version refe
 ## Deprecation Policy
 
 1. Deprecated checks remain documented for **6 months** after deprecation announcement.
-2. Deprecated schemas and fields remain in the repo for at least **1 minor version** after deprecation.
-3. Deprecation notices are published in [CHANGELOG.md](CHANGELOG.md).
+2. Deprecation notices are published in [CHANGELOG.md](CHANGELOG.md).
 
-### v1.0.0 Deprecation (June 2026)
+### Module Deprecation (June 2026)
 
-All original modules (01–09: Branch Naming, Commit Message, PR Description, AI Change Review, CI Failure, Release Readiness, Approval Workflow, Rollback Plan, Production Evidence) are deprecated. JSON Schemas remain in `schemas/` for reference. Tooling no longer supports them.
+The original modules (01–09: Branch Naming, Commit Message, PR Description, AI Change Review, CI Failure, Release Readiness, Approval Workflow, Rollback Plan, Production Evidence) and their JSON Schemas have been **removed**. The CLI never shipped support for most of them, and the survivors were superseded by the AI code quality pipeline (`detect → analyze → score → check`). Their definitions remain available in git history.
 
 ## Tooling Compatibility
 
-| Spec Version | CLI Version | Action Version |
-|-------------|-------------|----------------|
-| `2.0.0` | `>= 2.0.0` | `@v2` |
-| `1.0.0` | `>= 1.0.0` | `@v1` |
+| Spec Surface | CLI Version | Action Version |
+|--------------|-------------|----------------|
+| AI code quality pipeline (`detect → analyze → score → check`) | `>= 1.0.0` | `@v1` |
 
-CLI and GitHub Action versions track the aggregate spec version. Breaking changes to tooling follow their own semver. `@v1` of the validate-action targets spec v1.0.0 (modules 01–09). `@v2` targets spec v2.0.0+ (AI code quality pipeline).
+The CLI and GitHub Action track the spec's aggregate version. `validate-action@v1` runs the current AI code quality pipeline. Breaking changes to tooling follow their own semver; a future `@v2` would accompany a `2.0.0` spec.
