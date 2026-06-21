@@ -1,6 +1,6 @@
 # Open Delivery Spec (ODS)
 
-> **Detect AI-generated code, analyze its quality, and prevent technical debt — before it reaches production.**
+> **Zero-config AI code detection for teams using Claude Code, Copilot, or Cursor.** These tools already write `Co-Authored-By` trailers to every commit. ODS reads them automatically in CI — detecting AI-generated code, analyzing quality, scoring technical debt, and enforcing policy on every PR.
 
 [![CI](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml/badge.svg)](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml)
 
@@ -14,7 +14,7 @@ Enterprises are adopting AI coding tools at speed — but AI-generated code incr
 PR arrived
    │
    ▼
-① Detect  — Which code is AI-generated? (multi-source, no self-disclosure required)
+① Detect  — Which code is AI-generated? (Co-Authored-By trailers, PR disclosure, branch prefix, diff heuristics)
    │
    ▼
 ② Analyze — What quality defects does the AI code have? (5 rule categories)
@@ -59,13 +59,14 @@ ods hook install
 
 ### 1. Detect — AI Code Detection
 
-Finds AI-generated code without relying on developer self-disclosure.
+Finds AI-generated code using multiple independent signals. `Co-Authored-By` trailers — automatically emitted by Claude Code, GitHub Copilot, and Cursor — are the primary signal. No configuration required.
 
 | Signal | Source |
 |---|---|
-| Git commit trailers | `AI-assisted: true`, `AI-tool: name` |
+| **`Co-Authored-By` commit trailers** | Auto-emitted by Claude Code, GitHub Copilot, Cursor — primary signal |
+| ODS trailer fields | `AI-assisted: true`, `AI-tool: name` — supplemental, optional |
 | PR body AI disclosure | Checkbox and section parsing |
-| Branch name prefix | `ai-*` convention |
+| Branch name prefix | `claude/`, `copilot/`, `cursor/`, `ai-*` prefixes |
 | Diff heuristics | Comment ratio, verbose naming, error patterns |
 
 ### 2. Analyze — Quality Defect Detection
@@ -124,11 +125,11 @@ deny[msg] {
 
 ## Design Principles
 
-1. **Detect, don't rely on disclosure.** AI code detection uses multiple independent signal sources — not just developer checkboxes.
-2. **Deterministic rules, probabilistic signals.** Quality rules are yes/no. Detection confidence is a signal, not a verdict.
+1. **Detect, don’t rely on disclosure.** `Co-Authored-By` trailers are emitted automatically — detection works even without developer cooperation.
+2. **Deterministic rules, probabilistic signals.** Quality rules are yes/no. Detection confidence is a signal for policy thresholds, not a verdict.
 3. **Tool-agnostic.** Works with GitHub, GitLab, Jenkins, or any CI/CD that can run a binary.
 4. **Policy as code.** Enterprise rules written in Rego, version-controlled alongside code.
-5. **Prevent, don't just report.** Pre-commit hooks block problems before they reach CI.
+5. **Prevent, don’t just report.** Pre-commit hooks block problems before they reach CI.
 
 ---
 
