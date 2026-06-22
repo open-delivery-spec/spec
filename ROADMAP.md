@@ -5,7 +5,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 ## Status Legend
 
 | Status | Meaning |
-|--------|---------|
+|--------|-------|
 | **Experimental** | Direction-setting. Not recommended for production adoption. Breaking changes expected. |
 | **Candidate** | Stable enough for tooling. Minor additions only. |
 | **Stable** | Production-ready. Semver applies. |
@@ -15,7 +15,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 ## Current Status (June 2026)
 
-> **Strategy**: ODS is an AI code quality gate. Detect AI-generated code, analyze its quality defects, score technical debt impact, and enforce enterprise policy — all before merge.
+> **Strategy**: Zero-config AI code quality gate. Claude Code, GitHub Copilot, and Cursor auto-emit `Co-Authored-By` trailers — ODS reads them in CI to detect, analyze, score, and enforce policy on every PR.
 
 ### Core Pipeline
 
@@ -26,21 +26,22 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | `ods score` | 5-dimension technical debt scoring | ✅ Stable |
 | `ods check` | OPA Rego policy enforcement | ✅ Stable |
 | `ods hook install` | Pre-commit / prepare-commit-msg / pre-push hooks | ✅ Stable |
-| `ods init` | Scaffold CI workflow, AGENTS.md, Cursor rules | ✅ Candidate |
+| `ods init` | Scaffold CI workflow, policy.rego, AGENTS.md, Cursor rules | ✅ Candidate |
 
 ### Detection Signals
 
 | Signal | Source | Confidence | Status |
 |--------|--------|-----------|--------|
-| Git commit trailers | `AI-assisted: true`, `AI-tool: name` | 90% | ✅ Stable |
-| PR body AI disclosure | Checkbox and section parsing | 85% | ✅ Stable |
+| `Co-Authored-By` commit trailers | Auto-emitted by Claude Code, GitHub Copilot, Cursor — **primary signal** | 90% | ✅ Stable |
+| ODS trailer fields | `AI-assisted: true`, `AI-tool: name` — supplemental, optional | 85% | ✅ Stable |
+| PR body AI disclosure | Checkbox and section parsing | 75% | ✅ Stable |
 | Branch name prefix | `ai-*` convention | 35–50% | ✅ Stable |
 | Diff heuristics | Comment ratio, verbose naming, error patterns | 40% | ✅ Candidate |
 
 ### Analysis Rules
 
 | Rule | Severity | Status |
-|------|----------|--------|
+|------|----------|---------|
 | `ai-redundant-error-handling` | medium | ✅ Stable |
 | `ai-over-commenting` | medium-high | ✅ Stable |
 | `ai-missing-edge-case` | low | ✅ Stable |
@@ -64,7 +65,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 The original 01–09 module system has been **deprecated and removed** as of June 2026 — from the CLI, the spec documents, and the JSON Schemas. Their definitions remain available in git history. Tooling no longer supports them.
 
 | Module | Deprecation Date |
-|--------|-----------------|
+|--------|------------------|
 | 01 — Branch Naming | June 2026 |
 | 02 — Commit Message | June 2026 |
 | 03 — PR Description | June 2026 |
@@ -83,7 +84,7 @@ The original 01–09 module system has been **deprecated and removed** as of Jun
 
 **Status: Complete (June 2026)**
 
-- [x] CLI: `ods detect` with multi-source AI detection (commit trailers, PR body, branch prefix, diff heuristics)
+- [x] CLI: `ods detect` with multi-source AI detection (Co-Authored-By trailers, ODS trailer fields, PR body, branch prefix, diff heuristics)
 - [x] CLI: `ods analyze` with 5 rule categories for AI code quality defects
 - [x] CLI: `ods score` with 5-dimension weighted technical debt scoring
 - [x] CLI: `ods check` with OPA Rego policy engine and policy tests
