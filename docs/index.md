@@ -24,7 +24,7 @@ AI coding tools make changes faster than delivery processes can explain them. OD
 # Install CLI
 go install github.com/open-delivery-spec/cli/cmd/ods@latest
 
-# Initialize your repo (creates workflow + AGENTS.md)
+# Initialize your repo (creates the CI workflow + .ods/policy.rego)
 ods init
 
 # Run the pipeline locally

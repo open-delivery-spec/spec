@@ -26,7 +26,7 @@ Save as `.github/pull_request_template.md` in your repository.
 # Install ODS CLI
 go install github.com/open-delivery-spec/cli/cmd/ods@latest
 
-# Initialize your repo (creates workflow, AGENTS.md, Cursor rules)
+# Initialize your repo (creates the CI workflow + .ods/policy.rego)
 ods init
 
 # Copy a policy example
