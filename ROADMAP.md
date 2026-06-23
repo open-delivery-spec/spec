@@ -26,7 +26,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | `ods score` | 5-dimension technical debt scoring | ✅ Stable |
 | `ods check` | OPA Rego policy enforcement | ✅ Stable |
 | `ods hook install` | Pre-commit / prepare-commit-msg / pre-push hooks | ✅ Stable |
-| `ods init` | Scaffold CI workflow, policy.rego, AGENTS.md, Cursor rules | ✅ Candidate |
+| `ods init` | Scaffold CI workflow + `.ods/policy.rego` | ✅ Stable |
 
 ### Detection Signals
 
