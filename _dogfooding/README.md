@@ -26,7 +26,7 @@ These workflows demonstrate how any project can adopt ODS validation on their pu
 
 Each workflow runs on every pull request to the default branch and performs:
 
-1. **Conventional branch & commit checks** — runs [`commit-check/commit-check-action@v2`](https://github.com/commit-check/commit-check-action) to validate branch names (Conventional Branch) and commit messages (Conventional Commits). Using the dedicated tool — instead of hand-rolled `grep` — keeps the rules configurable and correctly recognizes AI-tool branch prefixes (`claude/`, `copilot/`, `cursor/`).
+1. **Conventional branch & commit checks** — runs the [`commit-check`](https://github.com/commit-check/commit-check) CLI (`commit-check>=2.9.0`) to validate branch names (Conventional Branch) and commit messages (Conventional Commits). Using the dedicated tool — instead of hand-rolled `grep` — keeps the rules configurable and, from 2.9.0 on, recognizes AI-tool branch prefixes (`claude/`, `copilot/`, `cursor/`). The workflow checks out `github.head_ref` so the check sees the real PR branch and head commit (not the synthetic merge commit).
 2. **ODS AI code quality gate** — detects AI-generated code, analyzes quality, scores technical debt, and enforces policy (using `validate-action@v1`)
 
 ## Note
