@@ -1,0 +1,18 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.92,
+  "technical_debt_delta": 3.8,
+  "test_coverage": 0.04,
+  "test_coverage_source": "cobertura",
+  "branch": "cursor/implement-billing",
+  "changed_files": ["billing/invoice.go", "billing/payment.go"],
+  "issues": [],
+  "ai_files": [
+    {
+      "path": "billing/invoice.go",
+      "ai_lines": 203,
+      "total_lines": 230,
+      "confidence": 0.92
+    }
+  ]
+}

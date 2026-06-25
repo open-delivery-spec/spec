@@ -20,8 +20,28 @@ Start with the smallest production-ready loop: **ODS AI Quality Gate**. This tak
 
 ### 1. Install the CLI
 
+**Binary install (recommended):**
+
+Download a pre-compiled binary from the [releases page](https://github.com/open-delivery-spec/cli/releases/latest):
+
 ```bash
-go install github.com/open-delivery-spec/cli/cmd/ods@main
+# macOS (Apple Silicon)
+curl -L https://github.com/open-delivery-spec/cli/releases/latest/download/ods_latest_darwin_arm64.tar.gz | tar xz
+sudo mv ods /usr/local/bin/
+
+# macOS (Intel)
+curl -L https://github.com/open-delivery-spec/cli/releases/latest/download/ods_latest_darwin_amd64.tar.gz | tar xz
+sudo mv ods /usr/local/bin/
+
+# Linux (amd64)
+curl -L https://github.com/open-delivery-spec/cli/releases/latest/download/ods_latest_linux_amd64.tar.gz | tar xz
+sudo mv ods /usr/local/bin/
+```
+
+**From source (Go required):**
+
+```bash
+go install github.com/open-delivery-spec/cli/cmd/ods@latest
 ```
 
 ### 2. Add to your CI
@@ -62,6 +82,47 @@ ods check     # Does the OPA policy allow this change?
 ```
 
 **You're ready** when `ods check` passes and the validate-action reports `PASS` on every PR.
+
+### Optional: Bring your own scanner (SARIF)
+
+ODS can ingest SARIF v2.1.0 output from tools like semgrep or CodeQL and include their findings in the policy input's `issues[]` array. This lets a single Rego policy block on both ODS-native findings and external scanner findings:
+
+```bash
+# Run semgrep and pass its findings to ods analyze
+semgrep --config=auto --sarif > semgrep.sarif
+ods analyze --sarif semgrep.sarif --json
+
+# Or in a CI step, before ods check:
+- name: Semgrep
+  run: semgrep --config=auto --sarif > semgrep.sarif
+- name: ODS check
+  run: ods analyze --sarif semgrep.sarif && ods score && ods check
+```
+
+### Optional: Real test coverage
+
+ODS automatically detects coverage reports in the working directory and uses them instead of estimating from test file line counts. Supported formats:
+
+| Format | File(s) |
+|--------|---------|
+| Go | `coverage.out`, `cover.out` |
+| LCOV | `lcov.info`, `coverage/lcov.info` |
+| Cobertura | `coverage.xml`, `coverage/cobertura-coverage.xml` |
+| NYC/Istanbul | `coverage-summary.json`, `coverage/coverage-summary.json` |
+
+Generate coverage before running `ods score`:
+
+```bash
+# Go
+go test ./... -coverprofile=coverage.out
+ods score  # auto-detects coverage.out
+
+# Jest (NYC)
+npx jest --coverage
+ods score  # auto-detects coverage/coverage-summary.json
+```
+
+When no coverage file is found, ODS sets `test_coverage = -1` ("not measured") and skips the coverage penalty. Your Rego policies **must guard** coverage rules with `input.test_coverage >= 0` to avoid false positives on projects without coverage tooling.
 
 ---
 
@@ -135,8 +196,10 @@ deny[msg] {
 }
 
 # Block high-confidence AI code with low test coverage
+# NOTE: guard with >= 0 — value of -1 means "not measured", skip the check
 deny[msg] {
     input.ai_confidence > 0.8
+    input.test_coverage >= 0
     input.test_coverage < 0.3
     msg := "AI code with low test coverage"
 }

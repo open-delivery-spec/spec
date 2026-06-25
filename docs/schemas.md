@@ -12,16 +12,35 @@ ODS's machine-readable contract is the **policy input** — the structured objec
 > [!NOTE]
 > ODS previously published per-module JSON Schemas (branch naming, commit message, release evidence, etc.). Those modules were deprecated in June 2026 and their schemas removed. The pipeline's policy input below is the current machine contract. See [ROADMAP.md](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md).
 
+## Machine-Readable Schema
+
+The policy input contract is published as a versioned JSON Schema:
+
+**[`schemas/policy-input/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/policy-input/v1.json)**
+(`$id`: `https://open-delivery-spec.dev/schemas/policy-input/v1.json`)
+
+You can use it to validate policy inputs or generate typed bindings in your language of choice:
+
+```bash
+# Validate a local policy input against the schema
+npx ajv-cli validate -s schemas/policy-input/v1.json -d .ods/out/detect.json
+```
+
 ## Policy Input Fields
 
-| Field | Type | Produced by | Description |
-|-------|------|-------------|-------------|
-| `ai_generated` | bool | `detect` | Whether AI code was detected in the diff |
-| `ai_confidence` | float (0.0–1.0) | `detect` | Aggregate detection confidence |
-| `issues` | array | `analyze` | Quality issues found; each item has `rule`, `severity`, `file`, `line` |
-| `technical_debt_delta` | float | `score` | Weighted technical-debt impact of the PR |
-| `test_coverage` | float (0.0–1.0) | `score` | Test coverage ratio for the change |
-| `branch` | string | context | The PR's head branch name |
+| Field | Type | Required | Produced by | Description |
+|-------|------|----------|-------------|-------------|
+| `ai_generated` | bool | ✅ | `detect` | Whether AI code was detected in the diff |
+| `ai_confidence` | float (0.0–1.0) | ✅ | `detect` | Aggregate detection confidence |
+| `issues` | array | | `analyze` | Quality issues found |
+| `technical_debt_delta` | float | | `score` | Weighted technical-debt impact of the PR |
+| `test_coverage` | float (−1 or 0.0–1.0) | | `score` | Test coverage ratio; **−1 means not measured** |
+| `test_coverage_source` | string | | `score` | How coverage was measured (`go`/`lcov`/`cobertura`/`nyc`/`estimated`/`unknown`) |
+| `branch` | string | | context | The PR's head branch name |
+| `changed_files` | string[] | | context | Paths of files changed in the PR |
+| `ai_files` | array | | `detect` | Per-file AI attribution detail |
+
+> **`test_coverage` sentinel:** A value of `−1` means coverage was not measured (no coverage file found). Policies that check coverage MUST guard with `input.test_coverage >= 0` to avoid false positives on PRs where coverage is unavailable.
 
 ### `issues[]` item shape
 
@@ -31,6 +50,16 @@ ODS's machine-readable contract is the **policy input** — the structured objec
 | `severity` | string | `low` \| `medium` \| `high` \| `critical` |
 | `file` | string | Path to the affected file |
 | `line` | integer | Line number of the finding |
+| `message` | string | Human-readable description |
+
+### `ai_files[]` item shape
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `path` | string | File path |
+| `ai_lines` | integer | Lines attributed to AI |
+| `total_lines` | integer | Total changed lines in the file |
+| `confidence` | float | Per-file confidence (0.0–1.0) |
 
 ## Using the Input in a Policy
 

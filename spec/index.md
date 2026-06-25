@@ -79,6 +79,25 @@ A change **conforms** to ODS when the pipeline runs on it and the policy is sati
 - ⚠️ `WARN` — A `warn` rule fired, but no `deny` rule
 - ❌ `BLOCK` — At least one `deny` rule fired (CI exits non-zero)
 
+### Conformance Test Scenarios
+
+The [`spec/conformance/`](conformance/) directory contains reference scenarios — each with an `input.json`, `policy.rego`, and `expected.json` — that any ODS-compatible implementation must pass:
+
+| Scenario | Expected result |
+|----------|----------------|
+| `pass-human-code` | PASS — human PR, no issues |
+| `warn-ai-detected` | WARN — AI detected, policy fires `warn` |
+| `block-critical-issue` | BLOCK — critical issue found |
+| `block-ai-no-tests` | BLOCK — AI code with < 30% test coverage |
+| `warn-detect-inconclusive` | WARN — detection error, `_ods_detect_error` sentinel set |
+
+See [`spec/conformance/README.md`](conformance/README.md) for how to run the suite.
+
+### Policy Input Schema
+
+The machine-readable contract for what fields a policy can read is published as a versioned JSON Schema:
+[`schemas/policy-input/v1.json`](../schemas/policy-input/v1.json) — full field reference in [Policy Input Schema](../docs/schemas.md).
+
 ## Tooling
 
 - [ODS CLI](https://github.com/open-delivery-spec/cli) — Reference implementation

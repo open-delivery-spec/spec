@@ -1,0 +1,33 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.88,
+  "technical_debt_delta": 4.5,
+  "test_coverage": 0.15,
+  "test_coverage_source": "lcov",
+  "branch": "copilot/refactor-parser",
+  "changed_files": ["src/parser.py", "src/parser_test.py"],
+  "issues": [
+    {
+      "rule": "ai-unsafe-deserialization",
+      "severity": "critical",
+      "file": "src/parser.py",
+      "line": 87,
+      "message": "json.loads() result cast to interface{} without validation"
+    },
+    {
+      "rule": "ai-over-commenting",
+      "severity": "medium",
+      "file": "src/parser.py",
+      "line": 12,
+      "message": "Comment-to-code ratio 61% — comments restate the obvious"
+    }
+  ],
+  "ai_files": [
+    {
+      "path": "src/parser.py",
+      "ai_lines": 110,
+      "total_lines": 145,
+      "confidence": 0.88
+    }
+  ]
+}

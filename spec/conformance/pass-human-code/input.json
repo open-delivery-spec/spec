@@ -1,0 +1,11 @@
+{
+  "ai_generated": false,
+  "ai_confidence": 0.0,
+  "technical_debt_delta": 0.2,
+  "test_coverage": 0.82,
+  "test_coverage_source": "go",
+  "branch": "feature/add-login",
+  "changed_files": ["cmd/login.go", "cmd/login_test.go"],
+  "issues": [],
+  "ai_files": []
+}

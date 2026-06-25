@@ -1,0 +1,5 @@
+{
+  "allowed": true,
+  "denials": [],
+  "warnings": ["AI-generated code detected — ensure human review"]
+}

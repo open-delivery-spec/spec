@@ -1,0 +1,18 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.95,
+  "technical_debt_delta": 1.2,
+  "test_coverage": 0.71,
+  "test_coverage_source": "go",
+  "branch": "claude/add-oauth-handler",
+  "changed_files": ["internal/auth/oauth.go"],
+  "issues": [],
+  "ai_files": [
+    {
+      "path": "internal/auth/oauth.go",
+      "ai_lines": 42,
+      "total_lines": 78,
+      "confidence": 0.9
+    }
+  ]
+}

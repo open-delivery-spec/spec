@@ -1,0 +1,8 @@
+{
+  "allowed": false,
+  "denials": [
+    "CRITICAL: ai-unsafe-deserialization at src/parser.py:87",
+    "AI code with low test coverage"
+  ],
+  "warnings": []
+}
