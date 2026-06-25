@@ -1,0 +1,12 @@
+{
+  "_ods_detect_error": true,
+  "ai_generated": false,
+  "ai_confidence": 0,
+  "technical_debt_delta": 0.5,
+  "test_coverage": -1,
+  "test_coverage_source": "unknown",
+  "branch": "feature/cleanup",
+  "changed_files": ["README.md"],
+  "issues": [],
+  "ai_files": []
+}

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-delivery-spec.dev/schemas/policy-input/v1.json",
+  "title": "ODS Policy Input v1",
+  "description": "The structured object ODS feeds to OPA Rego policy evaluation at the check stage. All fields are set by the ODS CLI pipeline (detect → analyze → score) and are available as `input.*` inside your Rego policy.",
+  "type": "object",
+  "required": ["ai_generated", "ai_confidence"],
+  "properties": {
+    "ai_generated": {
+      "type": "boolean",
+      "description": "Whether AI code was detected in the diff."
+    },
+    "ai_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Aggregate AI detection confidence (0.0–1.0). 0 means no signal; 1.0 means multiple high-confidence signals."
+    },
+    "technical_debt_delta": {
+      "type": "number",
+      "description": "Weighted technical-debt impact of the PR. Higher positive = more debt added. Negative values indicate debt reduction."
+    },
+    "test_coverage": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1,
+      "description": "Line coverage rate (0.0–1.0). -1 means not measured (no coverage file found). Policies should guard with `input.test_coverage >= 0` before comparing."
+    },
+    "test_coverage_source": {
+      "type": "string",
+      "enum": ["go", "lcov", "cobertura", "nyc", "estimated", "unknown"],
+      "description": "How test_coverage was obtained. 'unknown' means it was not measured."
+    },
+    "branch": {
+      "type": "string",
+      "description": "The PR head branch name (e.g. claude/add-auth, feature/oauth)."
+    },
+    "changed_files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Paths of all files changed in the PR (all types, not just code files)."
+    },
+    "issues": {
+      "type": "array",
+      "description": "Quality issues found by ods analyze. Each item represents one finding from the heuristic analyzer or an ingested SARIF report.",
+      "items": { "$ref": "#/$defs/Issue" }
+    },
+    "ai_files": {
+      "type": "array",
+      "description": "Files detected as containing AI-generated code by ods detect.",
+      "items": { "$ref": "#/$defs/AIFile" }
+    }
+  },
+  "$defs": {
+    "Issue": {
+      "type": "object",
+      "required": ["rule", "severity", "file", "line"],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "description": "Rule identifier. Built-in rules are prefixed ai- (e.g. ai-unsafe-deserialization). SARIF rules use the tool's own id."
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low", "info"],
+          "description": "Issue severity."
+        },
+        "file": {
+          "type": "string",
+          "description": "Repository-relative file path."
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Line number (0 when the location is not known)."
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable description of the issue."
+        }
+      }
+    },
+    "AIFile": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Repository-relative file path."
+        },
+        "ai_lines": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Estimated number of AI-generated lines in the file."
+        },
+        "total_lines": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total lines added in this file."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "AI detection confidence for this file (0.0–1.0)."
+        }
+      }
+    }
+  }
+}

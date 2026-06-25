@@ -1,0 +1,5 @@
+{
+  "allowed": false,
+  "denials": ["AI code with low test coverage"],
+  "warnings": []
+}

@@ -46,6 +46,36 @@ These are different questions with different audiences, and they are often co-de
 
 ODS does not compete with these standards — it **builds on them** by treating their metadata as AI-detection input. A repository can use Conventional Commits and ODS together without conflict.
 
+## ODS and Semgrep / CodeQL
+
+| Dimension | Semgrep / CodeQL | ODS |
+|---|---|---|
+| **What it finds** | Security, bug, or style defects in any code | Quality patterns specific to AI-generated code |
+| **Output format** | SARIF v2.1.0 | ODS `issues[]` JSON |
+| **Policy enforcement** | Rule suppression / audit logs | OPA Rego gates in CI |
+| **AI focus** | None by default | Primary |
+
+Semgrep and CodeQL are **complementary inputs to ODS**. Run them as a CI step, then pass their SARIF output to `ods analyze --sarif`:
+
+```bash
+semgrep --config=auto --sarif > semgrep.sarif
+ods analyze --sarif semgrep.sarif --json
+```
+
+ODS converts SARIF severity levels (`error` → `high`, `warning` → `medium`, `note` → `low`) into its own issue schema and includes them in the policy input's `issues[]` array. A Rego policy can then block on semgrep `critical` findings the same way it blocks on native ODS findings.
+
+## ODS and commit-check
+
+[commit-check](https://github.com/commit-check/commit-check) validates commit messages and branch names against Conventional Commit / Conventional Branch rules. ODS uses commit-check in its own CI to ensure that AI-tool-generated branches (`claude/`, `copilot/`, `cursor/`) are recognized as valid branch prefixes (requires commit-check ≥ 2.9.0).
+
+| Dimension | commit-check | ODS |
+|---|---|---|
+| **What it checks** | Commit message and branch name format | AI code quality and delivery governance |
+| **Output** | Pass / Fail on format rules | Structured JSON + OPA policy decision |
+| **AI branch names** | Validates them (≥ 2.9.0) | Reads them as a detection signal |
+
+They are **co-deployed**: commit-check enforces naming conventions, ODS enforces delivery quality.
+
 ## ODS vs AI Code Linters
 
 AI-focused linters (e.g., specialized Copilot review tools) detect code quality issues in AI output. ODS overlaps at the analysis layer but adds:
@@ -54,6 +84,7 @@ AI-focused linters (e.g., specialized Copilot review tools) detect code quality 
 - **Technical debt scoring** that combines detection confidence, defect density, and test coverage
 - **Policy enforcement** via OPA Rego, allowing enterprise-specific rules
 - **Policy decisions recorded as structured JSON** for an audit trail of what was gated and why
+- **SARIF ingestion** to merge external tool findings (semgrep, CodeQL) into the policy decision
 
 ## ODS vs GitHub Code Review / GitLab MR
 
@@ -70,11 +101,13 @@ The human reviewer still makes the final decision. ODS gives them the informatio
 
 ## Summary
 
-| Standard | Layer | AI Focus | ODS Relationship |
+| Standard / Tool | Layer | AI Focus | ODS Relationship |
 |---|---|---|---|
 | APP / C2PA | Content artifact | Labeling | Complementary |
 | SLSA | Supply chain | None | Co-deployable |
 | Conventional Commits | Commit format | None | Extended by ODS |
 | Conventional Branch | Branch naming | None | Extended by ODS |
+| Semgrep / CodeQL | Code analysis | None | Input to ODS via `--sarif` |
+| commit-check | Commit/branch naming | AI branches (≥ 2.9.0) | Co-deployed |
 | AI Linters | Code quality | Detection + analysis | Overlaps, ODS adds policy + scoring |
 | Platform review | Process | None | Augmented by ODS |
