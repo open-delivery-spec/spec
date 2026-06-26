@@ -25,21 +25,26 @@ This is the ODS specification repository. It contains:
 
   Never branch from a stale local `main` or from another feature branch.
 
-- **Branch names must follow Conventional Branch naming.** Allowed prefixes:
+- **Branch names must follow [Conventional Branch](https://conventional-branch.github.io/) naming.** Allowed prefixes:
 
   | Prefix | Use for |
   |--------|---------|
-  | `feat/` | New features or spec additions |
-  | `fix/` | Corrections to existing spec or schemas |
-  | `docs/` | Documentation only |
-  | `chore/` | Maintenance, versioning |
-  | `ci/` | CI/CD changes |
-  | `refactor/` | Restructuring without behavioral change |
-  | `test/` | Conformance tests only |
+  | `feature/` | New features or spec additions |
+  | `bugfix/` | Corrections to existing spec or schemas |
+  | `hotfix/` | Urgent fixes |
+  | `release/` | Release preparation |
+  | `chore/` | Maintenance, versioning, **docs, CI, conformance tests, refactors** |
 
-  AI-agent branches are also accepted: `claude/`, `copilot/`, `github-actions/`
+  AI-agent branches are also accepted: `claude/`, `copilot/`, `cursor/`, `github-actions/`
+
+  Long-lived branches: `main`, `master`, `develop`
 
   Branch names must be lowercase. The description part must not contain `/`.
+
+  > ⚠️ **Conventional _Branch_ types ≠ Conventional _Commit_ types.** Branch names use
+  > `feature/bugfix/hotfix/release/chore`; commit messages use `feat/fix/docs/test/…`.
+  > `test/`, `feat/`, `fix/`, `docs/`, `ci/` are **not** valid branch prefixes and are
+  > rejected by `commit-check`. For docs/test/CI work, branch under `chore/`.
 
 ## Commit Message Rules
 
