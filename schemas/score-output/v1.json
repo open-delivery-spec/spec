@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-delivery-spec.dev/schemas/score-output/v1.json",
+  "title": "ODS Score Output v1",
+  "description": "Output of `ods score --json`: the technical-debt impact of a change, combining AI detection, quality analysis, test coverage, and duplication signals.",
+  "type": "object",
+  "required": ["technical_debt_delta", "breakdown", "verdict", "recommendation", "files_analyzed"],
+  "properties": {
+    "pr_number": {
+      "type": "integer",
+      "description": "Pull request number, when known. Omitted otherwise."
+    },
+    "technical_debt_delta": {
+      "type": "number",
+      "description": "Weighted technical-debt impact. Higher positive = more debt added; negative = debt reduced."
+    },
+    "breakdown": { "$ref": "#/$defs/Breakdown" },
+    "verdict": {
+      "type": "string",
+      "enum": ["decrease", "neutral", "increase"],
+      "description": "Overall direction of the debt delta."
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "Human-readable guidance derived from the verdict."
+    },
+    "files_analyzed": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of files included in the score."
+    }
+  },
+  "$defs": {
+    "Breakdown": {
+      "type": "object",
+      "required": ["ai_code_ratio", "defect_density", "critical_issues", "test_coverage", "duplication_rate"],
+      "description": "The dimensional scores that combine into technical_debt_delta.",
+      "properties": {
+        "ai_code_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "AI lines / total changed lines."
+        },
+        "defect_density": {
+          "type": "number",
+          "minimum": 0,
+          "description": "High/critical issues per 1000 lines (KLOC)."
+        },
+        "critical_issues": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of critical + high severity issues."
+        },
+        "test_coverage": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Line coverage rate (0.0–1.0). -1 means not measured."
+        },
+        "test_coverage_source": {
+          "type": "string",
+          "enum": ["go", "lcov", "cobertura", "nyc", "estimated", "unknown"],
+          "description": "How test_coverage was obtained. 'unknown' means it was not measured."
+        },
+        "duplication_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Estimated fraction of duplicated code in the change."
+        }
+      }
+    }
+  }
+}

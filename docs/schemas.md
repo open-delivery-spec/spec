@@ -26,6 +26,24 @@ You can use it to validate policy inputs or generate typed bindings in your lang
 npx ajv-cli validate -s schemas/policy-input/v1.json -d .ods/out/detect.json
 ```
 
+## Per-Command Output Schemas
+
+Each pipeline stage emits a JSON document with `--json`. These outputs are the
+building blocks the `check` stage assembles into the policy input above, and each
+has its own versioned schema so tools can consume stage output directly:
+
+| Command | Schema | `$id` |
+|---------|--------|-------|
+| `ods detect --json` | [`schemas/detect-output/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/detect-output/v1.json) | `…/schemas/detect-output/v1.json` |
+| `ods analyze --json` | [`schemas/analyze-output/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/analyze-output/v1.json) | `…/schemas/analyze-output/v1.json` |
+| `ods score --json` | [`schemas/score-output/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/score-output/v1.json) | `…/schemas/score-output/v1.json` |
+
+```bash
+# Validate real stage output against its schema
+ods detect --json > detect.json
+npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
+```
+
 ## Policy Input Fields
 
 | Field | Type | Required | Produced by | Description |
