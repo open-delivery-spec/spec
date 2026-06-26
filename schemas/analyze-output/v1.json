@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-delivery-spec.dev/schemas/analyze-output/v1.json",
+  "title": "ODS Analyze Output v1",
+  "description": "Output of `ods analyze --json`: quality issues found by the heuristic analyzer (and any ingested SARIF findings).",
+  "type": "object",
+  "required": ["total_lines", "ai_lines", "issues", "summary"],
+  "properties": {
+    "pr_number": {
+      "type": "integer",
+      "description": "Pull request number, when known. Omitted otherwise."
+    },
+    "total_lines": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total lines analyzed across all input files."
+    },
+    "ai_lines": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Lines attributed to AI-generated code, when known."
+    },
+    "issues": {
+      "type": "array",
+      "description": "Quality findings. Built-in rule IDs are prefixed ai-; ingested SARIF findings use the tool's own rule id.",
+      "items": { "$ref": "#/$defs/Issue" }
+    },
+    "summary": {
+      "type": "string",
+      "description": "Human-readable summary of findings."
+    }
+  },
+  "$defs": {
+    "Issue": {
+      "type": "object",
+      "required": ["rule", "file", "line", "severity"],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "description": "Rule identifier. See the rule catalogue (`ods rules --json`) for built-in rules."
+        },
+        "file": { "type": "string", "description": "Repository-relative file path." },
+        "line": { "type": "integer", "minimum": 0, "description": "Line number (0 when not known)." },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low", "info"],
+          "description": "Issue severity."
+        },
+        "message": { "type": "string", "description": "Human-readable description of the issue." },
+        "suggestion": { "type": "string", "description": "Suggested remediation, when available." }
+      }
+    }
+  }
+}
