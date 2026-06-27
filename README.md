@@ -22,7 +22,7 @@ PR arrived
 ② Analyze — What quality defects does the AI code have? (5 rule categories)
    │
    ▼
-③ Score   — How much technical debt does this PR add? (5-dimension weighted score)
+③ Score   — How much technical debt does this PR add? (quality-driven score, AI-risk weighted)
    │
    ▼
 ④ Enforce — Should this PR be blocked? (OPA Rego policies)
@@ -73,27 +73,41 @@ Finds AI-generated code using multiple independent signals. `Co-Authored-By` tra
 
 ### 2. Analyze — Quality Defect Detection
 
-Checks AI code for known failure patterns:
+Built-in heuristics flag known AI failure patterns. They are deliberately
+conservative **hints** — for authoritative, multi-language analysis, import
+findings from a dedicated scanner (Semgrep, CodeQL, golangci-lint, …) as SARIF.
 
-| Rule | What it detects |
-|---|---|
-| `ai-redundant-error-handling` | Dense clusters of if-err-nil blocks |
-| `ai-over-commenting` | Comment-to-code ratio >40% |
-| `ai-missing-edge-case` | if-statements without else branches |
-| `ai-unsafe-deserialization` | json.Unmarshal into interface{} |
-| `ai-inconsistent-pattern` | Mixed naming conventions / indentation |
+| Rule | What it detects | Severity |
+|---|---|---|
+| `ai-unsafe-deserialization` | json.Unmarshal into interface{} | high |
+| `ai-inconsistent-pattern` | Mixed naming conventions / indentation | medium |
+| `ai-redundant-error-handling` | Dense clusters of if-err-nil blocks | info |
+| `ai-over-commenting` | Comment-to-code ratio ≥40% | info |
+
+Imported SARIF findings keep their tool's own rule IDs and severities, and feed
+the score and policy gate alongside the built-in rules. The full, machine-readable
+catalogue is `ods rules --json`.
 
 ### 3. Score — Technical Debt Impact
 
-Computes a 5-dimension weighted score:
+Technical debt is driven by code **quality**, not by how much of the change is
+AI-written. Quality signals form the base debt:
 
-| Dimension | Weight |
+| Quality dimension | Weight |
 |---|---|
-| AI code ratio | 3.0 |
-| Defect density | 2.0 |
-| Critical issues | 1.5 each |
-| Test coverage gap | 1.0 |
+| Defect density (high/critical per KLOC) | 2.0 |
+| Critical + high issues | 1.5 each |
+| Test coverage gap (when measured) | 1.0 |
 | Code duplication | 1.0 |
+
+The **AI code ratio** is then applied as a bounded risk multiplier
+(`1.0 + 0.5 × ai_ratio`, i.e. 1.0–1.5×): AI-authored defects and untested AI
+code carry more risk because no human reasoned through them. But AI quantity
+**alone never creates debt** — a clean, fully-AI change scores ~0.
+
+```
+technical_debt_delta = quality_debt × (1 + 0.5 × ai_code_ratio)
+```
 
 Verdict: **decrease** / **neutral** / **increase**
 
