@@ -60,7 +60,7 @@ PR arrives
    │         (5 rule categories across changed files)
    ▼
 ③ score   — How much technical debt does this PR add?
-   │         (5-dimension weighted formula)
+   │         (quality-driven, weighted by AI risk)
    ▼
 ④ check   — Should this PR be blocked?
              (OPA Rego policy: PASS / WARN / BLOCK)

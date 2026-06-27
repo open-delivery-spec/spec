@@ -68,8 +68,8 @@ jobs:
 
 The Action automatically:
 1. **Detects** AI code (`Co-Authored-By` trailers, PR disclosure, branch names, diff heuristics)
-2. **Analyzes** code quality (5 rule categories for AI-specific defects)
-3. **Scores** technical debt impact (5-dimension weighted model)
+2. **Analyzes** code quality (built-in AI heuristics plus imported SARIF findings)
+3. **Scores** technical debt impact (quality-driven, weighted by AI risk)
 4. **Enforces** policy (OPA Rego — optional, place at `.ods/policy.rego`)
 
 ### 3. Run the pipeline locally
