@@ -85,7 +85,7 @@ Policy: ✅ Allowed
 1 issue found:
 | Severity | Rule                   | Location           |
 |----------|------------------------|--------------------|
-| medium   | ai-missing-edge-case   | auth/token.go:142  |
+| medium   | ai-inconsistent-pattern | auth/token.go:142  |
 
 ### Score
 AI Code Ratio: 78% | Defect Density: 0.8/KLOC | Test Coverage: 42%
@@ -95,7 +95,7 @@ AI Code Ratio: 78% | Defect Density: 0.8/KLOC | Test Coverage: 42%
 1. Reads title: knows it's a bugfix in auth module for OAuth state expiry.
 2. Reads Summary: understands the race condition in one sentence.
 3. Reads ODS report: AI was detected at high confidence; one specific issue flagged at `auth/token.go:142`.
-4. Goes straight to `token.go:142` — reviews the missing edge case carefully.
+4. Goes straight to `token.go:142` — reviews the flagged issue carefully.
 5. Reads AI Disclosure: confirms what the AI touched and what the human verified.
 6. Starts code review with full context. Zero clarification questions.
 
@@ -109,7 +109,7 @@ ODS produces heuristic signals and policy verdicts. The numbers are indicators f
 | What ODS produces | What it is not |
 |---|---|
 | AI detected at 85% confidence | Proof that exactly 85% of lines are AI-written |
-| Issue: `ai-missing-edge-case` at `token.go:142` | Proof the code is broken — it is a heuristic pattern match |
+| Issue: `ai-inconsistent-pattern` at `token.go:142` | Proof the code is broken — it is a heuristic pattern match |
 | Technical debt delta: +2.1 | A precise measurement of future maintenance cost |
 | Policy `PASS` — no deny rule fired | Proof the code has no bugs |
 | Policy `BLOCK` — a deny rule fired | A permanent verdict — only that the change did not meet your policy thresholds |

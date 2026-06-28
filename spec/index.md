@@ -38,10 +38,10 @@ PR arrives
 ① Detect  — Is there AI code? (Co-Authored-By, PR disclosure, branch prefix, diff heuristics)
    │
    ▼
-② Analyze — What quality issues does it have? (5 rule categories)
+② Analyze — What quality issues does it have? (built-in AI heuristics + imported SARIF)
    │
    ▼
-③ Score   — How much technical debt does this PR add? (5-dimension weighted score)
+③ Score   — How much technical debt does this PR add? (quality-driven, weighted by AI risk)
    │
    ▼
 ④ Enforce — Should this PR be blocked? (OPA Rego policy)

@@ -57,7 +57,7 @@ PR arrives
    │         (Co-Authored-By trailers, branch prefix, diff heuristics)
    ▼
 ② analyze — What quality issues does it have?
-   │         (5 rule categories across changed files)
+   │         (built-in AI heuristics + imported SARIF findings)
    ▼
 ③ score   — How much technical debt does this PR add?
    │         (quality-driven, weighted by AI risk)

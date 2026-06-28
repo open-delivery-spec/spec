@@ -19,7 +19,7 @@ PR arrived
 ① Detect  — Which code is AI-generated? (Co-Authored-By trailers, PR disclosure, branch prefix, diff heuristics)
    │
    ▼
-② Analyze — What quality defects does the AI code have? (5 rule categories)
+② Analyze — What quality defects does the AI code have? (built-in AI heuristics + imported SARIF)
    │
    ▼
 ③ Score   — How much technical debt does this PR add? (quality-driven score, AI-risk weighted)
