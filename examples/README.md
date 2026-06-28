@@ -2,6 +2,13 @@
 
 Copy-paste resources for integrating Open Delivery Spec into your project.
 
+## End-to-End Walkthrough
+
+[`walkthrough/`](walkthrough/) — a complete, reproducible example: an
+AI-assisted change introduces a command-injection bug, Semgrep finds it, and the
+ODS policy gate **blocks the merge** — then passes once it's fixed. Every command
+output is real. Start here to see ODS actually working.
+
 ## Policy Examples
 
 Save one of these as `.ods/policy.rego` in your repository.
