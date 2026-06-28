@@ -1,0 +1,10 @@
+# A minimal, self-contained Semgrep rule so the walkthrough reproduces without
+# network access. In real use, `--config auto` (the public registry) catches the
+# same class of issue.
+rules:
+  - id: python-subprocess-shell-true
+    languages: [python]
+    severity: ERROR
+    message: subprocess called with shell=True on untrusted input — command injection risk.
+    patterns:
+      - pattern: subprocess.run(..., shell=True, ...)
