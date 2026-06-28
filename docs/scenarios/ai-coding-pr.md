@@ -121,7 +121,7 @@ Technical-debt delta: +6.2
 | Severity | Rule | Location |
 |----------|------|----------|
 | high     | ai-unsafe-deserialization | payments/webhook.go:88 |
-| medium   | ai-missing-edge-case      | payments/token.go:142  |
+| medium   | ai-inconsistent-pattern   | payments/token.go:142  |
 
 Policy: WARN — AI change with multiple quality issues. Review carefully.
 ```
