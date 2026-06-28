@@ -1,6 +1,6 @@
 # Open Delivery Spec (ODS)
 
-> **Zero-config AI code detection for teams using Claude Code, Copilot, or Cursor.** These tools already write `Co-Authored-By` trailers to every commit. ODS reads them automatically in CI — detecting AI-generated code, analyzing quality, scoring technical debt, and enforcing policy on every PR.
+> **Zero-config AI code quality gate for teams using Claude Code, Copilot, or Cursor.** These tools already stamp `Co-Authored-By` trailers on every commit, so ODS attributes AI-generated code automatically in CI — then analyzes quality, scores technical debt, and enforces policy on every PR. No disclosure forms, no manual tagging.
 
 [![CI](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml/badge.svg)](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml)
 [![Spec](https://img.shields.io/badge/spec-read-blue?logo=readthedocs&logoColor=white)](https://open-delivery-spec.github.io/spec/)
@@ -59,17 +59,21 @@ ods hook install
 
 ## The Four Commands
 
-### 1. Detect — AI Code Detection
+### 1. Detect — AI Code Attribution
 
-Finds AI-generated code using multiple independent signals. `Co-Authored-By` trailers — automatically emitted by Claude Code, GitHub Copilot, and Cursor — are the primary signal. No configuration required.
+Attributes AI-generated code from signals the tools volunteer. `Co-Authored-By`
+trailers — automatically emitted by Claude Code, GitHub Copilot, and Cursor — are
+the primary signal, so attribution is zero-config. This is **attribution, not
+forensic detection**: it reads what the tools disclose; an author who strips the
+trailer can evade it, and the diff heuristics are only a low-confidence fallback.
 
-| Signal | Source |
-|---|---|
-| **`Co-Authored-By` commit trailers** | Auto-emitted by Claude Code, GitHub Copilot, Cursor — primary signal |
-| ODS trailer fields | `AI-assisted: true`, `AI-tool: name` — supplemental, optional |
-| PR body AI disclosure | Checkbox and section parsing |
-| Branch name prefix | `claude/`, `copilot/`, `cursor/`, `ai-*` prefixes |
-| Diff heuristics | Comment ratio, verbose naming, error patterns |
+| Signal | Source | Confidence |
+|---|---|---|
+| **`Co-Authored-By` commit trailers** | Auto-emitted by Claude Code, GitHub Copilot, Cursor — primary signal | high |
+| ODS trailer fields | `AI-assisted: true`, `AI-tool: name` — supplemental, optional | high |
+| PR body AI disclosure | Checkbox and section parsing | high |
+| Branch name prefix | `claude/`, `copilot/`, `cursor/`, `ai-*` prefixes | medium |
+| Diff heuristics | Comment ratio, verbose naming, error patterns | low (fallback) |
 
 ### 2. Analyze — Quality Defect Detection
 
@@ -141,7 +145,7 @@ deny[msg] {
 
 ## Design Principles
 
-1. **Detect, don’t rely on disclosure.** `Co-Authored-By` trailers are emitted automatically — detection works even without developer cooperation.
+1. **Zero-config attribution.** AI tools emit `Co-Authored-By` trailers automatically, so ODS attributes AI code with no disclosure forms or manual tagging. It reads signals the tools volunteer — this is attribution, not forensic detection: stripping the trailer evades it, and diff heuristics are only a low-confidence fallback.
 2. **Deterministic rules, probabilistic signals.** Quality rules are yes/no. Detection confidence is a signal for policy thresholds, not a verdict.
 3. **Tool-agnostic.** Works with GitHub, GitLab, Jenkins, or any CI/CD that can run a binary.
 4. **Policy as code.** Enterprise rules written in Rego, version-controlled alongside code.

@@ -1,6 +1,6 @@
 # Contributing to Open Delivery Spec
 
-Thank you for your interest in contributing! ODS is an open specification for the **AI code quality gate** — detecting AI-generated code, analyzing its quality, scoring its technical-debt impact, and enforcing policy in CI. We welcome contributions from everyone.
+Thank you for your interest in contributing! ODS is an open specification for the **AI code quality gate** — attributing AI-generated code, analyzing its quality, scoring its technical-debt impact, and enforcing policy in CI. We welcome contributions from everyone.
 
 ## How to Contribute
 
