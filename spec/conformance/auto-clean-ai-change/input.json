@@ -1,0 +1,18 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.9,
+  "technical_debt_delta": 0.4,
+  "test_coverage": 0.85,
+  "test_coverage_source": "go",
+  "branch": "claude/add-retry-helper",
+  "changed_files": ["internal/retry/retry.go", "internal/retry/retry_test.go"],
+  "issues": [],
+  "ai_files": [
+    {
+      "path": "internal/retry/retry.go",
+      "ai_lines": 60,
+      "total_lines": 74,
+      "confidence": 0.9
+    }
+  ]
+}

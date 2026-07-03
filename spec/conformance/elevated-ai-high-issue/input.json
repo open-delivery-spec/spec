@@ -1,0 +1,26 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.9,
+  "technical_debt_delta": 2.2,
+  "test_coverage": 0.55,
+  "test_coverage_source": "lcov",
+  "branch": "copilot/import-config-loader",
+  "changed_files": ["src/config.py"],
+  "issues": [
+    {
+      "rule": "python-tempfile-insecure",
+      "severity": "high",
+      "file": "src/config.py",
+      "line": 41,
+      "message": "mktemp() is vulnerable to symlink attacks — use mkstemp()"
+    }
+  ],
+  "ai_files": [
+    {
+      "path": "src/config.py",
+      "ai_lines": 88,
+      "total_lines": 120,
+      "confidence": 0.9
+    }
+  ]
+}

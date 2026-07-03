@@ -64,6 +64,10 @@ ODS-specific trailer fields (`AI-assisted:`, `AI-tool:`) are supplemental and op
 
 The pipeline emits structured JSON at every stage (`detect`, `analyze`, `score`), and `check` evaluates that output against an OPA Rego policy. The policy input contract — the fields a policy can read — is documented in the [Policy Input Schema](../docs/schemas.md).
 
+### Review Routing
+
+The review bottleneck in AI-assisted delivery is attention allocation, not review speed. Beyond allow/deny, a policy may define a `review_tier` rule (`auto` / `standard` / `elevated`) that tells CI how much human attention an *allowed* change needs — deny always wins, and the tier never affects the gate itself. Semantics and the normative degradation rules are in the [schema docs](../docs/schemas.md#review-routing-the-review_tier-output).
+
 ## Versioning
 
 ODS follows [Semantic Versioning](https://semver.org):
