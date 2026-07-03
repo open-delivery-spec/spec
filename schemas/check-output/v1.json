@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-delivery-spec.dev/schemas/check-output/v1.json",
+  "title": "ODS Check Output v1",
+  "description": "Output of `ods check --json`: the policy gate's verdict. `allowed` is authoritative (deny always wins); `review_tier` is an advisory routing signal for allowed changes and never affects the gate itself.",
+  "type": "object",
+  "required": ["allowed"],
+  "properties": {
+    "allowed": {
+      "type": "boolean",
+      "description": "Whether the policy allows the change to merge. False whenever any deny rule fired."
+    },
+    "denials": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Messages from deny rules that fired. Non-empty implies allowed=false."
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Messages from warn rules that fired. Advisory only."
+    },
+    "review_tier": {
+      "type": "string",
+      "enum": ["auto", "standard", "elevated"],
+      "description": "The policy's review-routing verdict: how much human attention the change needs. Omitted when the policy defines no review_tier rule (consumers treat that as \"standard\"). Meaningful only when allowed=true — a blocked PR is never routed. Implementations MUST fall back to \"standard\" (with a warning) when a policy returns a value outside this enum, rather than failing the gate."
+    }
+  },
+  "additionalProperties": false
+}

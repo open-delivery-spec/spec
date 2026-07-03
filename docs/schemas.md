@@ -37,6 +37,7 @@ has its own versioned schema so tools can consume stage output directly:
 | `ods detect --json` | [`schemas/detect-output/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/detect-output/v1.json) | `…/schemas/detect-output/v1.json` |
 | `ods analyze --json` | [`schemas/analyze-output/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/analyze-output/v1.json) | `…/schemas/analyze-output/v1.json` |
 | `ods score --json` | [`schemas/score-output/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/score-output/v1.json) | `…/schemas/score-output/v1.json` |
+| `ods check --json` | [`schemas/check-output/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/check-output/v1.json) | `…/schemas/check-output/v1.json` |
 
 ```bash
 # Validate real stage output against its schema
@@ -94,6 +95,47 @@ deny[msg] {
 ```
 
 See the [`.ods/` Convention](ods-artifacts.md) for where the policy lives and [Get Started](get-started.md) for the full setup.
+
+## Review Routing: the `review_tier` Output
+
+Beyond allow/deny, a policy may answer a second question — **how much human
+attention does this change need?** — by defining a `review_tier` rule that
+returns one of:
+
+| Tier | Meaning |
+|------|---------|
+| `auto` | Low risk — eligible for expedited review or (opt-in) auto-merge |
+| `standard` | Normal review. The default when the policy defines no rule |
+| `elevated` | High risk — request extra reviewers or senior attention |
+
+```rego
+default review_tier := "standard"
+
+review_tier := "auto" {
+    input.technical_debt_delta <= 1.0
+    not has_high_or_critical
+}
+
+review_tier := "elevated" {
+    input.ai_generated == true
+    has_high_or_critical
+}
+```
+
+Semantics (normative):
+
+- **Deny always wins.** `review_tier` is advisory routing for changes that may
+  merge; it never affects `allowed` or the gate's exit code, and a blocked PR
+  is never routed.
+- **Absent rule = `standard`.** Policies without `review_tier` behave exactly
+  as before; consumers treat the omitted field as `standard`.
+- **Unknown values degrade safely.** An implementation MUST fall back to
+  `standard` (with a warning) when a policy returns a value outside the enum,
+  rather than failing the gate.
+
+The tier appears in the [check output](https://github.com/open-delivery-spec/spec/blob/main/schemas/check-output/v1.json)
+and is exercised by the `auto-clean-ai-change` and `elevated-ai-high-issue`
+[conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance).
 
 ## Inspecting the Input
 
