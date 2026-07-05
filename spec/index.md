@@ -58,7 +58,15 @@ PASS / WARN / BLOCK
 
 ODS reads `Co-Authored-By` trailers — already emitted by Claude Code, GitHub Copilot, and Cursor — as the **primary** AI attribution signal. A commit with a recognized AI tool in `Co-Authored-By` is an ODS-compliant disclosure without any additional fields.
 
-ODS-specific trailer fields (`AI-assisted:`, `AI-tool:`) are supplemental and optional. Teams using AI tools that already emit `Co-Authored-By` are already compliant.
+The [Linux kernel coding-assistants convention](https://docs.kernel.org/process/coding-assistants.html) is an equally recognized disclosure:
+
+```text
+Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]
+```
+
+Implementations MUST treat an `Assisted-by:` trailer as AI attribution at the same confidence as `Co-Authored-By`, SHOULD parse the agent name and model version, and SHOULD accept a bare agent without the `:MODEL_VERSION` part. The trailing analysis-tool list is not attribution. For reporting, commits aggregate under the agent name so model-version variants do not fragment per-tool statistics.
+
+ODS-specific trailer fields (`AI-assisted:`, `AI-tool:`) are supplemental and optional. Teams using AI tools that already emit `Co-Authored-By` — or following the kernel's `Assisted-by` convention — are already compliant.
 
 ### Machine-Parseable Output
 
