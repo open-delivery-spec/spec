@@ -44,7 +44,6 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 |------|----------|---------|
 | `ai-redundant-error-handling` | medium | ✅ Stable |
 | `ai-over-commenting` | medium-high | ✅ Stable |
-| `ai-missing-edge-case` | low | ✅ Stable |
 | `ai-unsafe-deserialization` | high | ✅ Stable |
 | `ai-inconsistent-pattern` | medium-low | ✅ Candidate |
 
