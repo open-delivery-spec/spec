@@ -1,0 +1,8 @@
+{
+  "allowed": true,
+  "denials": [],
+  "warnings": [
+    "AI reviewer claude-code requested changes (1 finding(s)) — extra review routed"
+  ],
+  "review_tier": "elevated"
+}

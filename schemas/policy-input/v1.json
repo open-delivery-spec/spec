@@ -49,6 +49,11 @@
       "type": "array",
       "description": "Files detected as containing AI-generated code by ods detect.",
       "items": { "$ref": "#/$defs/AIFile" }
+    },
+    "ai_reviews": {
+      "type": "array",
+      "description": "AI code-reviewer verdicts supplied via `ods check --ai-review` (see schemas/review-verdict/v1.json). Kept separate from `issues` on purpose: deterministic findings may deny, probabilistic reviewer opinions default to routing attention only. A policy must reference this section explicitly to let LLM findings block.",
+      "items": { "$ref": "#/$defs/AIReview" }
     }
   },
   "$defs": {
@@ -103,6 +108,50 @@
           "minimum": 0,
           "maximum": 1,
           "description": "AI detection confidence for this file (0.0–1.0)."
+        }
+      }
+    },
+    "AIReview": {
+      "type": "object",
+      "required": ["tool", "verdict"],
+      "properties": {
+        "tool": {
+          "type": "string",
+          "description": "The reviewing tool (e.g. claude-code, coderabbit)."
+        },
+        "model": {
+          "type": "string",
+          "description": "Model identifier used for the review, when known."
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["approve", "request_changes", "comment"],
+          "description": "The reviewer's overall conclusion. Only verdicts matching the evaluated HEAD enter the input — stale verdicts are skipped upstream."
+        },
+        "findings": {
+          "type": "array",
+          "description": "Semantic findings from the reviewer.",
+          "items": { "$ref": "#/$defs/ReviewFinding" }
+        }
+      }
+    },
+    "ReviewFinding": {
+      "type": "object",
+      "required": ["message"],
+      "properties": {
+        "file": { "type": "string" },
+        "line": { "type": "integer", "minimum": 0 },
+        "severity": {
+          "type": "string",
+          "enum": ["info", "low", "medium", "high", "critical"]
+        },
+        "category": {
+          "type": "string",
+          "description": "Free-form finding class, e.g. correctness, design, security."
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable description of the finding."
         }
       }
     }

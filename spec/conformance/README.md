@@ -50,3 +50,5 @@ opa eval -d spec/conformance/ai-no-tests/policy.rego \
 | `warn-detect-inconclusive` | Detection failed; pipeline degrades gracefully | WARN |
 | `auto-clean-ai-change` | Clean, tested, low-debt AI change | PASS, `review_tier: auto` |
 | `elevated-ai-high-issue` | AI change with a high finding — mergeable but risky | PASS, `review_tier: elevated` |
+| `elevated-ai-review-requests-changes` | Otherwise auto-eligible change, but an AI reviewer requested changes | PASS, WARN, `review_tier: elevated` |
+| `standard-ai-review-approve` | AI reviewer approves, but the change misses `auto` on its own merits — an approve never loosens the gate | PASS, `review_tier: standard` |

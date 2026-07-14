@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-delivery-spec.dev/schemas/review-verdict/v1.json",
+  "title": "ODS Review Verdict v1",
+  "description": "One AI code reviewer's conclusion about a change, consumed by `ods check --ai-review`. Verdicts are probabilistic signals: by default they may only tighten the gate (route additional human review), never deny and never loosen — a policy must opt in explicitly for LLM findings to block.",
+  "type": "object",
+  "required": ["schema", "reviewer", "verdict"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "ods.dev/review-verdict/v1",
+      "description": "Version stamp for this document shape."
+    },
+    "reviewer": {
+      "type": "object",
+      "required": ["tool"],
+      "properties": {
+        "tool": {
+          "type": "string",
+          "description": "The reviewing tool (e.g. \"claude-code\", \"coderabbit\", \"copilot-code-review\")."
+        },
+        "model": {
+          "type": "string",
+          "description": "Model identifier used for the review, when known."
+        }
+      },
+      "additionalProperties": false
+    },
+    "head_sha": {
+      "type": "string",
+      "description": "Commit the review applies to. Implementations MUST skip verdicts whose head_sha does not match the evaluated HEAD (abbreviations of one another match); stale opinions never enter the gate. Omitted means unstamped and applicable."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["approve", "request_changes", "comment"],
+      "description": "Overall conclusion. request_changes SHOULD raise review routing to elevated by default; approve MUST NOT loosen the gate (e.g. must never qualify a change for the auto tier by itself)."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "file": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "low", "medium", "high", "critical"]
+          },
+          "category": {
+            "type": "string",
+            "description": "Free-form finding class, e.g. correctness, design, security, test-coverage."
+          },
+          "message": { "type": "string" },
+          "suggestion": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
