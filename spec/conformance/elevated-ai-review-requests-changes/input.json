@@ -1,0 +1,34 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.9,
+  "technical_debt_delta": 0.3,
+  "test_coverage": 0.82,
+  "test_coverage_source": "go",
+  "branch": "claude/session-expiry-fix",
+  "changed_files": ["internal/auth/session.go"],
+  "issues": [],
+  "ai_files": [
+    {
+      "path": "internal/auth/session.go",
+      "ai_lines": 40,
+      "total_lines": 52,
+      "confidence": 0.9
+    }
+  ],
+  "ai_reviews": [
+    {
+      "tool": "claude-code",
+      "model": "claude-opus-4-8",
+      "verdict": "request_changes",
+      "findings": [
+        {
+          "file": "internal/auth/session.go",
+          "line": 42,
+          "severity": "high",
+          "category": "correctness",
+          "message": "Token expiry compared with local time; server skew bypasses the check"
+        }
+      ]
+    }
+  ]
+}

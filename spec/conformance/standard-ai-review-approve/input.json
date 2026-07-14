@@ -1,0 +1,33 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.9,
+  "technical_debt_delta": 2.4,
+  "test_coverage": 0.45,
+  "test_coverage_source": "lcov",
+  "branch": "copilot/rewrite-cache-layer",
+  "changed_files": ["src/cache.ts"],
+  "issues": [
+    {
+      "rule": "ts-any-cast",
+      "severity": "medium",
+      "file": "src/cache.ts",
+      "line": 88,
+      "message": "Unchecked `as any` cast defeats the type system"
+    }
+  ],
+  "ai_files": [
+    {
+      "path": "src/cache.ts",
+      "ai_lines": 130,
+      "total_lines": 155,
+      "confidence": 0.9
+    }
+  ],
+  "ai_reviews": [
+    {
+      "tool": "coderabbit",
+      "verdict": "approve",
+      "findings": []
+    }
+  ]
+}

@@ -58,6 +58,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `branch` | string | | context | The PR's head branch name |
 | `changed_files` | string[] | | context | Paths of files changed in the PR |
 | `ai_files` | array | | `detect` | Per-file AI attribution detail |
+| `ai_reviews` | array | | `check --ai-review` | AI code-reviewer verdicts (advisory by default — see below) |
 
 > **`test_coverage` sentinel:** A value of `−1` means coverage was not measured (no coverage file found). Policies that check coverage MUST guard with `input.test_coverage >= 0` to avoid false positives on PRs where coverage is unavailable.
 
@@ -79,6 +80,15 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `ai_lines` | integer | Lines attributed to AI |
 | `total_lines` | integer | Total changed lines in the file |
 | `confidence` | float | Per-file confidence (0.0–1.0) |
+
+### `ai_reviews[]` item shape
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tool` | string | The reviewing tool, e.g. `claude-code`, `coderabbit` |
+| `model` | string | Model used for the review, when known |
+| `verdict` | string | `approve` \| `request_changes` \| `comment` |
+| `findings` | array | Semantic findings: `{file, line, severity, category, message}` |
 
 ## Using the Input in a Policy
 
@@ -136,6 +146,70 @@ Semantics (normative):
 The tier appears in the [check output](https://github.com/open-delivery-spec/spec/blob/main/schemas/check-output/v1.json)
 and is exercised by the `auto-clean-ai-change` and `elevated-ai-high-issue`
 [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance).
+
+## AI Reviewer Verdicts: `input.ai_reviews`
+
+Static analysis answers "does this code violate known rules?" — an AI code
+reviewer answers a different question: "does this change look *correct*?"
+ODS ingests those opinions as gate input without letting them take the gate
+over. Reviewers (Claude Code `/review`, CodeRabbit, Copilot code review, …)
+emit a **review verdict** document:
+
+**[`schemas/review-verdict/v1.json`](https://github.com/open-delivery-spec/spec/blob/main/schemas/review-verdict/v1.json)**
+(`$id`: `https://open-delivery-spec.dev/schemas/review-verdict/v1.json`)
+
+```json
+{
+  "schema": "ods.dev/review-verdict/v1",
+  "reviewer": { "tool": "claude-code", "model": "claude-opus-4-8" },
+  "head_sha": "b8b56bd",
+  "verdict": "request_changes",
+  "findings": [
+    {
+      "file": "internal/auth/session.go",
+      "line": 42,
+      "severity": "high",
+      "category": "correctness",
+      "message": "Token expiry compared with local time; server skew bypasses the check"
+    }
+  ]
+}
+```
+
+The reference implementation feeds these to the policy via
+`ods check --ai-review verdict.json` (repeatable, one file per reviewer).
+
+Semantics (normative):
+
+- **Probabilistic signals only tighten, never loosen.** Deterministic
+  findings (`input.issues`) may deny; an LLM verdict by default only routes
+  more human attention. A `request_changes` verdict SHOULD raise
+  `review_tier` to `elevated`; an `approve` MUST NOT loosen the gate — it
+  must never qualify a change for the `auto` tier by itself. This keeps the
+  gate safe even against a prompt-injected or over-optimistic reviewer.
+- **Blocking is opt-in.** A team that wants LLM findings to deny writes it
+  explicitly in its own policy over `input.ai_reviews`:
+
+  ```rego
+  deny[msg] {
+      rev := input.ai_reviews[_]
+      f := rev.findings[_]
+      f.severity == "high"
+      msg := sprintf("AI reviewer %s: %s (%s:%d)", [rev.tool, f.message, f.file, f.line])
+  }
+  ```
+
+- **Stale verdicts never enter the gate.** Implementations MUST skip a
+  verdict whose `head_sha` does not match the evaluated HEAD (SHA
+  abbreviations of one another match, case-insensitively). An omitted
+  `head_sha` means unstamped and applicable.
+- **Malformed verdicts degrade safely.** A file that fails to parse or
+  validate MUST be skipped with a warning, not fail the gate.
+
+The `elevated-ai-review-requests-changes` and `standard-ai-review-approve`
+[conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
+exercise both directions: `request_changes` elevates without denying, and
+`approve` does not unlock `auto`.
 
 ## Inspecting the Input
 
