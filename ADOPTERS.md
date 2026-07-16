@@ -8,7 +8,7 @@ Projects running ODS on every pull request.
 |---------|-------------|-----------|-------|
 | [devops-maturity/devops-maturity](https://github.com/devops-maturity/devops-maturity) | DevOps maturity model and assessment | validate-action@v1 on every PR | July 2026 |
 | [conventional-branch/conventional-branch](https://github.com/conventional-branch/conventional-branch) | Conventional branch naming specification | validate-action@v1 on every PR | July 2026 |
-| [shenxianpeng/blog](https://github.com/shenxianpeng/blog) | Maintainer's blog (Hexo) | validate-action@v1 on every PR | July 2026 |
+| [shenxianpeng/blog](https://github.com/shenxianpeng/blog) | Maintainer's blog (Hugo) | validate-action@v1 on every PR | July 2026 |
 
 ## Open Delivery Spec (dogfooding)
 
