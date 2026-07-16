@@ -1,0 +1,19 @@
+ADOPTERS.md
+  s_065769c975ff71::t_42b03c927d77ea 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "3857d217581f06ff6136f3fd08487c7e8fc20eec",
+  "prompts": {},
+  "sessions": {
+    "s_065769c975ff71": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f6c8c-6a61-7261-88f0-78c73a798f28",
+        "model": "deepseek-v4-flash"
+      },
+      "human_author": "shenxianpeng <xianpeng.shen@gmail.com>"
+    }
+  }
+}
