@@ -1,13 +1,13 @@
 # This workflow validates delivery artifacts against Open Delivery Spec.
 # Submitted via PR from https://github.com/open-delivery-spec
 #
-# Targets master (default branch of shenxianpeng/shenxianpeng.github.io).
+# Targets main (default branch of shenxianpeng/shenxianpeng.github.io).
 
 name: ODS Validate
 
 on:
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   validate:
