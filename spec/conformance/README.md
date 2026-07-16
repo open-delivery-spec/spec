@@ -52,3 +52,5 @@ opa eval -d spec/conformance/ai-no-tests/policy.rego \
 | `elevated-ai-high-issue` | AI change with a high finding — mergeable but risky | PASS, `review_tier: elevated` |
 | `elevated-ai-review-requests-changes` | Otherwise auto-eligible change, but an AI reviewer requested changes | PASS, WARN, `review_tier: elevated` |
 | `standard-ai-review-approve` | AI reviewer approves, but the change misses `auto` on its own merits — an approve never loosens the gate | PASS, `review_tier: standard` |
+| `warn-ai-undisclosed` | AI suspected (branch + heuristics) but the author disclosed nothing — nudge and route, never block | PASS, WARN, `review_tier: elevated` |
+| `pass-ai-disclosed` | Same change with a `commit-trailer` disclosure — attribution silences the nudge | PASS, `review_tier: standard` |

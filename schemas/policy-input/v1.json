@@ -16,6 +16,14 @@
       "maximum": 1,
       "description": "Aggregate AI detection confidence (0.0–1.0). 0 means no signal; 1.0 means multiple high-confidence signals."
     },
+    "detection_sources": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["commit-trailer", "git-ai-notes", "pr-body", "branch-name", "diff-heuristics"]
+      },
+      "description": "Which detection signals fired. Lets policies separate disclosed AI use (author attribution: commit-trailer, git-ai-notes, pr-body) from merely suspected AI use (branch-name, diff-heuristics only), making author-disclosure norms (SFC guidance, kernel docs) checkable at the gate."
+    },
     "technical_debt_delta": {
       "type": "number",
       "description": "Weighted technical-debt impact of the PR. Higher positive = more debt added. Negative values indicate debt reduction."

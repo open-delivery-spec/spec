@@ -1,0 +1,8 @@
+{
+  "allowed": true,
+  "denials": [],
+  "warnings": [
+    "AI code detected without author disclosure — ask for attribution"
+  ],
+  "review_tier": "elevated"
+}

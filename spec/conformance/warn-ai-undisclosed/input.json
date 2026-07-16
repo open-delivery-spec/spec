@@ -1,0 +1,19 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.6,
+  "detection_sources": ["branch-name", "diff-heuristics"],
+  "technical_debt_delta": 0.4,
+  "test_coverage": 0.7,
+  "test_coverage_source": "go",
+  "branch": "copilot/refactor-parser",
+  "changed_files": ["src/parser.py"],
+  "issues": [],
+  "ai_files": [
+    {
+      "path": "src/parser.py",
+      "ai_lines": 55,
+      "total_lines": 80,
+      "confidence": 0.6
+    }
+  ]
+}

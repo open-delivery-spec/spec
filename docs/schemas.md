@@ -51,6 +51,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 |-------|------|----------|-------------|-------------|
 | `ai_generated` | bool | ✅ | `detect` | Whether AI code was detected in the diff |
 | `ai_confidence` | float (0.0–1.0) | ✅ | `detect` | Aggregate detection confidence |
+| `detection_sources` | string[] | | `detect` | Which signals fired (`commit-trailer`/`git-ai-notes`/`pr-body`/`branch-name`/`diff-heuristics`) — see [Disclosure completeness](#disclosure-completeness-inputdetection_sources) |
 | `issues` | array | | `analyze` | Quality issues found |
 | `technical_debt_delta` | float | | `score` | Weighted technical-debt impact of the PR |
 | `test_coverage` | float (−1 or 0.0–1.0) | | `score` | Test coverage ratio; **−1 means not measured** |
@@ -210,6 +211,55 @@ The `elevated-ai-review-requests-changes` and `standard-ai-review-approve`
 [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
 exercise both directions: `request_changes` elevates without denying, and
 `approve` does not unlock `auto`.
+
+## Disclosure Completeness: `input.detection_sources`
+
+The [SFC guidance on LLM-assisted contributions](https://sfconservancy.org/)
+and the [kernel docs](https://docs.kernel.org/process/coding-assistants.html)
+put the disclosure duty on the **author**: say what tool, what model, and how
+AI participated. `detection_sources` makes that norm checkable — it lists
+which detection signals fired, so a policy can separate **disclosed** AI use
+from merely **suspected** AI use:
+
+| Source | Class | Meaning |
+|--------|-------|---------|
+| `commit-trailer` | disclosure | `Co-Authored-By:` / `Assisted-by:` trailer written by the author |
+| `git-ai-notes` | disclosure | Measured line-level authorship recorded by [git-ai](https://github.com/git-ai-project/git-ai) |
+| `pr-body` | disclosure | An AI-disclosure section in the PR description |
+| `branch-name` | suspicion | Agent-style branch prefix (`claude/`, `copilot/`, …) |
+| `diff-heuristics` | suspicion | Statistical patterns in the diff itself |
+
+```rego
+ai_disclosed { input.detection_sources[_] == "commit-trailer" }
+ai_disclosed { input.detection_sources[_] == "git-ai-notes" }
+ai_disclosed { input.detection_sources[_] == "pr-body" }
+
+warn[msg] {
+    input.ai_generated == true
+    not ai_disclosed
+    msg = "AI code detected without author disclosure — ask for attribution"
+}
+```
+
+Semantics (normative):
+
+- **A disclosure gap is a nudge, never a block.** Suspicion signals are
+  heuristic; a policy SHOULD warn and MAY route extra review
+  (`review_tier: elevated`), but MUST NOT treat absence of disclosure alone
+  as grounds to deny — heuristic false positives would punish human authors.
+- **Disclosure silences the nudge.** Any disclosure-class source satisfies
+  the norm; policies MUST NOT nag changes that already carry author
+  attribution.
+- **Populated whenever detection fires.** An implementation that reports
+  `ai_generated: true` MUST also report the sources that led to it (the
+  field is omitted only when there is nothing to report). This keeps the
+  rules above sound: with `ai_generated` false they never fire, and with it
+  true the sources are guaranteed present.
+
+The `warn-ai-undisclosed` and `pass-ai-disclosed`
+[conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
+exercise both directions: suspicion without disclosure warns and routes
+elevated, and a trailer silences the nudge.
 
 ## Inspecting the Input
 
