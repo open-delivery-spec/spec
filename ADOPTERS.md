@@ -2,6 +2,14 @@
 
 Projects running ODS on every pull request.
 
+## External Repositories
+
+| Project | Description | What runs | Since |
+|---------|-------------|-----------|-------|
+| [devops-maturity/devops-maturity](https://github.com/devops-maturity/devops-maturity) | DevOps maturity model and assessment | validate-action@v1 on every PR | July 2026 |
+| [conventional-branch/conventional-branch](https://github.com/conventional-branch/conventional-branch) | Conventional branch naming specification | validate-action@v1 on every PR | July 2026 |
+| [shenxianpeng/blog](https://github.com/shenxianpeng/blog) | Maintainer's blog (Hexo) | validate-action@v1 on every PR | July 2026 |
+
 ## Open Delivery Spec (dogfooding)
 
 The ODS org runs `validate-action@v1` on all its own repositories.
@@ -20,7 +28,6 @@ Workflow files for the following repositories are ready in [`_dogfooding/`](_dog
 |---------|-------------|-------------------|
 | [cpp-linter/cpp-linter-action](https://github.com/cpp-linter/cpp-linter-action) | C++ linting GitHub Action (used by Microsoft, NASA, Apache projects) | `_dogfooding/cpp-linter-action-ods-validate.yml` |
 | [commit-check/commit-check](https://github.com/commit-check/commit-check) | Commit message and branch naming validator | `_dogfooding/commit-check-ods-validate.yml` |
-| [conventional-branch/conventional-branch](https://github.com/conventional-branch/conventional-branch) | Conventional branch naming enforcer | `_dogfooding/conventional-branch-ods-validate.yml` |
 
 ## Community
 
