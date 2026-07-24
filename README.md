@@ -150,6 +150,7 @@ deny[msg] {
 3. **Tool-agnostic.** Works with GitHub, GitLab, Jenkins, or any CI/CD that can run a binary.
 4. **Policy as code.** Enterprise rules written in Rego, version-controlled alongside code.
 5. **Prevent, don’t just report.** Pre-commit hooks block problems before they reach CI.
+6. **Consume AI review, don’t become an AI reviewer.** ODS is the governance layer that turns attribution, static findings, and any AI reviewer's verdict into one auditable "can this merge?" decision — it does not reproduce CodeRabbit/Copilot. See [POSITIONING.md](POSITIONING.md).
 
 ---
 

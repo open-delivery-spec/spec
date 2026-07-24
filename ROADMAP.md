@@ -134,7 +134,17 @@ The original 01–09 module system has been **deprecated and removed** as of Jun
 
 ---
 
-## Non-Goals (for now)
+## Non-Goals
+
+The single most important boundary — **ODS consumes AI review, it does not try
+to be an AI reviewer** — is argued in full in [POSITIONING.md](POSITIONING.md).
+In short, ODS will **not** build its own LLM code-review engine (it ingests any
+reviewer's output via `review-verdict/v1`), will not restructure into an
+agent/skill framework, and does not aim to remove humans from consequential
+merges — only to route their attention. This is a hard boundary, not a "for
+now."
+
+The following are "for now" — deferred, not ruled out:
 
 - A hosted dashboard / SaaS offering — focus is on the spec + CLI + CI integration
 - Deep integrations with every CI platform — start with GitHub Actions, expand with copy-paste examples
