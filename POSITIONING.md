@@ -14,6 +14,29 @@ Across a flood of pull requests — increasingly authored by AI — which ones c
 merge, and which carry risk that a human must look at? The bottleneck was never
 writing code; it's that humans cannot review as fast as machines now produce.
 
+## What ODS's signal sees — and what it can't
+
+ODS governs the **disclosed** flow: changes that carry an attribution signal
+(`Co-Authored-By` / `Assisted-by` trailers, PR-body disclosure). A measurement
+across all of GitHub ([discussion #185387](https://github.com/orgs/community/discussions/185387),
+2026-07) sized this population and its behaviour: over one four-week window,
+PRs carrying `Co-Authored-By: Claude` merged at **95.7%** versus an **88.2%**
+baseline, and the trailer sits on ~17M commits all-time. The disclosed
+population is large, real, and — because the trailer is opt-in — self-selected
+toward good-faith use.
+
+That selection cuts both ways, and ODS is built on admitting it:
+
+- **The disclosed half is real and mostly-fine.** So ODS's value there is *not*
+  catching bad PRs (they're rare in this set). It is **visibility** (how much of
+  our delivery is AI-assisted, trending which way), **routing** (concentrate
+  human attention on the few risky changes), **audit evidence**, and **policy
+  enforcement**. ODS is a governance-and-visibility layer, not a spam filter.
+- **The undisclosed half is invisible to any label** — and, as the same thread
+  showed with data, any detector sharp enough to find it also flags careful
+  human writing. So ODS does not chase it. Governing the disclosed flow honestly
+  beats pretending to detect the rest.
+
 ## "Can this merge?" has a deterministic shell and a semantic core
 
 The decision decomposes into questions of very different tractability:
