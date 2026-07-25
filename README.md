@@ -1,6 +1,6 @@
 # Open Delivery Spec (ODS)
 
-> **Zero-config AI code quality gate for teams using Claude Code, Copilot, or Cursor.** These tools already stamp `Co-Authored-By` trailers on every commit, so ODS attributes AI-generated code automatically in CI — then analyzes quality, scores technical debt, and enforces policy on every PR. No disclosure forms, no manual tagging.
+> **Zero-config governance and visibility for AI-assisted code — on every pull request.** Claude Code, Copilot, and Cursor already stamp `Co-Authored-By` trailers on every commit, so ODS shows how much of your delivery is AI-assisted, routes review attention to the changes that need it, and enforces your policy in CI — no disclosure forms, no manual tagging. It governs the AI you can see; it's a signal producer, not a quality oracle.
 
 [![CI](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml/badge.svg)](https://github.com/open-delivery-spec/spec/actions/workflows/ci.yml)
 [![Spec](https://img.shields.io/badge/spec-read-blue?logo=readthedocs&logoColor=white)](https://open-delivery-spec.github.io/spec/)
@@ -10,7 +10,7 @@
 
 ## What ODS Does
 
-Enterprises are adopting AI coding tools at speed — but AI-generated code increases technical debt in predictable, detectable ways. ODS is the CI gate that stops this.
+Enterprises are adopting AI coding tools at speed. ODS is the CI layer that makes that adoption **visible and governable** — it attributes AI-assisted code from the trailers the tools already emit, surfaces how much of your delivery is AI-assisted, routes review attention to the risky changes, and enforces your policy on every PR.
 
 ```
 PR arrived

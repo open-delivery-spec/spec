@@ -15,7 +15,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 ## Current Status (June 2026)
 
-> **Strategy**: Zero-config AI code quality gate. Claude Code, GitHub Copilot, and Cursor auto-emit `Co-Authored-By` trailers — ODS reads them in CI to attribute, analyze, score, and enforce policy on every PR.
+> **Strategy**: Zero-config governance and visibility for AI-assisted code. Claude Code, GitHub Copilot, and Cursor auto-emit `Co-Authored-By` trailers — ODS reads them in CI to attribute AI-assisted code, surface how much of delivery it is, route review attention, and enforce policy on every PR.
 
 ### Core Pipeline
 
