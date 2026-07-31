@@ -60,6 +60,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `changed_files` | string[] | | context | Paths of files changed in the PR |
 | `ai_files` | array | | `detect` | Per-file AI attribution detail |
 | `ai_reviews` | array | | `check --ai-review` | AI code-reviewer verdicts (advisory by default — see below) |
+| `merge_confidence` | object | | `check` | Deterministic diff facts: tested? shaped like real work? touches sensitive paths? — see [Merge-confidence signals](#merge-confidence-signals-inputmerge_confidence) |
 
 > **`test_coverage` sentinel:** A value of `−1` means coverage was not measured (no coverage file found). Policies that check coverage MUST guard with `input.test_coverage >= 0` to avoid false positives on PRs where coverage is unavailable.
 
@@ -260,6 +261,52 @@ The `warn-ai-undisclosed` and `pass-ai-disclosed`
 [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
 exercise both directions: suspicion without disclosure warns and routes
 elevated, and a trailer silences the nudge.
+
+## Merge-confidence signals: `input.merge_confidence`
+
+Static analysis answers "what's wrong?"; these answer "is the change **shaped
+like real work?**" — deterministic facts derived from the diff alone, no LLM and
+no stylometric "is this AI?" guessing. This is the achievable form of "is this
+PR safe to merge?": ODS proves the change is tested, scanned, and shaped like
+real work, and routes the risky ones to a human. It does **not** judge whether
+the code is *correct* — that needs a human or an AI reviewer.
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `added_source_without_tests` | bool | Source code added but no test file added/updated — the most-cited AI-PR smell |
+| `tests_touched` | bool | Any test file was added or modified |
+| `risky_paths` | string[] | Changed files on sensitive paths (CI config, dependency manifests/lockfiles, `auth`/`crypto`/`security`) |
+| `files_changed` / `net_added_lines` / `source_files_changed` / `test_files_changed` | int | Diff shape, for wide-but-shallow detection |
+
+```rego
+warn[msg] {
+    input.merge_confidence.added_source_without_tests
+    msg = "Source code changed but no tests were added or updated"
+}
+
+# Opt in to enforce — deterministic facts may deny:
+deny[msg] {
+    input.ai_generated
+    input.merge_confidence.added_source_without_tests
+    msg = "AI-authored change adds source without tests"
+}
+```
+
+Semantics (normative):
+
+- **Facts, not opinions.** These are deterministic and reproducible, so unlike
+  probabilistic reviewer verdicts they MAY be used to deny — but the default
+  posture is advisory: **warn and route, deny only when the team opts in.**
+- **Attribution raises the bar, it does not detect.** A policy SHOULD use
+  `ai_generated` to route AI-authored undertested/risky changes to `elevated`;
+  it MUST NOT use `merge_confidence` to *infer* whether a change is AI-written.
+- **Absence is safe.** When `merge_confidence` is omitted (e.g. no diff
+  available), rules that reference it simply do not fire.
+
+The `warn-ai-no-tests` and `pass-tested-change`
+[conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
+exercise both directions: an AI change adding source without tests warns and
+routes elevated, and adding a test clears it.
 
 ## Inspecting the Input
 

@@ -62,6 +62,10 @@
       "type": "array",
       "description": "AI code-reviewer verdicts supplied via `ods check --ai-review` (see schemas/review-verdict/v1.json). Kept separate from `issues` on purpose: deterministic findings may deny, probabilistic reviewer opinions default to routing attention only. A policy must reference this section explicitly to let LLM findings block.",
       "items": { "$ref": "#/$defs/AIReview" }
+    },
+    "merge_confidence": {
+      "$ref": "#/$defs/MergeConfidence",
+      "description": "Deterministic, diff-scoped facts about the change — is it tested, how is it shaped, does it touch sensitive paths. Facts, not opinions: advisory by default (they route review attention), and a policy may opt in to deny on them. Attribution (ai_generated) is used to raise the bar for AI-authored changes, never these signals to detect AI."
     }
   },
   "$defs": {
@@ -160,6 +164,45 @@
         "message": {
           "type": "string",
           "description": "Human-readable description of the finding."
+        }
+      }
+    },
+    "MergeConfidence": {
+      "type": "object",
+      "description": "Deterministic diff-scoped signals. All fields are facts computed from the diff alone.",
+      "properties": {
+        "files_changed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of files touched (all types)."
+        },
+        "source_files_changed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of non-test code files with added lines."
+        },
+        "test_files_changed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of test files with added lines."
+        },
+        "net_added_lines": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total added code lines across changed code files (for wide-but-shallow / diff-shape checks)."
+        },
+        "tests_touched": {
+          "type": "boolean",
+          "description": "Whether any test file was added or modified."
+        },
+        "added_source_without_tests": {
+          "type": "boolean",
+          "description": "Source code was added but no test file was added or updated — the most-cited AI-PR smell. A policy SHOULD warn/route on this; it MAY deny only when the team opts in."
+        },
+        "risky_paths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Changed files on sensitive paths — CI config (.github/workflows/), dependency manifests/lockfiles, and auth/crypto/security paths."
         }
       }
     }
