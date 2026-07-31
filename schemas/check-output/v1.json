@@ -24,6 +24,10 @@
       "type": "string",
       "enum": ["auto", "standard", "elevated"],
       "description": "The policy's review-routing verdict: how much human attention the change needs. Omitted when the policy defines no review_tier rule (consumers treat that as \"standard\"). Meaningful only when allowed=true — a blocked PR is never routed. Implementations MUST fall back to \"standard\" (with a warning) when a policy returns a value outside this enum, rather than failing the gate."
+    },
+    "merge_confidence": {
+      "type": "object",
+      "description": "Echo of the deterministic merge-confidence facts the gate evaluated (shape: policy-input/v1.json #/$defs/MergeConfidence). Present when the check computed them; lets reports and auditors render the facts without re-running the pipeline."
     }
   },
   "additionalProperties": false
