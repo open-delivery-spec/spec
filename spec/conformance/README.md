@@ -56,3 +56,5 @@ opa eval -d spec/conformance/ai-no-tests/policy.rego \
 | `pass-ai-disclosed` | Same change with a `commit-trailer` disclosure — attribution silences the nudge | PASS, `review_tier: standard` |
 | `warn-ai-no-tests` | AI-authored change adds source but no tests — warn and route, never block | PASS, WARN, `review_tier: elevated` |
 | `pass-tested-change` | Same change with a test added — the signal is cleared | PASS, `review_tier: standard` |
+| `warn-ai-low-patch-coverage` | AI-authored change whose added lines are under-covered (patch coverage 40%) — warn and route, never block | PASS, WARN, `review_tier: elevated` |
+| `pass-ai-covered-patch` | Same change with its added lines fully covered — the signal is cleared | PASS, `review_tier: standard` |

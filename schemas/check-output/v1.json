@@ -28,6 +28,12 @@
     "merge_confidence": {
       "type": "object",
       "description": "Echo of the deterministic merge-confidence facts the gate evaluated (shape: policy-input/v1.json #/$defs/MergeConfidence). Present when the check computed them; lets reports and auditors render the facts without re-running the pipeline."
+    },
+    "patch_coverage": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1,
+      "description": "Echo of the diff-scoped patch coverage the gate evaluated (see policy-input/v1.json #/patch_coverage). Coverage of the change's added lines; -1 when not measured. Lets reports render it without re-running the pipeline."
     }
   },
   "additionalProperties": false

@@ -56,6 +56,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `technical_debt_delta` | float | | `score` | Weighted technical-debt impact of the PR |
 | `test_coverage` | float (−1 or 0.0–1.0) | | `score` | Test coverage ratio; **−1 means not measured** |
 | `test_coverage_source` | string | | `score` | How coverage was measured (`go`/`lcov`/`cobertura`/`nyc`/`estimated`/`unknown`) |
+| `patch_coverage` | float (−1 or 0.0–1.0) | | `check` | Coverage of the **diff's added lines only**; **−1 means not measured** — see [Patch coverage](#patch-coverage-inputpatch_coverage) |
 | `branch` | string | | context | The PR's head branch name |
 | `changed_files` | string[] | | context | Paths of files changed in the PR |
 | `ai_files` | array | | `detect` | Per-file AI attribution detail |
@@ -307,6 +308,44 @@ The `warn-ai-no-tests` and `pass-tested-change`
 [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
 exercise both directions: an AI change adding source without tests warns and
 routes elevated, and adding a test clears it.
+
+## Patch coverage: `input.patch_coverage`
+
+`added_source_without_tests` answers "was **a** test touched?"; `patch_coverage`
+answers the stronger, still-deterministic question: **is this change's new code
+actually covered by tests?** An implementation reads an existing coverage report
+(Go `coverage.out`, LCOV, or Cobertura — no LLM) and intersects the covered
+lines with the diff's *added* lines. The result is a fraction in
+`input.patch_coverage`, or **`−1` when not measured** — so policies MUST guard
+with `>= 0` before comparing.
+
+```rego
+ai_low_patch_coverage {
+    input.ai_generated == true
+    input.patch_coverage >= 0        # guard: −1 means "not measured"
+    input.patch_coverage < 0.8       # tune to your team
+}
+
+warn[msg] {
+    ai_low_patch_coverage
+    pct := round(input.patch_coverage * 100)
+    msg = sprintf("AI-authored change: only %d%% of added lines are covered by tests", [pct])
+}
+```
+
+Semantics (normative):
+
+- **Same posture as the other merge-confidence signals.** Advisory by default
+  (warn + route AI changes to `elevated`); attribution only raises the bar; deny
+  stays opt-in.
+- **`−1` is not `0`.** Not-measured (no per-line report, or no changed source
+  file appears in it) is distinct from measured-and-zero. Aggregate-only formats
+  (e.g. NYC's `coverage-summary.json`) cannot produce patch coverage and yield
+  `−1`; whole-project coverage still flows through `test_coverage`.
+
+The `warn-ai-low-patch-coverage` and `pass-ai-covered-patch`
+[conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
+exercise both directions.
 
 ## Inspecting the Input
 
