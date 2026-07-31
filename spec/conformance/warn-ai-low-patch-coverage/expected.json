@@ -1,0 +1,6 @@
+{
+  "allowed": true,
+  "denials": [],
+  "warnings": ["AI-authored change: only 40% of added lines are covered by tests"],
+  "review_tier": "elevated"
+}
