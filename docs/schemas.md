@@ -57,6 +57,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `test_coverage` | float (−1 or 0.0–1.0) | | `score` | Test coverage ratio; **−1 means not measured** |
 | `test_coverage_source` | string | | `score` | How coverage was measured (`go`/`lcov`/`cobertura`/`nyc`/`estimated`/`unknown`) |
 | `patch_coverage` | float (−1 or 0.0–1.0) | | `check` | Coverage of the **diff's added lines only**; **−1 means not measured** — see [Patch coverage](#patch-coverage-inputpatch_coverage) |
+| `mutation_score` | float (−1 or 0.0–1.0) | | `check` | Mutants killed on the **diff's added lines**; **−1 means not measured** — see [Mutation score](#mutation-score-inputmutation_score) |
 | `branch` | string | | context | The PR's head branch name |
 | `changed_files` | string[] | | context | Paths of files changed in the PR |
 | `ai_files` | array | | `detect` | Per-file AI attribution detail |
@@ -344,6 +345,50 @@ Semantics (normative):
   `−1`; whole-project coverage still flows through `test_coverage`.
 
 The `warn-ai-low-patch-coverage` and `pass-ai-covered-patch`
+[conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
+exercise both directions.
+
+## Mutation score: `input.mutation_score`
+
+Coverage proves a line *ran*; it cannot prove a test would *catch a bug* in it —
+the classic AI failure mode is green coverage over assertions that never fail.
+`mutation_score` answers the deterministic question coverage cannot: **do the
+tests actually catch changes to the new code?** A mutation-testing tool injects
+small faults ("mutants") and checks whether the suite kills them; the producer
+reports a **diff-scoped** score over only the mutants on the change's *added*
+lines: `killed / (killed + survived)` (a timed-out mutant counts as killed;
+not-covered / not-viable mutants are excluded). The value is in
+`input.mutation_score`, or **`−1` when not measured** — so policies MUST guard
+with `>= 0`.
+
+```rego
+ai_weak_mutation_score {
+    input.ai_generated == true
+    input.mutation_score >= 0        # guard: −1 means "not measured"
+    input.mutation_score < 0.5       # mutation scores run lower than coverage
+}
+
+warn[msg] {
+    ai_weak_mutation_score
+    pct := round(input.mutation_score * 100)
+    msg = sprintf("AI-authored change: tests kill only %d%% of mutations on the added lines", [pct])
+}
+```
+
+Semantics (normative):
+
+- **Same posture as the other merge-confidence signals.** Advisory by default
+  (warn + route AI changes to `elevated`); attribution only raises the bar; deny
+  stays opt-in.
+- **The producer is a signal consumer, not a test runner.** ODS ingests a
+  mutation report the team already produces in CI (e.g. gremlins JSON); the spec
+  does not mandate a tool or format for running mutation testing, only the
+  resulting `mutation_score` field.
+- **Threshold runs lower than coverage.** Killing mutants is harder than
+  covering lines, so a sensible default warn threshold (e.g. 0.5) is below patch
+  coverage's.
+
+The `warn-ai-weak-mutation` and `pass-ai-strong-mutation`
 [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
 exercise both directions.
 

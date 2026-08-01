@@ -1,0 +1,6 @@
+{
+  "allowed": true,
+  "denials": [],
+  "warnings": ["AI-authored change: tests kill only 30% of mutations on the added lines"],
+  "review_tier": "elevated"
+}

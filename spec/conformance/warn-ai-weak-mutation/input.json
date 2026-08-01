@@ -1,0 +1,24 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.9,
+  "detection_sources": ["commit-trailer"],
+  "technical_debt_delta": 0.4,
+  "test_coverage": -1,
+  "patch_coverage": -1,
+  "mutation_score": 0.3,
+  "branch": "claude/add-endpoint",
+  "changed_files": ["src/api/handler.py", "tests/test_handler.py"],
+  "issues": [],
+  "ai_files": [
+    { "path": "src/api/handler.py", "ai_lines": 48, "total_lines": 60, "confidence": 0.9 }
+  ],
+  "merge_confidence": {
+    "files_changed": 2,
+    "source_files_changed": 1,
+    "test_files_changed": 1,
+    "net_added_lines": 60,
+    "tests_touched": true,
+    "added_source_without_tests": false,
+    "risky_paths": []
+  }
+}

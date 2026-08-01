@@ -45,6 +45,12 @@
       "maximum": 1,
       "description": "Coverage of the diff's ADDED lines only (0.0–1.0): the fraction of newly-added, executable lines that the coverage report marks as covered. Stronger than test_coverage — it asks whether *this change's* new code is tested, not the whole project. -1 means not measured (no per-line coverage report, or no changed source file appears in it; aggregate-only formats such as NYC's coverage-summary.json cannot produce it). Policies MUST guard with `input.patch_coverage >= 0` before comparing."
     },
+    "mutation_score": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1,
+      "description": "Diff-scoped mutation score (0.0–1.0): of the mutants injected on the change's ADDED lines, the fraction the test suite killed (killed / (killed + survived); a timed-out mutant counts as killed, not-covered/not-viable mutants are excluded). Stronger than patch_coverage — it asks whether the tests *assert*, not just execute. Produced from a mutation-testing report (e.g. gremlins JSON) supplied to the pipeline; the producer is a signal consumer, not a test runner. -1 means not measured (no report, or no mutant on a changed line). Policies MUST guard with `input.mutation_score >= 0` before comparing."
+    },
     "branch": {
       "type": "string",
       "description": "The PR head branch name (e.g. claude/add-auth, feature/oauth)."

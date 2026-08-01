@@ -58,3 +58,5 @@ opa eval -d spec/conformance/ai-no-tests/policy.rego \
 | `pass-tested-change` | Same change with a test added — the signal is cleared | PASS, `review_tier: standard` |
 | `warn-ai-low-patch-coverage` | AI-authored change whose added lines are under-covered (patch coverage 40%) — warn and route, never block | PASS, WARN, `review_tier: elevated` |
 | `pass-ai-covered-patch` | Same change with its added lines fully covered — the signal is cleared | PASS, `review_tier: standard` |
+| `warn-ai-weak-mutation` | AI-authored change whose added lines have a weak mutation score (30%) — warn and route, never block | PASS, WARN, `review_tier: elevated` |
+| `pass-ai-strong-mutation` | Same change with a strong mutation score — the signal is cleared | PASS, `review_tier: standard` |
