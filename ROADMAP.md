@@ -13,7 +13,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 ---
 
-## Current Status (June 2026)
+## Current Status (August 2026)
 
 > **Strategy**: Zero-config governance and visibility for AI-assisted code. Claude Code, GitHub Copilot, and Cursor auto-emit `Co-Authored-By` trailers — ODS reads them in CI to attribute AI-assisted code, surface how much of delivery it is, route review attention, and enforce policy on every PR.
 
@@ -27,6 +27,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | `ods check` | OPA Rego policy enforcement | ✅ Stable |
 | `ods hook install` | Pre-commit / prepare-commit-msg / pre-push hooks | ✅ Stable |
 | `ods init` | Scaffold CI workflow + `.ods/policy.rego` | ✅ Stable |
+| `ods report` | AI attribution report (text / JSON / HTML dashboard) | ✅ Candidate |
 
 ### Detection Signals
 
@@ -40,22 +41,41 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 ### Analysis Rules
 
-| Rule | Severity | Status |
-|------|----------|---------|
-| `ai-redundant-error-handling` | medium | ✅ Stable |
-| `ai-over-commenting` | medium-high | ✅ Stable |
+| Rule | Default severity | Status |
+|------|------------------|---------|
+| `ai-redundant-error-handling` | info | ✅ Stable |
+| `ai-over-commenting` | info | ✅ Stable |
 | `ai-unsafe-deserialization` | high | ✅ Stable |
-| `ai-inconsistent-pattern` | medium-low | ✅ Candidate |
+| `ai-inconsistent-pattern` | medium | ✅ Candidate |
+| `ai-hallucinated-api` | medium | ✅ Candidate |
 
 ### Scoring Dimensions
 
-| Dimension | Weight | Status |
-|-----------|--------|--------|
-| AI code ratio | 3.0 | ✅ Stable |
-| Defect density | 2.0 | ✅ Stable |
-| Critical issues | 1.5 each | ✅ Stable |
-| Test coverage gap | 1.0 | ✅ Candidate |
-| Code duplication rate | 1.0 | 🧪 Experimental |
+The technical-debt delta is `base_quality_debt × ai_risk_multiplier`. Quality
+signals form the base debt; the AI ratio only amplifies it — **quantity of AI
+code alone never creates debt** (a clean, fully-AI change scores ~0).
+
+| Dimension | Role in the delta | Status |
+|-----------|-------------------|--------|
+| Critical / high issues | `+1.5` each — base debt | ✅ Stable |
+| Test coverage gap | `+1.0 × (1 − coverage)` — skipped when coverage is unmeasured (−1) | ✅ Candidate |
+| Code duplication rate | `+1.0 × rate` — base debt | 🧪 Experimental |
+| AI code ratio | `×(1.0–1.5)` risk multiplier on the base debt | ✅ Stable |
+| Defect density | Informational only — a per-KLOC rate, **not** part of the delta | ✅ Stable |
+
+### Merge-Confidence Signals
+
+Deterministic, diff-scoped facts fed to the policy gate — advisory by default
+(they route review attention), attribution raises the bar for AI-authored
+changes, and deny stays opt-in.
+
+| Signal | What it checks | Status |
+|--------|----------------|--------|
+| `added_source_without_tests` / `tests_touched` | Source changed without a test added or updated | ✅ Stable |
+| `risky_paths` | Diff touches CI config, dependency manifests/lockfiles, auth/crypto/security | ✅ Stable |
+| Diff shape (`files_changed`, `net_added_lines`, …) | Wide-but-shallow change detection | ✅ Stable |
+| `patch_coverage` | Coverage of the diff's *added* lines (Go / LCOV / Cobertura) | ✅ Candidate |
+| `ai_reviews` (`--ai-review`) | AI code-reviewer verdicts — advisory, never auto-deny | ✅ Candidate |
 
 ---
 
@@ -99,7 +119,8 @@ The original 01–09 module system has been **deprecated and removed** as of Jun
 - [ ] Multi-platform CI examples: GitLab CI, Bitbucket Pipelines, Jenkins (copy-paste templates)
 - [ ] `ods init` expanded: one-command scaffolding for any CI platform
 - [ ] Policy library: pre-built Rego policies for common enterprise requirements (regulated, fintech, healthcare)
-- [ ] `ods report` command: aggregate reports across repos / teams
+- [x] `ods report` command: per-repo AI attribution report (text / JSON / HTML dashboard)
+- [ ] Aggregate reporting across repos / teams
 
 ### M3 — Advanced Detection & Scoring (Q3–Q4 2026)
 
@@ -107,11 +128,13 @@ The original 01–09 module system has been **deprecated and removed** as of Jun
 
 > **Next focus**: Deepen the analysis rules and scoring accuracy. Build adoption outside the ODS org.
 
-- [ ] Additional analysis rules (hallucinated API detection, AI-generated config drift)
+- [x] Hallucinated / deprecated API detection rule (`ai-hallucinated-api`)
+- [ ] AI-generated config drift detection
 - [ ] Language-specific analysis (Go, Python, TypeScript, Java in first wave)
 - [ ] `ods score` with repo-level trend tracking (PR-over-PR technical debt trajectory)
-- [ ] AI model attribution: detect which AI tool generated the code (Copilot vs. Cursor vs. Claude Code)
-- [ ] Test coverage gap analysis from actual coverage data (not just heuristics)
+- [x] AI tool attribution: identify which AI tool generated the code (from trailers; per-tool breakdown in `ods report`)
+- [x] Test coverage gap analysis from actual coverage data — real coverage parsing (Go / LCOV / Cobertura / NYC), plus diff-scoped `patch_coverage`
+- [x] Deterministic merge-confidence signals (added-source-without-tests, risky paths, diff shape, patch coverage) with `review_tier` routing
 
 ### M4 — Compliance & Audit Trail (Q4 2026)
 
