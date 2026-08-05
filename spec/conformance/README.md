@@ -60,3 +60,5 @@ opa eval -d spec/conformance/ai-no-tests/policy.rego \
 | `pass-ai-covered-patch` | Same change with its added lines fully covered — the signal is cleared | PASS, `review_tier: standard` |
 | `warn-ai-weak-mutation` | AI-authored change whose added lines have a weak mutation score (30%) — warn and route, never block | PASS, WARN, `review_tier: elevated` |
 | `pass-ai-strong-mutation` | Same change with a strong mutation score — the signal is cleared | PASS, `review_tier: standard` |
+| `evidence-inferred-elevated` | AI attribution is only `inferred` (branch + heuristics) — route to extra review | PASS, `review_tier: elevated` |
+| `evidence-attested-auto` | Same change with `attested` attribution (commit trailer) — trusted enough to stay standard | PASS, `review_tier: standard` |
