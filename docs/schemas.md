@@ -52,6 +52,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `ai_generated` | bool | ✅ | `detect` | Whether AI code was detected in the diff |
 | `ai_confidence` | float (0.0–1.0) | ✅ | `detect` | Aggregate detection confidence |
 | `detection_sources` | string[] | | `detect` | Which signals fired (`commit-trailer`/`git-ai-notes`/`pr-body`/`branch-name`/`diff-heuristics`) — see [Disclosure completeness](#disclosure-completeness-inputdetection_sources) |
+| `evidence_tier` | string | | `detect` | Strongest evidence class present: `corroborated`/`attested`/`inferred`/`inconclusive` — see [Evidence tiers](#evidence-tiers-inputevidence_tier) |
 | `issues` | array | | `analyze` | Quality issues found |
 | `technical_debt_delta` | float | | `score` | Weighted technical-debt impact of the PR |
 | `test_coverage` | float (−1 or 0.0–1.0) | | `score` | Test coverage ratio; **−1 means not measured** |
@@ -263,6 +264,56 @@ The `warn-ai-undisclosed` and `pass-ai-disclosed`
 [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
 exercise both directions: suspicion without disclosure warns and routes
 elevated, and a trailer silences the nudge.
+
+## Evidence tiers: `input.evidence_tier`
+
+`detection_sources` says *which* signals fired; `evidence_tier` says *how
+strong* the strongest one is — a single, ordered confidence label for **how the
+attribution was obtained**. It is derived deterministically from
+`detection_sources`, so it adds no new detection, only a summary a policy and a
+report can key off directly. It answers the user's real question — "how much
+should I trust this attribution?" — and, crucially, it is **not forensic proof
+of authorship**: an author who strips the trailer drops to a weaker tier, and
+ODS surfaces what it can see rather than claiming to unmask what hides.
+
+| Tier | Meaning | Derived from |
+|------|---------|--------------|
+| `corroborated` | Independently **measured** — the strongest evidence | `git-ai-notes` (per-file AI line attribution) |
+| `attested` | The author or tool **declared** it | `commit-trailer`, `pr-body` |
+| `inferred` | **Heuristic** guess only | `branch-name`, `diff-heuristics` |
+| `inconclusive` | Detection did not run, or produced no signal | (no sources; or detect failed) |
+
+Derivation (normative):
+
+- **Highest present wins.** `evidence_tier` is the maximum over the fired
+  sources in the order `corroborated > attested > inferred > inconclusive`. A
+  change with both a `branch-name` hint and a `commit-trailer` is `attested`,
+  not `inferred`.
+- **Deterministic and redundant with `detection_sources`.** Implementations
+  MUST compute it from the sources with the mapping above; it introduces no
+  signal that `detection_sources` does not already carry.
+- **`inconclusive` is distinct from `inferred`.** Not-measured (detection did
+  not run) is not the same as measured-weakly; policies MUST distinguish them
+  (guard as needed) and MUST NOT read `inconclusive` as "no AI".
+- **A confidence label, not a verdict.** A policy MAY require a minimum tier
+  before granting `auto` (e.g. "auto only when `attested` or better"); it MUST
+  NOT treat a low tier as grounds to *deny* on its own — that would punish
+  authors whose tooling simply emits weaker signals.
+
+```rego
+# Grant auto-merge only when attribution is at least attested.
+strong_evidence { input.evidence_tier == "corroborated" }
+strong_evidence { input.evidence_tier == "attested" }
+
+review_tier := "elevated" {
+    input.ai_generated
+    not strong_evidence          # inferred-only or inconclusive AI → extra eyes
+}
+```
+
+The `evidence-attested-auto` and `evidence-inferred-elevated`
+[conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
+exercise both directions.
 
 ## Merge-confidence signals: `input.merge_confidence`
 

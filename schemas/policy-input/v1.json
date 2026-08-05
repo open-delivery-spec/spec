@@ -24,6 +24,11 @@
       },
       "description": "Which detection signals fired. Lets policies separate disclosed AI use (author attribution: commit-trailer, git-ai-notes, pr-body) from merely suspected AI use (branch-name, diff-heuristics only), making author-disclosure norms (SFC guidance, kernel docs) checkable at the gate."
     },
+    "evidence_tier": {
+      "type": "string",
+      "enum": ["corroborated", "attested", "inferred", "inconclusive"],
+      "description": "The strongest class of AI-attribution evidence present, derived deterministically from detection_sources: 'corroborated' = independently measured (git-ai-notes, per-file AI line attribution); 'attested' = the author/tool declared it (commit-trailer, pr-body); 'inferred' = heuristic only (branch-name, diff-heuristics); 'inconclusive' = detection did not run or produced no signal. It is a confidence label for how the attribution was obtained — NOT forensic proof of authorship. Ordered corroborated > attested > inferred > inconclusive; a policy can require a minimum tier (e.g. attested) before granting auto-merge."
+    },
     "technical_debt_delta": {
       "type": "number",
       "description": "Weighted technical-debt impact of the PR. Higher positive = more debt added. Negative values indicate debt reduction."

@@ -40,6 +40,11 @@
       "minimum": -1,
       "maximum": 1,
       "description": "Echo of the diff-scoped mutation score the gate evaluated (see policy-input/v1.json #/mutation_score). Fraction of mutants on the change's added lines the tests killed; -1 when not measured. Lets reports render it without re-running the pipeline."
+    },
+    "evidence_tier": {
+      "type": "string",
+      "enum": ["corroborated", "attested", "inferred", "inconclusive"],
+      "description": "Echo of the AI-attribution evidence tier the gate saw (see policy-input/v1.json #/evidence_tier). A confidence label for how the attribution was obtained, not forensic proof. Lets reports render the badge without re-running the pipeline."
     }
   },
   "additionalProperties": false
