@@ -1,0 +1,255 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-08-06T14:00:00Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "ods",
+          "version": "0.7.5",
+          "supplier": { "name": "Open Delivery Spec" }
+        }
+      ]
+    },
+    "component": {
+      "bom-ref": "change:cli#83",
+      "type": "application",
+      "name": "open-delivery-spec/cli PR #83",
+      "description": "Change under governance: feat: evidence_tier — a confidence label for how AI attribution was obtained",
+      "pedigree": {
+        "commits": [
+          {
+            "uid": "8f5a957c0e2b9d4f6a1e3c5b7d9f0a2c4e6b8d0f",
+            "url": "https://github.com/open-delivery-spec/cli/commit/8f5a957",
+            "message": "feat: evidence_tier — a confidence label for how AI attribution was obtained"
+          }
+        ]
+      },
+      "properties": [
+        { "name": "ods:pr", "value": "83" },
+        { "name": "ods:head_sha", "value": "8f5a957c0e2b9d4f6a1e3c5b7d9f0a2c4e6b8d0f" },
+        { "name": "ods:diff_base", "value": "e6d332d" },
+        { "name": "ods:workflow_run", "value": "https://github.com/open-delivery-spec/cli/actions/runs/31002889583" }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "file:internal/detector/detector.go",
+      "type": "file",
+      "name": "internal/detector/detector.go",
+      "evidence": {
+        "identity": [
+          {
+            "field": "name",
+            "confidence": 0.9,
+            "concludedValue": "ai-assisted",
+            "methods": [
+              {
+                "technique": "attestation",
+                "confidence": 0.9,
+                "value": "commit-trailer: Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com> (commit 8f5a957)"
+              },
+              {
+                "technique": "filename",
+                "confidence": 0.35,
+                "value": "branch-name: feature/evidence-tier"
+              }
+            ]
+          }
+        ]
+      },
+      "properties": [
+        { "name": "ods:ai_tool", "value": "Claude Opus 4.8" },
+        { "name": "ods:evidence_tier", "value": "attested" }
+      ]
+    },
+    {
+      "bom-ref": "tool:claude-code",
+      "type": "application",
+      "name": "Claude Code",
+      "version": "claude-opus-4-8",
+      "description": "AI coding assistant attributed by commit trailers on this change"
+    }
+  ],
+  "definitions": {
+    "standards": [
+      {
+        "bom-ref": "std:ods-governance-1",
+        "name": "ODS AI-Assisted Code Governance",
+        "version": "1",
+        "description": "Deterministic, artifact-level requirements for governing AI-assisted changes: disclosure, evidence grading, diff-scoped test adequacy, policy evaluation, and pipeline integrity.",
+        "owner": "Open Delivery Spec",
+        "requirements": [
+          {
+            "bom-ref": "req:ods-r1",
+            "identifier": "ODS-R1",
+            "title": "AI involvement is disclosed",
+            "text": "When AI assistance is detected, author or tool attribution is present (commit trailer, PR-body disclosure, or git-ai notes)."
+          },
+          {
+            "bom-ref": "req:ods-r2",
+            "identifier": "ODS-R2",
+            "title": "Attribution strength is graded",
+            "text": "The change carries an evidence tier stating how attribution was obtained: corroborated (measured), attested (declared), inferred (heuristic), or inconclusive."
+          },
+          {
+            "bom-ref": "req:ods-r3",
+            "identifier": "ODS-R3",
+            "title": "Changed code is exercised by tests",
+            "text": "Source changes are accompanied by test changes, and the diff's added lines are covered (patch coverage) to the project's threshold."
+          },
+          {
+            "bom-ref": "req:ods-r4",
+            "identifier": "ODS-R4",
+            "title": "Tests detect faults in the added lines",
+            "text": "Mutants injected on the diff's added lines are killed by the test suite (diff-scoped mutation score) to the project's threshold."
+          },
+          {
+            "bom-ref": "req:ods-r5",
+            "identifier": "ODS-R5",
+            "title": "Policy was evaluated and the change routed",
+            "text": "The organization's OPA policy evaluated the change (allowed/denied) and produced a review-routing tier."
+          },
+          {
+            "bom-ref": "req:ods-r6",
+            "identifier": "ODS-R6",
+            "title": "Pipeline integrity",
+            "text": "Every pipeline stage (detect, analyze, score, check) completed; no stage result was substituted for a failure."
+          }
+        ]
+      }
+    ]
+  },
+  "declarations": {
+    "targets": {
+      "components": [
+        {
+          "bom-ref": "target:change",
+          "type": "application",
+          "name": "open-delivery-spec/cli PR #83"
+        }
+      ]
+    },
+    "evidence": [
+      {
+        "bom-ref": "ev:detection",
+        "propertyName": "ods:detection",
+        "description": "AI detection result: ai_generated=true, confidence=0.95, sources=[commit-trailer], evidence_tier=attested. Re-fetchable: commit 8f5a957 trailer via git log; workflow run 31002889583.",
+        "created": "2026-08-06T14:00:00Z"
+      },
+      {
+        "bom-ref": "ev:patch-coverage",
+        "propertyName": "ods:patch_coverage",
+        "description": "Patch coverage of added lines: 0.75 (source: go coverage.out, artifact digest sha256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae in workflow run 31002889583).",
+        "created": "2026-08-06T14:00:00Z"
+      },
+      {
+        "bom-ref": "ev:mutation",
+        "propertyName": "ods:mutation_score",
+        "description": "Diff-scoped mutation score: 0.50 (2/4 mutants on added lines killed; gremlins report digest sha256:4d967a30111bf29f0eba01c448b375c1629b2fed01cdfcc3aed91f1b57d5dd5e).",
+        "created": "2026-08-06T14:00:00Z"
+      },
+      {
+        "bom-ref": "ev:policy",
+        "propertyName": "ods:policy",
+        "description": "Policy evaluation: allowed=true, review_tier=standard, warnings=0, denials=0. Policy file .ods/policy.rego digest sha256:aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f.",
+        "created": "2026-08-06T14:00:00Z"
+      },
+      {
+        "bom-ref": "ev:pipeline",
+        "propertyName": "ods:pipeline_integrity",
+        "description": "All stages completed: detect, analyze, score, check. failure-mode=warn. No stage marked inconclusive.",
+        "created": "2026-08-06T14:00:00Z"
+      }
+    ],
+    "claims": [
+      {
+        "bom-ref": "claim:disclosed",
+        "target": "target:change",
+        "predicate": "AI assistance on this change is disclosed via a Co-Authored-By commit trailer naming the tool.",
+        "evidence": [ "ev:detection" ]
+      },
+      {
+        "bom-ref": "claim:graded",
+        "target": "target:change",
+        "predicate": "Attribution is graded 'attested': declared by the author/tool, not independently measured.",
+        "evidence": [ "ev:detection" ]
+      },
+      {
+        "bom-ref": "claim:tested",
+        "target": "target:change",
+        "predicate": "75% of the diff's added lines are executed by the test suite.",
+        "evidence": [ "ev:patch-coverage" ]
+      },
+      {
+        "bom-ref": "claim:mutation",
+        "target": "target:change",
+        "predicate": "50% of mutants injected on the added lines are killed by the test suite.",
+        "evidence": [ "ev:mutation" ]
+      },
+      {
+        "bom-ref": "claim:policy",
+        "target": "target:change",
+        "predicate": "The organization's policy allowed the change and routed it to standard review.",
+        "evidence": [ "ev:policy" ]
+      },
+      {
+        "bom-ref": "claim:integrity",
+        "target": "target:change",
+        "predicate": "Every pipeline stage completed; no failure was silently substituted.",
+        "evidence": [ "ev:pipeline" ]
+      }
+    ],
+    "attestations": [
+      {
+        "summary": "ODS self-assessment of PR #83 against ODS AI-Assisted Code Governance v1",
+        "map": [
+          {
+            "requirement": "req:ods-r1",
+            "claims": [ "claim:disclosed" ],
+            "conformance": { "score": 1.0, "rationale": "Commit trailer present on all AI-assisted commits." },
+            "confidence": { "score": 0.9, "rationale": "Evidence tier: attested (declared by author/tool; not independently measured)." }
+          },
+          {
+            "requirement": "req:ods-r2",
+            "claims": [ "claim:graded" ],
+            "conformance": { "score": 1.0, "rationale": "evidence_tier computed deterministically from detection sources." },
+            "confidence": { "score": 1.0, "rationale": "Derivation is a pure function of the sources; reproducible." }
+          },
+          {
+            "requirement": "req:ods-r3",
+            "claims": [ "claim:tested" ],
+            "conformance": { "score": 0.75, "rationale": "Patch coverage 75% of added lines (threshold 80% not met; advisory warn issued)." },
+            "confidence": { "score": 1.0, "rationale": "Corroborated: computed from the CI coverage artifact; digest recorded." }
+          },
+          {
+            "requirement": "req:ods-r4",
+            "claims": [ "claim:mutation" ],
+            "conformance": { "score": 0.5, "rationale": "Diff-scoped mutation score 50% (threshold 50% met)." },
+            "confidence": { "score": 1.0, "rationale": "Corroborated: computed from the gremlins report artifact; digest recorded." }
+          },
+          {
+            "requirement": "req:ods-r5",
+            "claims": [ "claim:policy" ],
+            "conformance": { "score": 1.0, "rationale": "Policy evaluated: allowed, review_tier=standard." },
+            "confidence": { "score": 1.0, "rationale": "Corroborated: OPA evaluation in CI; policy digest recorded." }
+          },
+          {
+            "requirement": "req:ods-r6",
+            "claims": [ "claim:integrity" ],
+            "conformance": { "score": 1.0, "rationale": "All four stages completed." },
+            "confidence": { "score": 1.0, "rationale": "Stage status derived from the run itself; failure substitution is structurally surfaced." }
+          }
+        ]
+      }
+    ],
+    "affirmation": {
+      "statement": "This document records deterministic, artifact-level evidence about AI-assisted code in the referenced change. Attribution reflects signals the tools and authors volunteered (graded by evidence tier); it is not forensic proof of authorship. Signals are advisory by default and never assert code correctness."
+    }
+  }
+}
