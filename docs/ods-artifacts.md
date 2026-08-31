@@ -6,7 +6,7 @@ parent: Home
 
 # `.ods/` Artifact Directory Convention
 
-ODS keeps its repository-local configuration under a `.ods/` directory at the repository root. The AI code quality gate works with **no configuration at all** — `.ods/` only exists when you want to customize policy or CLI behavior.
+ODS keeps its repository-local configuration under a `.ods/` directory at the repository root. The AI code quality gate works with **no configuration at all** — `.ods/` only exists when you want to enforce your own policy.
 
 ## Directory Layout
 
@@ -14,11 +14,20 @@ ODS keeps its repository-local configuration under a `.ods/` directory at the re
 repository-root/
 ├── .ods/
 │   └── policy.rego          # OPA Rego enforcement policy (optional)
-├── .ods.yaml                # Optional CLI configuration (optional)
 └── ...
 ```
 
-That's the whole convention. There are no required files. If `.ods/policy.rego` is absent, `ods check` applies a permissive default (only critical issues block).
+That's the whole convention: one optional file. If `.ods/policy.rego` is absent,
+`ods check` applies a permissive default (only critical issues block).
+
+`ods check` looks for the policy in this order, taking the first that exists —
+`--policy` overrides the search entirely:
+
+| Order | Path |
+|-------|------|
+| 1 | `.ods/policy.rego` (recommended) |
+| 2 | `.ods.rego` |
+| 3 | `policy.rego` |
 
 ## `.ods/policy.rego` — Enforcement Policy
 
@@ -68,28 +77,26 @@ The pipeline feeds these fields to your policy:
 > [!TIP]
 > Run `ods check` locally to evaluate the policy against the current diff before you push.
 
-## `.ods.yaml` — Optional CLI Configuration
+## Configuring the CLI
 
-An optional file at the repository root tunes CLI behavior. Every field is optional:
+There is no ODS configuration file beyond the policy. The CLI is configured by
+command-line flags, and by environment variables where CI needs to override what
+the CLI would otherwise infer from the checkout:
 
-```yaml
-# .ods.yaml
-policy:
-  path: ".ods/policy.rego"   # override the default policy location
+| Variable | Effect |
+|----------|--------|
+| `ODS_DIFF_BASE` | Ref to diff against, instead of `HEAD~1`. CI sets it to the PR base so the whole PR is analysed, not just the last commit |
+| `ODS_BRANCH` | Branch name, when the checkout does not carry it (`ODS_BRANCH_NAME` is accepted as an alias) |
+| `ODS_HEAD_SHA` | Commit that AI review verdicts are matched against. On `pull_request` events CI checks out a synthetic merge commit, which is not the SHA reviewers stamped |
+| `ODS_DEBUG` | Set to `1` to print decision diagnostics to stderr (same as `--debug`) |
 
-detect:
-  branch_prefixes:           # treat these branch prefixes as AI-authored
-    - claude/
-    - copilot/
-    - cursor/
-
-ci:
-  provider: github-actions
-```
+Everything else — the policy path, SARIF and mutation reports, review verdicts —
+is passed per invocation as a flag. See the
+[CLI README](https://github.com/open-delivery-spec/cli#readme) for the full list.
 
 ## Should I commit `.ods/` ?
 
-Yes. `.ods/policy.rego` and `.ods.yaml` are part of your repository's quality configuration and should be version-controlled like any other CI config. If your workflow generates transient files, ignore those specifically:
+Yes. `.ods/policy.rego` is part of your repository's quality configuration and should be version-controlled like any other CI config. If your workflow generates transient files, ignore those specifically:
 
 ```gitignore
 # ODS transient artifacts
@@ -108,4 +115,4 @@ Yes. `.ods/policy.rego` and `.ods.yaml` are part of your repository's quality co
 ---
 
 > [!NOTE]
-> ODS no longer defines per-module evidence artifacts (release readiness, rollback plans, approval records, etc.). Those concepts were deprecated in June 2026; see [ROADMAP.md](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md). The only ODS artifacts today are the optional `.ods/policy.rego` and `.ods.yaml`.
+> ODS no longer defines per-module evidence artifacts (release readiness, rollback plans, approval records, etc.). Those concepts were deprecated in June 2026; see [ROADMAP.md](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md). The only ODS artifact today is the optional `.ods/policy.rego`.
