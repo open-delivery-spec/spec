@@ -20,24 +20,53 @@ When `expected.json` contains `review_tier`, a conforming implementation must
 report that tier ([check output schema](../../schemas/check-output/v1.json));
 implementations without review-routing support will fail those scenarios.
 
+A conforming implementation must also **exit non-zero when `allowed` is false**.
+The exit code is what blocks a merge in CI, so it is part of conformance, not an
+implementation detail.
+
+Fields a scenario's `input.json` omits are **not measured**, which the input
+schema represents as the `-1` sentinel (`test_coverage`, `patch_coverage`,
+`mutation_score`). An implementation that reads an absent field as `0` will fire
+coverage rules the scenario never intended.
+
 **Comparison semantics:** `denials` and `warnings` come from Rego partial sets
 and are **unordered** — runners must compare them as sets, not ordered lists.
 `allowed` and `review_tier` are scalar equality.
 
 ## Running the test suite
 
+A scenario is a policy input plus a policy, so it runs without a matching
+repository. `ods check --input` evaluates the prepared input directly:
+
 ```bash
 # Install ODS CLI
 go install github.com/open-delivery-spec/cli/cmd/ods@latest
 
 # Run a single scenario
-ods check --policy spec/conformance/ai-no-tests/policy.rego  # run in a repo that matches the scenario
+ods check --input spec/conformance/block-ai-no-tests/input.json \
+          --policy spec/conformance/block-ai-no-tests/policy.rego \
+          --json
 
-# Or validate with any OPA-compatible runner
-opa eval -d spec/conformance/ai-no-tests/policy.rego \
-         -I spec/conformance/ai-no-tests/input.json \
+# Run every scenario
+for dir in spec/conformance/*/; do
+  [ -f "$dir/input.json" ] || continue
+  echo "== $(basename "$dir")"
+  ods check --input "$dir/input.json" --policy "$dir/policy.rego" --json
+done
+```
+
+Any OPA-compatible runner also works, but it checks the policy in isolation
+rather than an implementation's output shape and exit code:
+
+```bash
+opa eval -d spec/conformance/block-ai-no-tests/policy.rego \
+         -I spec/conformance/block-ai-no-tests/input.json \
          'data.ods.policy'
 ```
+
+The reference implementation runs this suite in its own CI at both layers —
+policy evaluation and the CLI contract — so a scenario added here fails the
+CLI build until it is satisfied.
 
 ## Scenarios
 
