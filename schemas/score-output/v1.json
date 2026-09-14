@@ -18,11 +18,16 @@
     "verdict": {
       "type": "string",
       "enum": ["decrease", "neutral", "increase"],
-      "description": "Overall direction of the debt delta."
+      "description": "Direction of the debt delta: increase (> 0), decrease (< 0), neutral (rounds to 0.0). Not a risk level — see risk."
+    },
+    "risk": {
+      "type": "string",
+      "enum": ["low", "moderate", "high", "critical"],
+      "description": "Band the delta falls in: low (<= 1.0), moderate (<= 3.0), high (<= 5.0), critical (> 5.0). Optional: older CLIs omit it and carried the band in the recommendation text."
     },
     "recommendation": {
       "type": "string",
-      "description": "Human-readable guidance derived from the verdict."
+      "description": "Human-readable guidance derived from the risk band."
     },
     "files_analyzed": {
       "type": "integer",
@@ -40,7 +45,12 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "AI lines / total changed lines."
+          "description": "AI lines / total changed code lines. 0 when ai_code_ratio_source is unknown: no per-file attribution exists and no ratio is claimed."
+        },
+        "ai_code_ratio_source": {
+          "type": "string",
+          "enum": ["git-ai", "commit-trailer", "diff-heuristics", "unknown"],
+          "description": "Provenance of the AI-line numerator: measured by git-ai authorship notes, attested by the code lines AI-attributed commits added, estimated by the diff heuristics, or unknown (nothing measured or attested). Optional: older CLIs omit it."
         },
         "defect_density": {
           "type": "number",
@@ -67,7 +77,7 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "Estimated fraction of duplicated code in the change."
+          "description": "Estimated fraction of duplicated lines among the change's added code lines. Non-code files are excluded; a change with no code lines reports 0."
         }
       }
     }

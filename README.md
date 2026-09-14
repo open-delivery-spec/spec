@@ -66,6 +66,8 @@ trailers — automatically emitted by Claude Code, GitHub Copilot, and Cursor �
 the primary signal, so attribution is zero-config. This is **attribution, not
 forensic detection**: it reads what the tools disclose; an author who strips the
 trailer can evade it, and the diff heuristics are only a low-confidence fallback.
+The aggregate confidence is the strongest signal plus a small boost per additional
+independent source, capped at 95% — ODS never reports certainty about authorship.
 
 | Signal | Source | Confidence |
 |---|---|---|
@@ -113,7 +115,11 @@ code carry more risk because no human reasoned through them. But AI quantity
 technical_debt_delta = quality_debt × (1 + 0.5 × ai_code_ratio)
 ```
 
-Verdict: **decrease** / **neutral** / **increase**
+Verdict: the delta's direction (**increase** / **neutral** / **decrease**). Risk: the
+band it falls in (**low** ≤ 1.0 < **moderate** ≤ 3.0 < **high** ≤ 5.0 < **critical**).
+The AI code ratio is AI lines over the change's added code lines, and it states its
+provenance — `git-ai` (measured), `commit-trailer` (the lines AI-attributed commits
+added), `diff-heuristics` (estimated), or `unknown`, in which case no ratio is claimed.
 
 ### 4. Enforce — OPA Policy Engine
 

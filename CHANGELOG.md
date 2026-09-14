@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **`risk`** in the score output (`low` / `moderate` / `high` / `critical`): the band the debt delta falls in, separated from `verdict`.
+- **`ai_code_ratio_source`** in the score breakdown (`git-ai` / `commit-trailer` / `diff-heuristics` / `unknown`): where the AI-line numerator comes from; `unknown` means no per-file attribution exists and no ratio is claimed.
+- **Attested per-file AI lines**: with a `Co-Authored-By` / `Assisted-by` trailer and no git-ai notes, `detect` reports the code lines each AI-attributed commit added (capped at what the change still contains) instead of running the diff heuristics next to the trailer.
 - **Merge-confidence signals** in the policy input (`merge_confidence`): deterministic, diff-scoped facts — `added_source_without_tests` / `tests_touched`, `risky_paths`, and diff shape — advisory by default with `review_tier` routing; deny stays opt-in.
 - **Patch (diff) coverage** (`patch_coverage`): coverage of a change's *added* lines from an existing report (Go / LCOV / Cobertura), with a `-1` "not measured" sentinel.
 - **AI reviewer verdicts** (`ai_reviews`, via `ods check --ai-review`) as a `review-verdict/v1` input — advisory: routes attention, never denies unless a policy opts in.
@@ -19,7 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Conformance suite for the policy-input contract (15 scenarios).
 
 ### Changed
+- **Detection confidence is capped at 0.95** and corroboration counts distinct sources, not signals: five attributed commits no longer stack to 100%.
+- **`verdict` is the direction of the delta** (`increase` / `neutral` / `decrease`), as the schema always described it; `+0.1` is no longer labelled `decrease`. The risk band moved to the new `risk` field, and the recommendation text no longer repeats it.
+- **`duplication_rate` is estimated over added code lines only**; repeated Markdown or YAML lines no longer count.
 - Front-door framing reframed from "AI code quality gate" to **governance and visibility for AI-assisted code** (disclosed AI PRs already merge at a high rate; ODS's value is visibility, routing, audit, and policy).
+
+### Fixed
+- `ai_code_ratio` was invented (`changed_lines × confidence × 0.5`) whenever no per-file attribution existed — "49%" for a change whose every commit was attested AI. It is now attested from the commits, or 0 with `ai_code_ratio_source: unknown`.
 
 ## [2.0.0] — 2026-06-11
 
