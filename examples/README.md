@@ -16,8 +16,14 @@ The ODS CLI evaluates this file using OPA (Open Policy Agent).
 
 | File | Use case |
 |------|----------|
+| [`ods-policy-oss-disclosure.rego`](ods-policy-oss-disclosure.rego) | Open-source project with an AI clause in CONTRIBUTING — disclose it, test it, own it; nudges and routes, denies only critical findings ([guide](../docs/oss-ai-policy.md)) |
+| [`ods-policy-oss-no-ai.rego`](ods-policy-oss-no-ai.rego) | Open-source project that does not accept AI-generated contributions — refuses attested AI changes, routes suspected ones to a maintainer |
 | [`ods-policy-oss.rego`](ods-policy-oss.rego) | Open-source project — permissive, blocks only critical issues |
 | [`ods-policy-enterprise.rego`](ods-policy-enterprise.rego) | Enterprise service — strict gates for production code |
+
+`scripts/check-example-policies.sh` evaluates every policy here against the
+[conformance scenarios](../spec/conformance/) and checks that the open-source
+templates behave as documented; CI runs it on every change.
 
 The CLI ships with a built-in default policy (`ods check` with no `.ods/policy.rego`).
 These examples show how to customize it.

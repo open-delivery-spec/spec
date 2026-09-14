@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Open-source policy templates**: `examples/ods-policy-oss-disclosure.rego` (disclose it, test it, own it — nudges and routes, denies only critical findings, with opt-in STRICT gates) and `examples/ods-policy-oss-no-ai.rego` (for projects that do not accept AI contributions), with the [Open-Source AI Policy](docs/oss-ai-policy.md) guide and `scripts/check-example-policies.sh`, which CI runs against the conformance scenarios.
 - **`risk`** in the score output (`low` / `moderate` / `high` / `critical`): the band the debt delta falls in, separated from `verdict`.
 - **`ai_code_ratio_source`** in the score breakdown (`git-ai` / `commit-trailer` / `diff-heuristics` / `unknown`): where the AI-line numerator comes from; `unknown` means no per-file attribution exists and no ratio is claimed.
 - **Attested per-file AI lines**: with a `Co-Authored-By` / `Assisted-by` trailer and no git-ai notes, `detect` reports the code lines each AI-attributed commit added (capped at what the change still contains) instead of running the diff heuristics next to the trailer.

@@ -43,9 +43,19 @@ jobs:
 
 With no `.ods/policy.rego`, the gate runs `detect → analyze → score` and posts a report, but only critical issues would ever block — so first-time contributors are never turned away by a red check.
 
+### If CONTRIBUTING has an AI clause
+
+Most projects that allow AI assistance ask for the same three things: disclose
+it, test it, own it. [`examples/ods-policy-oss-disclosure.rego`](https://github.com/open-delivery-spec/spec/blob/main/examples/ods-policy-oss-disclosure.rego)
+is that clause as a policy: an undisclosed AI change gets a nudge and extra
+review, an untested one a warning, and nothing is blocked on suspicion. The
+[Open-Source AI Policy](../oss-ai-policy.md) page walks through it, including
+the fork pull-request caveats and a variant for projects that do not accept
+AI contributions.
+
 ### Optional: a gentle policy
 
-If the project grows, add a minimal `.ods/policy.rego` that blocks only the truly dangerous:
+If you want no AI-specific rules at all, add a minimal `.ods/policy.rego` that blocks only the truly dangerous:
 
 ```rego
 package ods.policy
