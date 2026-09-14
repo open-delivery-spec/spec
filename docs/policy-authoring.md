@@ -153,6 +153,8 @@ while keeping `--json` output clean.
 
 Copy one of these to `.ods/policy.rego` and adapt:
 
+- [`examples/ods-policy-oss-disclosure.rego`](https://github.com/open-delivery-spec/spec/blob/main/examples/ods-policy-oss-disclosure.rego) — an open-source project's AI clause as a check: disclose it, test it, own it (see [Open-Source AI Policy](oss-ai-policy.md))
+- [`examples/ods-policy-oss-no-ai.rego`](https://github.com/open-delivery-spec/spec/blob/main/examples/ods-policy-oss-no-ai.rego) — for projects that do not accept AI-generated contributions
 - [`examples/ods-policy-oss.rego`](https://github.com/open-delivery-spec/spec/blob/main/examples/ods-policy-oss.rego) — permissive; blocks only critical issues
 - [`examples/ods-policy-enterprise.rego`](https://github.com/open-delivery-spec/spec/blob/main/examples/ods-policy-enterprise.rego) — strict; sensitive-module and debt gates
 

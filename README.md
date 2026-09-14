@@ -138,6 +138,11 @@ deny[msg] {
 }
 ```
 
+Maintaining an open-source project with an AI clause in CONTRIBUTING? The
+[Open-Source AI Policy](docs/oss-ai-policy.md) guide and
+[`examples/ods-policy-oss-disclosure.rego`](examples/ods-policy-oss-disclosure.rego)
+turn "disclose it, test it, own it" into this check.
+
 ---
 
 ## Tooling
