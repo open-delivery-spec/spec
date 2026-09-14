@@ -21,22 +21,27 @@ deny[msg] {
     file := input.ai_files[_]
     regex.match(".*(payment|auth|billing|security).*", file.path)
     file.confidence > 0.5
+    input.test_coverage >= 0
     input.test_coverage < 0.6
-    msg = sprintf("AI code in sensitive module '%s' has insufficient test coverage (%.0f%% < 60%%)", [file.path, input.test_coverage * 100.0])
+    pct := round(input.test_coverage * 100)
+    msg = sprintf("AI code in sensitive module '%s' has insufficient test coverage (%d%% < 60%%)", [file.path, pct])
 }
 
 # Block excessive tech debt
 deny[msg] {
     input.technical_debt_delta > 5.0
-    msg = sprintf("Technical debt increase %.1f exceeds block threshold (5.0)", [input.technical_debt_delta * 1.0])
+    msg = sprintf("Technical debt increase %v exceeds block threshold (5.0)", [input.technical_debt_delta])
 }
 
 # Warn on high AI confidence with low test coverage
 warn[msg] {
     input.ai_generated == true
     input.ai_confidence > 0.7
+    input.test_coverage >= 0
     input.test_coverage < 0.3
-    msg = sprintf("High-confidence AI code (%.0f%%) with low test coverage (%.0f%%)", [input.ai_confidence * 100.0, input.test_coverage * 100.0])
+    conf := round(input.ai_confidence * 100)
+    cov := round(input.test_coverage * 100)
+    msg = sprintf("High-confidence AI code (%d%%) with low test coverage (%d%%)", [conf, cov])
 }
 
 # Warn on high issue count
@@ -49,5 +54,5 @@ warn[msg] {
 warn[msg] {
     input.technical_debt_delta > 2.0
     input.technical_debt_delta <= 5.0
-    msg = sprintf("Moderate technical debt increase: %.1f (threshold: 5.0)", [input.technical_debt_delta * 1.0])
+    msg = sprintf("Moderate technical debt increase: %v (threshold: 5.0)", [input.technical_debt_delta])
 }

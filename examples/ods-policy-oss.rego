@@ -19,12 +19,14 @@ deny[msg] {
 warn[msg] {
     input.ai_generated == true
     input.ai_confidence > 0.9
+    input.test_coverage >= 0
     input.test_coverage < 0.1
-    msg = sprintf("Fully AI-generated code (%.0f%% confidence) with less than 10%% test coverage", [input.ai_confidence * 100.0])
+    pct := round(input.ai_confidence * 100)
+    msg = sprintf("Fully AI-generated code (%d%% confidence) with less than 10%% test coverage", [pct])
 }
 
 # Warn on extreme tech debt
 warn[msg] {
     input.technical_debt_delta > 8.0
-    msg = sprintf("Large technical debt increase: %.1f (consider splitting this PR)", [input.technical_debt_delta * 1.0])
+    msg = sprintf("Large technical debt increase: %v (consider splitting this PR)", [input.technical_debt_delta])
 }
