@@ -14,7 +14,7 @@
       "type": "number",
       "minimum": 0,
       "maximum": 1,
-      "description": "Aggregate detection confidence (0.0–1.0): the highest individual signal plus a small boost per corroborating signal."
+      "description": "Aggregate detection confidence: the highest individual signal plus 0.05 per additional distinct source (commit-trailer, git-ai-notes, pr-body, branch-name, diff-heuristics), capped at 0.95. Several signals from one source — five attributed commits — count once. Attribution is volunteered by tools and authors, never proven, so certainty (1.0) is never reported."
     },
     "files": {
       "type": "array",
@@ -42,7 +42,7 @@
       "required": ["path", "ai_lines", "total_lines", "confidence"],
       "properties": {
         "path": { "type": "string", "description": "Repository-relative file path." },
-        "ai_lines": { "type": "integer", "minimum": 0, "description": "Estimated AI-generated lines." },
+        "ai_lines": { "type": "integer", "minimum": 0, "description": "AI lines in the file: measured (git-ai authorship notes), attested (the code lines AI-attributed commits added, capped at the file's insertions in the diff), or estimated (diff heuristics), in that order of preference." },
         "total_lines": { "type": "integer", "minimum": 0, "description": "Total lines considered in the file." },
         "confidence": { "type": "number", "minimum": 0, "maximum": 1, "description": "Per-file detection confidence." }
       }

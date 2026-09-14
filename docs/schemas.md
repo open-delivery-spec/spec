@@ -50,7 +50,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | Field | Type | Required | Produced by | Description |
 |-------|------|----------|-------------|-------------|
 | `ai_generated` | bool | ✅ | `detect` | Whether AI code was detected in the diff |
-| `ai_confidence` | float (0.0–1.0) | ✅ | `detect` | Aggregate detection confidence |
+| `ai_confidence` | float (0.0–1.0) | ✅ | `detect` | Aggregate detection confidence. The reference CLI caps it at 0.95 — attribution is volunteered, never proven — so a policy threshold above 0.95 never fires |
 | `detection_sources` | string[] | | `detect` | Which signals fired (`commit-trailer`/`git-ai-notes`/`pr-body`/`branch-name`/`diff-heuristics`) — see [Disclosure completeness](#disclosure-completeness-inputdetection_sources) |
 | `evidence_tier` | string | | `detect` | Strongest evidence class present: `corroborated`/`attested`/`inferred`/`inconclusive` — see [Evidence tiers](#evidence-tiers-inputevidence_tier) |
 | `issues` | array | | `analyze` | Quality issues found |
