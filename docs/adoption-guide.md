@@ -259,6 +259,20 @@ Turn off PR comments:
     comment: "false"
 ```
 
+### "The ODS comment doesn't appear on PRs from forks"
+
+GitHub gives `pull_request` workflows triggered from a fork a read-only token,
+so the comment (and review-routing labels) cannot be posted there. The gate
+still runs, the check still fails on `BLOCK`, and the report is in the job
+summary and the `ods-report` artifact. Two things to check:
+
+- Check out the PR head by SHA (the `pull_request.head.sha` event field) or keep
+  the default merge ref. A checkout of `github.head_ref` fails on fork PRs,
+  because that branch exists only in the fork.
+- To post the comment on fork PRs, run it from a follow-up `workflow_run` job —
+  see [Permissions and Fork Pull Requests](https://github.com/open-delivery-spec/validate-action#permissions-and-fork-pull-requests)
+  in the validate-action README.
+
 ### "I want to diff against a different base"
 
 By default the Action diffs against `origin/main`. Override it:
