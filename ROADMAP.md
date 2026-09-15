@@ -120,7 +120,7 @@ The original 01–09 module system has been **deprecated and removed** as of Jun
 - [ ] `ods init` expanded: one-command scaffolding for any CI platform
 - [ ] Policy library: pre-built Rego policies for common enterprise requirements (regulated, fintech, healthcare)
 - [x] `ods report` command: per-repo AI attribution report (text / JSON / HTML dashboard)
-- [ ] Aggregate reporting across repos / teams
+- [x] Aggregate reporting across repos: `ods report merge` + the `org-ai-report` reusable workflow (dashboard, job summary, GitHub Pages); per-team grouping pending
 
 ### M3 — Advanced Detection & Scoring (Q3–Q4 2026)
 

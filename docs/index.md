@@ -15,6 +15,7 @@ AI coding tools make changes faster than delivery processes can explain them. OD
 > **Start here**: [Get Started](get-started.md) → [Adoption Guide](adoption-guide.md)  
 > **Real-world scenarios**: [Open-source](scenarios/open-source-project.md) · [Enterprise](scenarios/enterprise-service.md) · [AI coding team](scenarios/ai-coding-pr.md)  
 > **Maintainers with an AI clause in CONTRIBUTING**: [Open-Source AI Policy](oss-ai-policy.md) — disclose it, test it, own it, as a check on every PR  
+> **How much of the organization's delivery is AI-assisted**: [Organization-wide View](org-view.md) — one scheduled workflow, every repository, one dashboard  
 > **Policy customization**: [`.ods/` Convention](ods-artifacts.md)  
 > **How it fits**: [ODS and SLSA](comparison/slsa.md) — SLSA proves how artifacts were built; ODS proves how changes were delivered.  
 > **Threats & Failure Modes**: [Why this exists](threats-and-failure-modes.md)

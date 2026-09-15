@@ -151,6 +151,7 @@ turn "disclose it, test it, own it" into this check.
 |------|------------|
 | ODS CLI | [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) |
 | GitHub Action | [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) |
+| Organization report workflow | [open-delivery-spec/.github](https://github.com/open-delivery-spec/.github/blob/main/.github/workflows/org-ai-report.yml) — every repository, one dashboard ([guide](docs/org-view.md)) |
 
 ---
 
