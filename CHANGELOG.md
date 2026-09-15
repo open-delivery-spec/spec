@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Organization-wide view**: `ods report merge` combines per-repository `ods report --json` files into one report (summed shares, per-tool breakdown, merged trend, per-repository table) as JSON, Markdown or an HTML dashboard; `ods report --repo` names the repository in each file. The `org-ai-report` reusable workflow in `open-delivery-spec/.github` scans an organization on a schedule and publishes the dashboard as an artifact, a job summary, or GitHub Pages. Guide: [Organization-wide View](docs/org-view.md).
 - **Open-source policy templates**: `examples/ods-policy-oss-disclosure.rego` (disclose it, test it, own it — nudges and routes, denies only critical findings, with opt-in STRICT gates) and `examples/ods-policy-oss-no-ai.rego` (for projects that do not accept AI contributions), with the [Open-Source AI Policy](docs/oss-ai-policy.md) guide and `scripts/check-example-policies.sh`, which CI runs against the conformance scenarios.
 - **`risk`** in the score output (`low` / `moderate` / `high` / `critical`): the band the debt delta falls in, separated from `verdict`.
 - **`ai_code_ratio_source`** in the score breakdown (`git-ai` / `commit-trailer` / `diff-heuristics` / `unknown`): where the AI-line numerator comes from; `unknown` means no per-file attribution exists and no ratio is claimed.
