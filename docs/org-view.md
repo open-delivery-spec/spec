@@ -69,7 +69,8 @@ jobs:
       pages: write      # only with deploy-pages: true
       id-token: write   # only with deploy-pages: true
     with:
-      org: your-org                 # or: repos: | (one owner/name per line)
+      org: your-org                 # optional (defaults to this repository's owner);
+                                    # or repos: | with one owner/name per line
       since: "90 days ago"
       deploy-pages: true
     secrets:
@@ -85,9 +86,13 @@ jobs:
 4. **GitHub Pages**: in the hosting repository, Settings → Pages → Source:
    GitHub Actions. The run prints the dashboard URL.
 
+The ODS organization runs the workflow on itself; the latest run, with its
+artifact and job summary, is on the
+[workflow page](https://github.com/open-delivery-spec/.github/actions/workflows/org-ai-report.yml).
+
 | Input | Default | Meaning |
 |---|---|---|
-| `org` | | Organization or user whose repositories to cover. Archived repositories and forks are skipped. |
+| `org` | owner of the calling repository | Organization or user whose repositories to cover. Archived repositories and forks are skipped. |
 | `repos` | | Explicit list instead, one `owner/name` per line. |
 | `since` | `90 days ago` | History window, any git `--since` expression. |
 | `cli-ref` | `main` | ODS CLI version, tag or commit to install. |
