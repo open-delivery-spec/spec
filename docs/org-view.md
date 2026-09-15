@@ -108,6 +108,17 @@ artifact and job summary, is on the
   "no AI use" or "no disclosure", and the report cannot tell which. The
   [Open-Source AI Policy](oss-ai-policy.md) nudge on each pull request is what
   closes that gap over time.
+- **Squash merges can erase the attribution.** The trailers live in the
+  commit message, and a squash merge writes a new one. GitHub keeps them only
+  when the squash message includes the commit details ("Default message" or
+  "Default to pull request title and commit details" under Settings → General
+  → Pull Requests); "Default to pull request title" and "… title and
+  description" produce a commit with no trailer at all, so a pull request that
+  was disclosed and checked lands on `main` as a human commit. Rebase and merge
+  commits keep the original commits and need no setting. This report scans
+  merged history, so that one setting decides whether the organization view
+  sees the AI work at all; check it with `git log -1 --format=%B` after the
+  next merge.
 - **Trend granularity** is weekly for windows up to about six months and
   monthly beyond; when repositories with different spans are merged, weekly
   buckets are rolled up to months.

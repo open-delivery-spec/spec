@@ -145,7 +145,7 @@ Policy: WARN — AI change with multiple quality issues. Review carefully.
 ## Lessons learned
 
 1. **The quality report changes reviewer behavior immediately** — they stop skimming and start targeting.
-2. **Keep commit trailers.** `Co-Authored-By` is the highest-confidence detection signal and survives squash merges.
+2. **Keep commit trailers.** `Co-Authored-By` is the highest-confidence detection signal. It survives a squash merge only when the squash message includes the commit details; a squash configured to keep just the pull request title erases it from `main`.
 3. **Start with WARN, then BLOCK.** Observe the findings for a week, then turn on the blocking policy once the team trusts it.
 
 ## Next steps after adoption
