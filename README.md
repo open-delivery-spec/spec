@@ -66,6 +66,10 @@ trailers — automatically emitted by Claude Code, GitHub Copilot, and Cursor �
 the primary signal, so attribution is zero-config. This is **attribution, not
 forensic detection**: it reads what the tools disclose; an author who strips the
 trailer can evade it, and the diff heuristics are only a low-confidence fallback.
+The trailers also have to survive the merge: a squash merge whose message keeps
+only the pull request title erases them from `main`, so configure squash merging
+to include the commit details, or use rebase or merge commits (see
+[Reading the numbers](docs/org-view.md#reading-the-numbers)).
 The aggregate confidence is the strongest signal plus a small boost per additional
 independent source, capped at 95% — ODS never reports certainty about authorship.
 
