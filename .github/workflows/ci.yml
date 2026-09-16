@@ -8,9 +8,10 @@ on:
 
 jobs:
   # ── Schema validation ─────────────────────────────────────────
-  # ODS no longer ships per-module artifact JSON Schemas. The product is the
-  # AI code quality gate (detect → analyze → score → check). This job remains
-  # so that any future schemas under schemas/ are validated automatically.
+  # The contracts live at schemas/<name>/v1.json. Each must compile as a JSON
+  # Schema, and the conformance fixtures must satisfy the contracts they
+  # exercise: every input.json is a policy-input document, every expected.json
+  # a check-output document.
   schemas:
     name: Validate JSON Schemas
     runs-on: ubuntu-latest
@@ -24,21 +25,27 @@ jobs:
       - name: Install AJV
         run: npm install -g ajv-cli ajv-formats
 
-      - name: Validate schema syntax (all schemas are valid JSON Schemas)
+      - name: Compile every schema
         run: |
+          set -euo pipefail
           shopt -s nullglob
-          files=(schemas/*.json)
+          files=(schemas/*/*.json)
           if [ ${#files[@]} -eq 0 ]; then
-            echo "No JSON Schemas present under schemas/ — nothing to validate."
-            exit 0
+            echo "::error::No schema found under schemas/<name>/ — did the layout change?"
+            exit 1
           fi
           for f in "${files[@]}"; do
-            echo "Validating $f ..."
-            ajv compile -s "$f" \
-              --strict=false \
-              --spec=draft2020 \
-              -c ajv-formats
+            echo "Compiling $f ..."
+            ajv compile -s "$f" --strict=false --spec=draft2020 -c ajv-formats
           done
+
+      - name: Validate the conformance fixtures against the contracts
+        run: |
+          set -euo pipefail
+          ajv validate -s schemas/policy-input/v1.json -d "spec/conformance/*/input.json" \
+            --strict=false --spec=draft2020 -c ajv-formats
+          ajv validate -s schemas/check-output/v1.json -d "spec/conformance/*/expected.json" \
+            --strict=false --spec=draft2020 -c ajv-formats
 
   # ── Example policies ──────────────────────────────────────────
   # The templates under examples/ are what adopters copy. Every one must
@@ -67,26 +74,56 @@ jobs:
       - name: Evaluate example policies against the conformance scenarios
         run: scripts/check-example-policies.sh
 
-  # ── cross-reference: CLI schemas match spec schemas ──────────
-  # Source-of-truth check for any schemas the spec repo publishes. Passes
-  # cleanly when the spec ships no schemas (current state).
+  # ── CLI ↔ spec ─────────────────────────────────────────────────
+  # The reference CLI's outputs must satisfy the published contracts. Run the
+  # four stages on this repository and validate each JSON document against
+  # its schema, so a field added or renamed on one side fails here.
   schema-sync:
     name: CLI ↔ Spec Schema Sync
     runs-on: ubuntu-latest
+    env:
+      GOPROXY: direct
+      GOSUMDB: "off"
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
-      - name: Check CLI repo schemas match spec repo schemas
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.25"
+          cache: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Install ODS CLI and AJV
         run: |
-          shopt -s nullglob
-          files=(schemas/*.json)
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "Spec repo publishes no JSON Schemas — sync check is a no-op."
-            exit 0
-          fi
-          echo "The spec repo is the source of truth for schemas."
-          echo "To run this locally: diff -r schemas/ ../cli/internal/validator/schemas/"
-          for f in "${files[@]}"; do
-            echo "  Checking $(basename "$f") exists at ../cli/internal/validator/schemas/$(basename "$f")"
+          go install github.com/open-delivery-spec/cli/cmd/ods@main
+          npm install -g ajv-cli ajv-formats
+
+      - name: Run the pipeline on this repository
+        env:
+          ODS_DIFF_BASE: ${{ github.event.pull_request.base.sha || 'HEAD~1' }}
+        run: |
+          set -uo pipefail
+          mkdir -p out
+          # Exit codes carry the verdicts (AI detected, policy denied); only
+          # the documents matter here.
+          ods detect --json > out/detect.json || true
+          ods analyze --json > out/analyze.json || true
+          ods score --json > out/score.json || true
+          ods check --json > out/check.json || true
+          for f in out/*.json; do
+            python3 -m json.tool "$f" > /dev/null || { echo "::error::$f is not a JSON document"; exit 1; }
           done
-          echo "✅ Schema structure is consistent (manual sync check)"
+
+      - name: Validate each output against its contract
+        run: |
+          set -euo pipefail
+          for name in detect analyze score check; do
+            echo "out/${name}.json against schemas/${name}-output/v1.json"
+            ajv validate -s "schemas/${name}-output/v1.json" -d "out/${name}.json" \
+              --strict=false --spec=draft2020 -c ajv-formats
+          done
