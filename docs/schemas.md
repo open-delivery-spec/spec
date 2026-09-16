@@ -1,8 +1,8 @@
 ---
 title: Policy Input Schema
 layout: default
-nav_order: 10
 has_children: false
+nav_order: 4
 ---
 
 # Policy Input Schema
@@ -64,6 +64,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `ai_files` | array | | `detect` | Per-file AI attribution detail |
 | `ai_reviews` | array | | `check --ai-review` | AI code-reviewer verdicts (advisory by default — see below) |
 | `merge_confidence` | object | | `check` | Deterministic diff facts: tested? shaped like real work? touches sensitive paths? — see [Merge-confidence signals](#merge-confidence-signals-inputmerge_confidence) |
+| `_ods_detect_error` | bool | | CI | `true` when the detect stage failed to run, so `ai_generated: false` is an absence of facts, not a finding. The reference GitHub Action sets it; the `warn-detect-inconclusive` conformance scenario shows the policy pattern (warn, route to review) |
 
 > **`test_coverage` sentinel:** A value of `−1` means coverage was not measured (no coverage file found). Policies that check coverage MUST guard with `input.test_coverage >= 0` to avoid false positives on PRs where coverage is unavailable.
 
