@@ -5,18 +5,18 @@ nav_order: 2
 
 # Get Started
 
-Start with the smallest production-ready loop: **ODS AI Quality Gate**. This takes ~5 minutes and runs in CI.
+Start with the smallest production-ready loop: the ODS check on every pull request. It takes about five minutes and runs in CI.
 
 > [!TIP]
 > Want to see what an ODS-compliant PR looks like? Copy the [PR Template](https://github.com/open-delivery-spec/spec/blob/main/examples/ods-pr-template.md) into `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ---
 
-## Path A: AI Quality Gate
+## Path A: The check on every PR
 
-**For**: Individual maintainers, open source projects, any team that wants automated AI code quality checks in CI.
+**For**: Individual maintainers, open source projects, any team that wants to see AI-assisted changes and hold them to a policy in CI.
 
-**Goal**: Detect AI-generated code, analyze quality, score technical debt, and enforce policy — on every PR.
+**Goal**: Attribute AI-assisted code, surface quality findings, score technical debt, and enforce policy — on every PR.
 
 ### 1. Install the CLI
 
@@ -67,7 +67,7 @@ jobs:
 ```
 
 The Action automatically:
-1. **Detects** AI code (`Co-Authored-By` trailers, PR disclosure, branch names, diff heuristics)
+1. **Detects** AI-assisted code (`Co-Authored-By` trailers, PR disclosure, branch names, diff heuristics)
 2. **Analyzes** code quality (built-in AI heuristics plus imported SARIF findings)
 3. **Scores** technical debt impact (quality-driven, weighted by AI risk)
 4. **Enforces** policy (OPA Rego — optional, place at `.ods/policy.rego`)
@@ -205,7 +205,7 @@ deny[msg] {
 }
 ```
 
-See the [`.ods/` Convention](ods-artifacts.md) for the full list of policy input fields.
+See [Writing Policies (Rego)](policy-authoring.md) for the patterns and the [Policy Input Schema](schemas.md) for every field the policy can read.
 
 ### 3. Require the check in branch protection
 
@@ -213,14 +213,66 @@ Once `ods check` blocks the changes you care about, make the ODS workflow a requ
 
 ---
 
+## Rolling it out to a team
+
+Nothing here needs a flag day. The Action reports before it enforces:
+
+1. **Observe (week 1).** The workflow runs, the report appears on every PR, and
+   branch protection does not require it yet. Note the findings that recur.
+2. **Require the check (week 2).** Make the ODS workflow a required status
+   check. With no `.ods/policy.rego`, only the built-in default applies.
+3. **Add your policy (week 3+).** Commit `.ods/policy.rego` with the rules
+   your team agreed on, starting from an [example](https://github.com/open-delivery-spec/spec/tree/main/examples).
+   Prefer `warn` for a week, then turn the rules you trust into `deny`.
+
+A message that has worked for teams adopting it:
+
+> We're adopting [Open Delivery Spec](https://github.com/open-delivery-spec/spec)
+> to make AI-assisted changes visible and easier to review. CI now runs the ODS
+> check on every PR and posts a short report. This week is observe-only; next
+> week the check becomes required. Questions? See the
+> [Get Started](https://open-delivery-spec.github.io/spec/get-started.html) page.
+
+---
+
+## Troubleshooting
+
+**The PR comment is too noisy.** Turn it off and keep the job summary and artifact:
+
+```yaml
+- uses: open-delivery-spec/validate-action@v1
+  with:
+    comment: "false"
+```
+
+**The comment does not appear on PRs from forks.** GitHub gives `pull_request`
+workflows from a fork a read-only token, so the comment and review-routing
+labels cannot be posted there. The check still runs and still fails on `BLOCK`;
+the report is in the job summary and the `ods-report` artifact. Check out the
+PR head by SHA (`github.event.pull_request.head.sha`) or keep the default merge
+ref; a checkout of `github.head_ref` fails on fork PRs. To post the comment on
+fork PRs anyway, use the `workflow_run` recipe in
+[Permissions and Fork Pull Requests](https://github.com/open-delivery-spec/validate-action#permissions-and-fork-pull-requests).
+
+**I want to diff against a different base.** The Action diffs against the PR
+base; override it with `diff-base: origin/develop`.
+
+**I want a specific CLI version.** Pin it with `cli-ref: v0.7.8` (any tag,
+branch or commit of the CLI repository).
+
+**I want to pass the PR body explicitly.** `pr-body: ${{ github.event.pull_request.body }}`;
+the Action reads it from the event by default.
+
+---
+
 ## Quick Reference
 
 | If you want... | Start with |
 |----------------|----------|
-| Automated AI quality checks in CI | [Path A](#path-a-ai-quality-gate) |
+| The ODS check in CI | [Path A](#path-a-the-check-on-every-pr) |
 | AI disclosure and attribution | [Path B](#path-b-ai-disclosure) |
 | A hard gate tuned to your policy | [Path C](#path-c-customize-enforcement-policy) |
 | The simplest possible setup | Add `open-delivery-spec/validate-action@v1` to your PR workflow |
 
 > [!TIP]
-> Not sure where to start? [Path A](#path-a-ai-quality-gate) takes 5 minutes.
+> Not sure where to start? [Path A](#path-a-the-check-on-every-pr) takes five minutes.

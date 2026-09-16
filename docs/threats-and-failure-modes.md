@@ -16,10 +16,10 @@ nav_order: 8
 |---|-------------|-----------------|----------------|
 | 1 | **AI code ships with no disclosure** | Reviewers can't tell which changes were AI-generated, so they can't target scrutiny | `detect` surfaces AI involvement from `Co-Authored-By` trailers, PR-body disclosure, branch prefixes, and diff heuristics |
 | 2 | **High-volume AI PRs go under-reviewed** | "AI wrote it, it's probably fine" — large diffs are skimmed and merged | `detect` + `analyze` flag AI-touched code and its defect patterns so review effort goes where the risk is |
-| 3 | **AI introduces subtle quality defects** | Hallucinated APIs, unsafe deserialization, missing edge cases pass CI but rot the codebase | `analyze` applies AI-specific rule categories that generic linters don't check for |
+| 3 | **AI introduces subtle quality defects** | Hallucinated or deprecated APIs and unsafe deserialization pass CI but rot the codebase | `analyze` flags known AI failure patterns as hints and ingests your scanners' SARIF, so one policy sees both |
 | 4 | **Technical debt accumulates invisibly** | Each AI PR looks fine alone; the aggregate quality slide is never measured | `score` produces a weighted technical-debt delta per PR |
 | 5 | **No consistent quality bar** | Whether risky AI code merges depends on which reviewer happened to look | `check` enforces an OPA Rego policy identically on every PR |
-| 6 | **No audit trail for AI-era changes** | Compliance asks "how do you control AI risk?" and there's no structured answer | Every detection, analysis, score, and policy decision is emitted as structured JSON |
+| 6 | **No audit trail for AI-era changes** | Compliance asks "how do you control AI risk?" and there's no structured answer | Every detection, analysis, score, and policy decision is emitted as structured JSON, and `ods attest` writes a CycloneDX evidence document |
 
 ---
 
@@ -53,5 +53,5 @@ ODS mitigates these by producing **machine-readable evidence at every stage of t
 
 ## Further Reading
 
-- [ODS Levels](levels.md) — progressive adoption model
+- [Get Started](get-started.md) — the check on every PR, and how to roll it out
 - [SLSA Comparison](comparison/slsa.md) — how ODS and SLSA address different layers

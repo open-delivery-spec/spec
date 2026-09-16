@@ -7,7 +7,7 @@ This file instructs AI coding agents (Claude Code, Copilot Workspace, etc.) on h
 This is the ODS specification repository. It contains:
 
 - `schemas/` — JSON Schema definitions for the ODS data model
-- `spec/` — the human-readable specification and conformance tests
+- `spec/conformance/` — the conformance suite (one directory per scenario)
 - `docs/` — guides, ecosystem docs, and quickstarts
 - `_dogfooding/` — example workflows that use ODS on external repos
 
@@ -80,9 +80,11 @@ When modifying schemas under `schemas/`:
 
 Tests live in `spec/conformance/`. Each scenario is a directory containing:
 
-- `input.json` — the `EvalInput` document
-- `expected.json` — `{ "allowed": true/false, "denials": [...], "warnings": [...] }`
-- `README.md` — one-paragraph description of what the scenario tests
+- `input.json` — a `policy-input/v1` document (`schemas/policy-input/v1.json`)
+- `expected.json` — a `check-output/v1` document: `{ "allowed": true/false, "denials": [...], "warnings": [...] }`, optionally `review_tier`
+- `policy.rego` — the policy the scenario evaluates
+
+The scenario's name says what it tests; `spec/conformance/README.md` lists every scenario with its expected result, so add a row there.
 
 All scenarios must pass against the reference CLI implementation before merging.
 

@@ -50,10 +50,9 @@ ods score
 
 # Enforce enterprise policy
 ods check
-
-# Install pre-commit hooks
-ods hook install
 ```
+
+The same four stages run in CI through the [GitHub Action](https://github.com/open-delivery-spec/validate-action); `ods report` and `ods attest` answer the questions that span more than one pull request (below).
 
 ---
 
@@ -91,6 +90,7 @@ findings from a dedicated scanner (Semgrep, CodeQL, golangci-lint, …) as SARIF
 |---|---|---|
 | `ai-unsafe-deserialization` | json.Unmarshal into interface{} | high |
 | `ai-inconsistent-pattern` | Mixed naming conventions / indentation | medium |
+| `ai-hallucinated-api` | Removed or deprecated API usage | medium |
 | `ai-redundant-error-handling` | Dense clusters of if-err-nil blocks | info |
 | `ai-over-commenting` | Comment-to-code ratio ≥40% | info |
 
@@ -147,6 +147,12 @@ Maintaining an open-source project with an AI clause in CONTRIBUTING? The
 [`examples/ods-policy-oss-disclosure.rego`](examples/ods-policy-oss-disclosure.rego)
 turn "disclose it, test it, own it" into this check.
 
+## Beyond One Pull Request
+
+- **`ods report`** turns the same attribution into a per-repository view over git history (text, JSON, HTML), and **`ods report merge`** combines repositories into an [organization-wide view](docs/org-view.md).
+- **`ods attest`** emits an AI-code evidence document as a CycloneDX 1.6 BOM, for audit trails and customer questionnaires ([proposal 001](docs/proposals/001-ai-code-evidence.md)).
+- **`ods rules`** prints the analysis rule catalogue, machine-readable.
+
 ---
 
 ## Tooling
@@ -156,6 +162,7 @@ turn "disclose it, test it, own it" into this check.
 | ODS CLI | [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) |
 | GitHub Action | [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) |
 | Organization report workflow | [open-delivery-spec/.github](https://github.com/open-delivery-spec/.github/blob/main/.github/workflows/org-ai-report.yml) — every repository, one dashboard ([guide](docs/org-view.md)) |
+| Examples | [`examples/`](examples/) — policy templates and a [worked walkthrough](examples/walkthrough/) in which Semgrep finds a bug in an AI-assisted change and the policy blocks it |
 
 ---
 
@@ -165,7 +172,7 @@ turn "disclose it, test it, own it" into this check.
 2. **Deterministic rules, probabilistic signals.** Quality rules are yes/no. Detection confidence is a signal for policy thresholds, not a verdict.
 3. **Tool-agnostic.** Works with GitHub, GitLab, Jenkins, or any CI/CD that can run a binary.
 4. **Policy as code.** Enterprise rules written in Rego, version-controlled alongside code.
-5. **Prevent, don’t just report.** Pre-commit hooks block problems before they reach CI.
+5. **Prevent, don’t just report.** The same checks run locally (`ods check`) and as a [pre-commit](https://pre-commit.com) hook before they reach CI.
 6. **Consume AI review, don’t become an AI reviewer.** ODS is the governance layer that turns attribution, static findings, and any AI reviewer's verdict into one auditable "can this merge?" decision — it does not reproduce CodeRabbit/Copilot. See [POSITIONING.md](POSITIONING.md).
 
 ---

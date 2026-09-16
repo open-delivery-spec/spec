@@ -64,8 +64,6 @@ Copy this into `.github/PULL_REQUEST_TEMPLATE.md` or your PR description. A stru
 cp examples/ods-pr-template.md .github/PULL_REQUEST_TEMPLATE.md
 ```
 
-`ods init` also scaffolds this template automatically.
-
 ## Related
 
 - [ODS README](../README.md) — project overview

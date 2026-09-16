@@ -6,96 +6,50 @@ nav_order: 1
 
 # Open Delivery Spec
 
-**A lightweight, machine-readable standard for AI-aware pull request delivery.**
+**Zero-config governance and visibility for AI-assisted code, on every pull request.**
 
-> ODS does not prove the code is correct. It proves the delivery process contains the minimum structured evidence needed for humans and machines to review the change responsibly.
+Claude Code, GitHub Copilot and Cursor already stamp `Co-Authored-By` trailers on
+the commits they help write. ODS reads those signals in CI to attribute
+AI-assisted code, show how much of your delivery it is, route review attention
+to the changes that need it, and enforce your policy as code. It governs the AI
+you can see: it is a signal producer, not a quality oracle, and it never claims
+that code is correct.
 
-AI coding tools make changes faster than delivery processes can explain them. ODS defines a CI quality gate that answers: what did AI generate, how much risk does it add, and does it meet your policy before merge?
+> **Start here**: [Get Started](get-started.md), five minutes to a report on every PR  
+> **Write the policy**: [Writing Policies (Rego)](policy-authoring.md) and the [contract it reads](schemas.md)  
+> **Maintainers with an AI clause in CONTRIBUTING**: [Open-Source AI Policy](oss-ai-policy.md), disclose it, test it, own it  
+> **How much of the organization's delivery is AI-assisted**: [Organization-wide View](org-view.md)  
+> **Where the policy lives**: [`.ods/` Convention](ods-artifacts.md)  
+> **Why, and where it fits**: [Threats and Failure Modes](threats-and-failure-modes.md) · [Ecosystem](ecosystem.md) · [ODS and SLSA](comparison/slsa.md)  
+> **Worked example**: [an AI-assisted change that Semgrep catches and the policy blocks](https://github.com/open-delivery-spec/spec/tree/main/examples/walkthrough)
 
-> **Start here**: [Get Started](get-started.md) → [Adoption Guide](adoption-guide.md)  
-> **Real-world scenarios**: [Open-source](scenarios/open-source-project.md) · [Enterprise](scenarios/enterprise-service.md) · [AI coding team](scenarios/ai-coding-pr.md)  
-> **Maintainers with an AI clause in CONTRIBUTING**: [Open-Source AI Policy](oss-ai-policy.md) — disclose it, test it, own it, as a check on every PR  
-> **How much of the organization's delivery is AI-assisted**: [Organization-wide View](org-view.md) — one scheduled workflow, every repository, one dashboard  
-> **Policy customization**: [`.ods/` Convention](ods-artifacts.md)  
-> **How it fits**: [ODS and SLSA](comparison/slsa.md) — SLSA proves how artifacts were built; ODS proves how changes were delivered.  
-> **Threats & Failure Modes**: [Why this exists](threats-and-failure-modes.md)
-
-## Quick Start
-
-```bash
-# Install CLI
-go install github.com/open-delivery-spec/cli/cmd/ods@latest
-
-# Initialize your repo (creates the CI workflow + .ods/policy.rego)
-ods init
-
-# Run the pipeline locally
-ods detect && ods analyze && ods score && ods check
-```
-
-Add the GitHub Action to your CI:
-
-```yaml
-- uses: actions/checkout@v7
-  with:
-    fetch-depth: 0
-- uses: open-delivery-spec/validate-action@v1
-  with:
-    diff-base: ${{ github.event.pull_request.base.sha }}
-    pr-body: ${{ github.event.pull_request.body }}
-    branch: ${{ github.head_ref }}
-    commits: ${{ github.event.pull_request.commits }}
-```
-
-## The AI Code Quality Pipeline
-
-ODS runs four stages on every PR:
+## What runs on a pull request
 
 ```
-PR arrives
-   │
-   ▼
-① detect  — Is there AI code?
-   │         (Co-Authored-By trailers, branch prefix, diff heuristics)
-   ▼
-② analyze — What quality issues does it have?
-   │         (built-in AI heuristics + imported SARIF findings)
-   ▼
-③ score   — How much technical debt does this PR add?
-   │         (quality-driven, weighted by AI risk)
-   ▼
-④ check   — Should this PR be blocked?
-             (OPA Rego policy: PASS / WARN / BLOCK)
+detect  → which changes are AI-assisted, from the signals tools volunteer
+analyze → what the built-in heuristics and your SARIF scanners found
+score   → how much technical debt the change adds, driven by quality
+check   → your Rego policy: PASS / WARN / BLOCK, plus a review tier
 ```
 
-## What ODS Detects
+The result is a PR comment, a job summary and a machine-readable report. The
+[GitHub Action](https://github.com/open-delivery-spec/validate-action) runs all
+four stages with no configuration. Each stage, the detection signals with their
+confidence, and the design principles are described in the
+[project README](https://github.com/open-delivery-spec/spec#readme).
 
-| Signal | How it works |
-|--------|-------------|
-| `Co-Authored-By` trailer | Primary — emitted automatically by Claude Code, Copilot, Cursor |
-| Branch prefix | `claude/`, `copilot/`, `cursor/`, `codeium/` branches |
-| PR body | `AI-assisted: true` or `AI-tool:` disclosure fields |
-| Diff heuristics | Patterns in changed files consistent with AI generation |
+## Beyond one pull request
 
-## Why This Matters
+- `ods report` turns the same attribution into a per-repository dashboard over
+  git history, and `ods report merge` combines repositories into one
+  [organization-wide view](org-view.md).
+- `ods attest` emits an AI-code evidence document (CycloneDX 1.6) for audit
+  trails; the design is [proposal 001](proposals/001-ai-code-evidence.md).
+- The contracts (`policy-input/v1`, `check-output/v1`, `review-verdict/v1` and
+  the per-command outputs) are published as JSON Schemas so any pipeline can
+  produce or consume them: [Schemas](schemas.md).
 
-| Question | Why it matters |
-|---|---|
-| Was this code AI-assisted? | Reviewers need to know where to apply extra scrutiny. |
-| Was AI-generated code reviewed by a human? | Teams need accountability, not just fast diffs. |
-| What technical debt does this PR introduce? | CI should catch quality regressions before merge. |
-| What evidence existed before release? | Audit and incident review need structured records. |
+## Related
 
-## Design Principles
-
-1. **Machine-first, human-readable.** Every output has structured JSON. Every JSON has human docs.
-2. **AI-aware, not AI-obsessed.** ODS detects AI involvement — it does not block it by default.
-3. **Policy-driven.** Teams define what passes via OPA Rego in `.ods/policy.rego`.
-4. **Tool-agnostic.** Works with any CI/CD, AI coding tool, or VCS.
-5. **Honest about scope.** ODS proves delivery metadata exists — it does not prove code correctness.
-
-## Inspiration
-
-- [Conventional Commits](https://www.conventionalcommits.org)
-- [OpenAPI Specification](https://www.openapis.org)
-- [DORA 2025 Report](https://cloud.google.com/blog/products/devops-sre/dora-2025-report)
+- [Positioning](https://github.com/open-delivery-spec/spec/blob/main/POSITIONING.md): ODS consumes AI review; it does not try to be an AI reviewer.
+- [Roadmap](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md) · [Contributing](https://github.com/open-delivery-spec/spec/blob/main/CONTRIBUTING.md)
