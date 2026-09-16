@@ -1,6 +1,6 @@
 # Open Delivery Spec — Code Owners
 
-# Spec modules
+# Conformance suite
 spec/                                                     @open-delivery-spec/spec-maintainers
 
 # JSON Schemas

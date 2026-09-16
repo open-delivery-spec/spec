@@ -1,6 +1,6 @@
 # Contributing to Open Delivery Spec
 
-Thank you for your interest in contributing! ODS is an open specification for the **AI code quality gate** — attributing AI-generated code, analyzing its quality, scoring its technical-debt impact, and enforcing policy in CI. We welcome contributions from everyone.
+Thank you for your interest in contributing! ODS is an open specification for **governance and visibility of AI-assisted code**: attributing it from the signals tools volunteer, surfacing findings, routing review attention, and enforcing policy as code in CI. We welcome contributions from everyone. How decisions are made is in [GOVERNANCE.md](GOVERNANCE.md).
 
 ## How to Contribute
 
@@ -37,8 +37,8 @@ Each new check carries a maturity status (**Experimental → Candidate → Stabl
 When contributing, keep these principles in mind:
 
 1. **Machine-first, human-readable.** Every pipeline stage emits structured JSON; every output has human docs.
-2. **AI-native.** ODS exists to govern AI-generated code. Design checks around how AI actually writes code.
-3. **Honest about scope.** ODS proves AI code was detected, vetted, and within policy — it does not prove correctness.
+2. **AI-native.** ODS exists to govern AI-assisted code. Design checks around how AI tools actually work, and read what they volunteer before inferring anything.
+3. **Honest about scope.** ODS attributes, routes and gates; it is a signal producer, not a quality oracle, and it does not prove correctness or authorship.
 4. **Tool-agnostic.** Don't assume a specific CI/CD, AI tool, or VCS.
 5. **Policy-driven.** Enforcement decisions belong in OPA Rego, not hardcoded in tooling.
 

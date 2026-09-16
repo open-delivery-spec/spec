@@ -83,6 +83,10 @@
     "merge_confidence": {
       "$ref": "#/$defs/MergeConfidence",
       "description": "Deterministic, diff-scoped facts about the change — is it tested, how is it shaped, does it touch sensitive paths. Facts, not opinions: advisory by default (they route review attention), and a policy may opt in to deny on them. Attribution (ai_generated) is used to raise the bar for AI-authored changes, never these signals to detect AI."
+    },
+    "_ods_detect_error": {
+      "type": "boolean",
+      "description": "Set to true by CI (the reference GitHub Action) when the detect stage failed to run, so the input carries no detection facts: ai_generated is false and ai_confidence 0 by construction, not by evidence. Policies should treat such an input as inconclusive (warn, route to review) rather than as human code; see the warn-detect-inconclusive conformance scenario."
     }
   },
   "$defs": {

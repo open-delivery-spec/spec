@@ -12,8 +12,6 @@ These workflows demonstrate how any project can adopt ODS validation on their pu
 |---|---|---|
 | [commit-check-ods-validate.yml](commit-check-ods-validate.yml) | [commit-check/commit-check](https://github.com/commit-check/commit-check) | `main` |
 | [cpp-linter-action-ods-validate.yml](cpp-linter-action-ods-validate.yml) | [cpp-linter/cpp-linter-action](https://github.com/cpp-linter/cpp-linter-action) | `main` |
-| [conventional-branch-ods-validate.yml](conventional-branch-ods-validate.yml) | [conventional-branch/conventional-branch](https://github.com/conventional-branch/conventional-branch) | `main` |
-| [blog-ods-validate.yml](blog-ods-validate.yml) | [shenxianpeng/shenxianpeng.github.io](https://github.com/shenxianpeng/shenxianpeng.github.io) | `master` |
 
 ## How to Submit
 
@@ -31,4 +29,4 @@ Each workflow runs on every pull request to the default branch and performs:
 
 ## Note
 
-These workflows are not automatically deployed. They are templates for Xianpeng to submit as manual PRs to the target repositories.
+These workflows are not deployed automatically. A maintainer submits each one as a pull request to the target repository; once it lands, the template is removed here and the repository is listed in [ADOPTERS.md](../ADOPTERS.md).

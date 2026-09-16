@@ -50,4 +50,4 @@ cp examples/ods-policy-enterprise.rego .ods/policy.rego
 ods detect && ods analyze && ods score && ods check
 ```
 
-For CI integration, see the [Adoption Guide](../docs/adoption-guide.md).
+For CI integration, see [Get Started](../docs/get-started.md).

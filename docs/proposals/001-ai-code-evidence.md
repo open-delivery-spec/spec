@@ -1,15 +1,22 @@
+---
+title: "Proposal 001: AI Code Evidence"
+nav_order: 12
+---
+
 # Proposal 001 — AI-Code Evidence Documents (CycloneDX-aligned)
 
-**Status:** Proposal / RFC — design only, no schema or code changes yet.
+**Status:** Phase 1 shipped (`ods attest` in the reference CLI writes the CycloneDX 1.6 document); phases 2 and 3 are open.
 **Depends on:** nothing shipped changes; builds on data ODS already computes.
 
 ## Motivation
 
-Regulation has arrived: the EU AI Act's technical-documentation requirements
-(Article 11 / Annex IV) took effect on 2026-08-02, and audit-style questions —
-*"which parts of this codebase were AI-assisted, by what tool, and what
-verification was applied?"* — are becoming procurement and compliance
-questions, not just engineering ones.
+Audit-style questions — *"which parts of this codebase were AI-assisted, by what
+tool, and what verification was applied?"* — are becoming procurement and
+compliance questions, not just engineering ones: SOC 2 change-management
+evidence, customer security questionnaires, internal AI-use policies, ISO 42001.
+For providers of high-risk AI systems the EU AI Act's technical documentation
+(Article 11 / Annex IV) asks the same question; for everyone else it is a
+reference, not the driver.
 
 The existing AI-BOM ecosystem (CycloneDX ML-BOM / modelCard, OWASP AIBOM
 tooling, runtime generators such as k8s-aibom) answers a *different* question:
@@ -83,17 +90,17 @@ standards entry without forking the format.
 
 ## Delivery phases
 
-- **Phase 1 — emit.** New CLI command (working name `ods attest`) that reuses
+- [x] **Phase 1 — emit.** `ods attest` (shipped) reuses
   the exact data `ods check` already assembles and writes
   `evidence.cdx.json`. validate-action uploads it with the existing report
   artifact and links it from the PR comment. No new detection, no new
   computation.
-- **Phase 2 — sign.** Wire the emitted document through GitHub artifact
+- [ ] **Phase 2 — sign.** Wire the emitted document through GitHub artifact
   attestations (sigstore) in validate-action. No home-grown crypto; CycloneDX
   JSF `signature` slots remain available for teams with their own signing.
-- **Phase 3 — aggregate.** `ods attest --range vX..vY`: the release-level
-  AI-code evidence document — the artifact an EU-AI-Act-style technical-file
-  request actually asks for.
+- [ ] **Phase 3 — aggregate.** `ods attest --range vX..vY`: the release-level
+  AI-code evidence document, the artifact an audit or a technical-file request
+  actually asks for.
 
 ## Non-goals
 
@@ -107,8 +114,7 @@ standards entry without forking the format.
 
 ## Open questions (for review)
 
-1. Command name: `ods attest` vs `ods evidence` vs a flag on `ods check`
-   (`--evidence-out`).
+1. ~~Command name~~: settled, `ods attest` with `--out evidence.cdx.json`.
 2. Register the `ods:` prefix in the CycloneDX property-taxonomy registry
    once the shape stabilizes?
 3. Target CycloneDX 1.6 now (widest tool support, validated) and revisit 1.7

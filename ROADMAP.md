@@ -25,9 +25,10 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | `ods analyze` | AI code quality analysis (5 rule categories) | ✅ Stable |
 | `ods score` | 5-dimension technical debt scoring | ✅ Stable |
 | `ods check` | OPA Rego policy enforcement | ✅ Stable |
-| `ods hook install` | Pre-commit / prepare-commit-msg / pre-push hooks | ✅ Stable |
 | `ods init` | Scaffold CI workflow + `.ods/policy.rego` | ✅ Stable |
-| `ods report` | AI attribution report (text / JSON / HTML dashboard) | ✅ Candidate |
+| `ods report` | AI attribution report (text / JSON / HTML dashboard); `ods report merge` for an organization | ✅ Candidate |
+| `ods attest` | AI-code evidence document (CycloneDX 1.6), [proposal 001](docs/proposals/001-ai-code-evidence.md) phase 1 | 🧪 Experimental |
+| `ods rules` | The analysis rule catalogue, machine-readable | ✅ Stable |
 
 ### Detection Signals
 
@@ -36,7 +37,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | `Co-Authored-By` commit trailers | Auto-emitted by Claude Code, GitHub Copilot, Cursor — **primary signal** | 90% | ✅ Stable |
 | ODS trailer fields | `AI-assisted: true`, `AI-tool: name` — supplemental, optional | 85% | ✅ Stable |
 | PR body AI disclosure | Checkbox and section parsing | 75% | ✅ Stable |
-| Branch name prefix | `ai-*` convention | 35–50% | ✅ Stable |
+| Branch name prefix | `claude/`, `copilot/`, `cursor/`, `codeium/`, `ai-*` | 35–50% | ✅ Stable |
 | Diff heuristics | Comment ratio, verbose naming, error patterns | 40% | ✅ Candidate |
 
 ### Analysis Rules
@@ -79,21 +80,12 @@ changes, and deny stays opt-in.
 
 ---
 
-## Deprecated Modules (v1.0.0)
+## What was removed
 
-The original 01–09 module system has been **deprecated and removed** as of June 2026 — from the CLI, the spec documents, and the JSON Schemas. Their definitions remain available in git history. Tooling no longer supports them.
-
-| Module | Deprecation Date |
-|--------|------------------|
-| 01 — Branch Naming | June 2026 |
-| 02 — Commit Message | June 2026 |
-| 03 — PR Description | June 2026 |
-| 04 — AI Change Review | June 2026 |
-| 05 — CI Failure | June 2026 |
-| 06 — Release Readiness | June 2026 |
-| 07 — Approval Workflow | June 2026 |
-| 08 — Rollback Plan | June 2026 |
-| 09 — Production Evidence | June 2026 |
+The 1.0.0 module system (branch naming, commit message, PR description, review,
+CI failure, release readiness, approval, rollback, production evidence) was
+removed in 2.0.0 (June 2026) from the CLI, the spec and the schemas; the
+definitions remain in git history. See [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -107,7 +99,7 @@ The original 01–09 module system has been **deprecated and removed** as of Jun
 - [x] CLI: `ods analyze` with 5 rule categories for AI code quality defects
 - [x] CLI: `ods score` with 5-dimension weighted technical debt scoring
 - [x] CLI: `ods check` with OPA Rego policy engine and policy tests
-- [x] CLI: `ods hook install` and `ods init` for pre-commit governance
+- [x] CLI: `ods init` for scaffolding; a pre-commit-framework hook for local runs
 - [x] Removal of legacy delivery governance code (modules 01–09)
 
 ### M2 — CI Integration & Enterprise Surface (Q3 2026)
@@ -141,9 +133,11 @@ The original 01–09 module system has been **deprecated and removed** as of Jun
 **Goal:** Make ODS an auditable evidence system for AI governance.
 
 - [ ] Immutable audit log: every detection, analysis, and enforcement decision recorded
-- [ ] Compliance mapping: ODS checks → NIST AI RMF / EU AI Act controls
+- [x] Evidence document: `ods attest` emits CycloneDX 1.6 ([proposal 001](docs/proposals/001-ai-code-evidence.md), phase 1)
+- [ ] Signed evidence: GitHub artifact attestations / sigstore in validate-action (proposal 001, phase 2)
+- [ ] Release-level evidence: `ods attest --range` (proposal 001, phase 3)
+- [ ] Compliance mapping: the ODS-R1…R6 requirements → SOC 2 change management, ISO 42001, NIST AI RMF; the EU AI Act as a reference for providers of high-risk systems, not a driver
 - [ ] SLSA integration: ODS evidence as input to SLSA provenance
-- [ ] Signed attestations for AI code provenance
 - [ ] At least one scoring dimension promoted from Experimental to Stable
 
 ### M5 — Community & Governance (Q4 2026)

@@ -1,6 +1,6 @@
 ---
 title: Ecosystem
-nav_order: 7
+nav_order: 9
 ---
 
 # ODS Ecosystem Positioning
@@ -16,26 +16,20 @@ This document clarifies how Open Delivery Spec relates to other standards and to
 | **What's governed** | Content artifacts (text, images, video) | Software delivery lifecycle |
 | **Target user** | Content platforms, social media, regulators | Engineering teams, CI/CD pipelines |
 | **CI/CD integration** | None | Native (GitHub Actions, CLI, Git hooks) |
-| **Core question** | "Was this content AI-generated?" | "Is this AI-generated code safe to ship?" |
+| **Core question** | "Was this content AI-generated?" | "Which changes are AI-assisted, are they tested, and do they meet policy?" |
 
 APP (AI Content Provenance) and C2PA (Coalition for Content Provenance and Authenticity) solve the content labeling problem at the **artifact layer**: marking which images, text, or videos were generated or modified by AI. This is important for content platforms complying with regulations like the EU AI Act Article 50.
 
-ODS solves the delivery governance problem at the **process layer**: ensuring that AI-generated code in a pull request is reviewed, scoped correctly, and free of known quality defects before it reaches production.
+ODS works at the **process layer**: it attributes AI-assisted code in a pull request from the signals tools volunteer, routes review attention to it, and enforces the team's policy before it reaches production.
 
 They are **complementary**: you might use C2PA to mark AI-generated documentation inside your repository, and ODS to govern how that repository's changes are reviewed and deployed. ODS does not compete with or replace content provenance standards.
 
 ## ODS vs SLSA
 
-| Dimension | SLSA | ODS |
-|---|---|---|
-| **What's governed** | Supply chain integrity | Delivery quality |
-| **Core question** | "Was this artifact built from the right source?" | "Was this change reviewed, scoped, and ready?" |
-| **Target** | Build pipelines, artifact registries | Pull requests, CI gates |
-| **AI focus** | None | Primary |
-
-SLSA (Supply-chain Levels for Software Artifacts) governs supply chain integrity — verifying that a software artifact was built from the correct source code without tampering. ODS governs delivery quality — verifying that a code change was properly reviewed, stays within its declared scope, and doesn't introduce AI-specific quality regressions.
-
-These are different questions with different audiences, and they are often co-deployed: SLSA ensures the artifact is authentic, ODS ensures the change is safe.
+SLSA proves how an artifact was built; ODS shows how a change was delivered,
+who (or what) wrote it, and whether it met policy. Different questions,
+different audiences, often co-deployed. The full comparison is
+[ODS and SLSA](comparison/slsa.md).
 
 ## ODS and Conventional Commits / Conventional Branch
 
@@ -76,23 +70,35 @@ ODS converts SARIF severity levels (`error` → `high`, `warning` → `medium`, 
 
 They are **co-deployed**: commit-check enforces naming conventions, ODS enforces delivery quality.
 
-## ODS vs AI Code Linters
+## ODS and AI code reviewers
 
-AI-focused linters (e.g., specialized Copilot review tools) detect code quality issues in AI output. ODS overlaps at the analysis layer but adds:
+CodeRabbit, Copilot code review, `claude -p` and their peers produce opinions
+about a change. ODS does not compete with them and does not run a model of its
+own: it **consumes** their verdicts (`review-verdict/v1`, via
+`ods check --ai-review`) as one more input to a deterministic, auditable
+"can this merge?" decision. What ODS adds around any reviewer:
 
-- **Multi-source AI detection** without relying on developer self-disclosure
-- **Technical debt scoring** that combines detection confidence, defect density, and test coverage
-- **Policy enforcement** via OPA Rego, allowing enterprise-specific rules
-- **Policy decisions recorded as structured JSON** for an audit trail of what was gated and why
-- **SARIF ingestion** to merge external tool findings (semgrep, CodeQL) into the policy decision
+- **Attribution** from the signals tools volunteer (`Co-Authored-By`, git-ai
+  notes, PR disclosure), graded by evidence tier: it never claims forensic
+  detection, and it says so.
+- **Routing**: a `review_tier` that sends undisclosed or untested AI changes to
+  a human, and lets clean, disclosed, tested ones through.
+- **Policy as code**: OPA Rego over a published contract, so the bar is the
+  same on every PR and lives in the repository.
+- **An audit trail**: every decision as structured JSON, and an evidence
+  document (`ods attest`) for the ones that need one.
+- **SARIF ingestion**: findings from Semgrep, CodeQL or any scanner feed the
+  same policy.
+
+The argument in full is [POSITIONING.md](https://github.com/open-delivery-spec/spec/blob/main/POSITIONING.md).
 
 ## ODS vs GitHub Code Review / GitLab MR
 
 Platform-native code review is the default process for most teams. ODS does not replace it — ODS **augments** it by:
 
-1. Flagging which changes are AI-generated before the reviewer starts
-2. Automating the AI-specific checklist items
-3. Providing machine-readable review records for compliance
+1. Flagging which changes are AI-assisted before the reviewer starts
+2. Routing review attention with a `review_tier` instead of treating every PR alike
+3. Providing machine-readable records of what was gated and why
 4. Enforcing policy gates automatically in CI
 
 The human reviewer still makes the final decision. ODS gives them the information they need to make it faster and more reliably.
@@ -104,10 +110,10 @@ The human reviewer still makes the final decision. ODS gives them the informatio
 | Standard / Tool | Layer | AI Focus | ODS Relationship |
 |---|---|---|---|
 | APP / C2PA | Content artifact | Labeling | Complementary |
-| SLSA | Supply chain | None | Co-deployable |
+| SLSA | Supply chain | None | Co-deployable ([comparison](comparison/slsa.md)) |
 | Conventional Commits | Commit format | None | Extended by ODS |
 | Conventional Branch | Branch naming | None | Extended by ODS |
 | Semgrep / CodeQL | Code analysis | None | Input to ODS via `--sarif` |
 | commit-check | Commit/branch naming | AI branches (≥ 2.9.0) | Co-deployed |
-| AI Linters | Code quality | Detection + analysis | Overlaps, ODS adds policy + scoring |
+| AI code reviewers | Review | Verdicts | Input to ODS via `review-verdict/v1` |
 | Platform review | Process | None | Augmented by ODS |

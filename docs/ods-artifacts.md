@@ -1,12 +1,11 @@
 ---
 title: ODS Artifacts
-nav_order: 4
-parent: Home
+nav_order: 7
 ---
 
 # `.ods/` Artifact Directory Convention
 
-ODS keeps its repository-local configuration under a `.ods/` directory at the repository root. The AI code quality gate works with **no configuration at all** — `.ods/` only exists when you want to enforce your own policy.
+ODS keeps its repository-local configuration under a `.ods/` directory at the repository root. The check works with **no configuration at all**; `.ods/` only exists when you want to enforce your own policy.
 
 ## Directory Layout
 
@@ -45,9 +44,12 @@ deny[msg] {
     msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
 }
 
-# Block AI code with low test coverage
+# Block high-confidence AI code with low test coverage.
+# -1 means "not measured": guard with >= 0 or the rule fires on every
+# repository without coverage tooling.
 deny[msg] {
     input.ai_confidence > 0.8
+    input.test_coverage >= 0
     input.test_coverage < 0.3
     msg := "AI code with low test coverage"
 }
@@ -63,16 +65,9 @@ warn[msg] {
 
 ### Policy Input Fields
 
-The pipeline feeds these fields to your policy:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `input.ai_generated` | bool | Whether AI code was detected |
-| `input.ai_confidence` | float | Detection confidence (0.0–1.0) |
-| `input.issues` | array | Quality issues found by `analyze` (each has `rule`, `severity`, `file`, `line`) |
-| `input.technical_debt_delta` | float | Technical-debt impact score from `score` |
-| `input.test_coverage` | float | Test coverage ratio (0.0–1.0) |
-| `input.branch` | string | Branch name |
+Every field the policy can read, with its type, which stage produces it and
+its sentinels, is in the [Policy Input Schema](schemas.md); the patterns for
+using them are in [Writing Policies (Rego)](policy-authoring.md).
 
 > [!TIP]
 > Run `ods check` locally to evaluate the policy against the current diff before you push.
@@ -112,7 +107,3 @@ Yes. `.ods/policy.rego` is part of your repository's quality configuration and s
 | in-toto | Supply-chain metadata | Complementary — different layer |
 | OPA / Rego | Policy language | ODS uses Rego directly for `ods check` |
 
----
-
-> [!NOTE]
-> ODS no longer defines per-module evidence artifacts (release readiness, rollback plans, approval records, etc.). Those concepts were deprecated in June 2026; see [ROADMAP.md](https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md). The only ODS artifact today is the optional `.ods/policy.rego`.

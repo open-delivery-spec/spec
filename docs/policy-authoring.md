@@ -1,8 +1,8 @@
 ---
 title: Writing Policies (Rego)
 layout: default
-nav_order: 11
 has_children: false
+nav_order: 3
 ---
 
 # Writing Policies in Rego
