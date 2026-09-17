@@ -63,6 +63,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # This repository runs the open-source disclosure template on its own
+      # pull requests, byte for byte: what adopters copy is what the
+      # maintainers live with. A drift between the two fails here.
+      - name: The repository runs the template it publishes
+        run: diff -u examples/ods-policy-oss-disclosure.rego .ods/policy.rego
+
       - uses: actions/setup-go@v7
         with:
           go-version: "1.25"

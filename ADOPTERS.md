@@ -12,17 +12,23 @@ Projects running ODS on every pull request.
 
 ## Open Delivery Spec (dogfooding)
 
-The ODS org runs `validate-action@v1` on all its own repositories.
+Every repository in the organization runs `validate-action@v1` on its own
+pull requests with the [open-source disclosure policy](docs/oss-ai-policy.md),
+the same `examples/ods-policy-oss-disclosure.rego` adopters copy, with review
+routing on. The AI Disclosure pull-request template and the CONTRIBUTING AI
+clause are set once, as organization defaults in
+[`open-delivery-spec/.github`](https://github.com/open-delivery-spec/.github).
 
-| Project | What runs | Since |
-|---|---|---|
-| [open-delivery-spec/spec](https://github.com/open-delivery-spec/spec) | validate-action@v1 on every PR | June 2026 |
-| [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) | validate-action@v1 on every PR | June 2026 |
-| [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) | validate-action@v1 on every PR | June 2026 |
+| Project | What runs | Policy | Since |
+|---|---|---|---|
+| [open-delivery-spec/spec](https://github.com/open-delivery-spec/spec) | validate-action@v1 on every PR | OSS disclosure; CI keeps `.ods/policy.rego` identical to the template | June 2026 |
+| [open-delivery-spec/cli](https://github.com/open-delivery-spec/cli) | validate-action@v1 on every PR, built from the PR head, with a diff-scoped mutation report | OSS disclosure | June 2026 |
+| [open-delivery-spec/validate-action](https://github.com/open-delivery-spec/validate-action) | validate-action@v1 on every PR | OSS disclosure | June 2026 |
+| [open-delivery-spec/.github](https://github.com/open-delivery-spec/.github) | validate-action@v1 on every PR; `org-ai-report` weekly for the organization | OSS disclosure | September 2026 |
 
 ## Pending External Adoption
 
-Workflow files for the following repositories are ready in [`_dogfooding/`](_dogfooding/) and pending PR submission:
+Workflow files for the following repositories are ready in [`_dogfooding/`](_dogfooding/) and pending PR submission; [`_dogfooding/pull-request-body.md`](_dogfooding/pull-request-body.md) is the description to open them with:
 
 | Project | Description | Workflow template |
 |---------|-------------|-------------------|

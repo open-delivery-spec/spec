@@ -18,7 +18,15 @@ These workflows demonstrate how any project can adopt ODS validation on their pu
 1. Fork the target repository
 2. Copy the workflow file to `.github/workflows/ods-validate.yml` in the target repo
 3. Optionally adjust the `on:` trigger branches to match the repo's default branch
-4. Commit and open a pull request
+4. Commit and open a pull request, using [`pull-request-body.md`](pull-request-body.md)
+   as the description: it says what the check does, what it does not do, and
+   how to try it for a week, keep it, or drop it
+
+The workflow is deliberately one file with the built-in default policy: the
+smallest change a maintainer can accept. Turning the project's own AI clause
+into policy is the second step, with the
+[open-source disclosure template](../docs/oss-ai-policy.md), once the
+comments have been watched on real pull requests.
 
 ## What Each Workflow Does
 
