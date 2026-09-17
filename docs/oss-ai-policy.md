@@ -26,6 +26,22 @@ contributor understood the code. Attribution is volunteered, never proven. The
 check makes honest disclosures count and gives your rule a place to live. It is
 not a detector for people hiding AI use, and it says nothing about correctness.
 
+## The clause, if you do not have one yet
+
+The policy's messages send contributors to CONTRIBUTING.md, so say it there.
+This is the wording this organization uses in its own repositories; adjust the
+tool names and the paths you consider sensitive:
+
+> **AI-assisted contributions.** AI assistance is welcome here on three
+> conditions. **Disclose it:** keep the `Co-Authored-By` trailer your tool
+> adds, add `Assisted-by: <tool>` to the commit message, or tick the AI
+> Disclosure box in the pull request template. **Test it:** AI-authored code
+> comes with tests. **Own it:** you have read and understood what you submit
+> and can answer questions about it in review. CI checks what it can see of
+> these on every pull request and posts the result as a comment; a change that
+> looks AI-assisted but says nothing gets a nudge and a maintainer's look,
+> never a refusal.
+
 ## Set it up
 
 ### 1. The policy
@@ -43,6 +59,10 @@ has one section per clause. Out of the box it denies only critical findings;
 everything about AI warns and routes. Each section ends with a commented
 `STRICT` block that turns the warning into a `deny` once you have watched the
 warnings for a while and trust them.
+
+This organization runs this exact file on all of its own repositories
+([ADOPTERS.md](https://github.com/open-delivery-spec/spec/blob/main/ADOPTERS.md));
+the spec repository's CI keeps its copy identical to the template.
 
 ### 2. The workflow
 

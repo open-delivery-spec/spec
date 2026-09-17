@@ -10,6 +10,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: write  # the ODS comment, the review-tier label, reviewer requests
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -33,6 +37,10 @@ jobs:
           python3 -m pip install 'commit-check>=2.9.0'
           commit-check --message --branch
 
+      # The policy is examples/ods-policy-oss-disclosure.rego, copied to
+      # .ods/policy.rego (CI keeps the two identical): disclose it, test it,
+      # own it. Review routing labels the PR with its tier and asks a
+      # maintainer to look at the changes the policy marks elevated.
       - name: ODS AI code quality gate
         uses: open-delivery-spec/validate-action@v1
         with:
@@ -40,3 +48,5 @@ jobs:
           branch: ${{ github.head_ref }}
           summary: 'true'
           comment: 'true'
+          review-routing: 'true'
+          elevated-reviewers: 'shenxianpeng'

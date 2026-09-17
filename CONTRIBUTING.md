@@ -32,6 +32,29 @@ Each new check carries a maturity status (**Experimental → Candidate → Stabl
 - [ ] Breaking changes are called out explicitly
 - [ ] [CHANGELOG.md](CHANGELOG.md) is updated
 
+### AI-Assisted Contributions
+
+AI assistance is welcome here on three conditions. This repository runs the
+[open-source disclosure policy](docs/oss-ai-policy.md) it publishes, as
+[`.ods/policy.rego`](.ods/policy.rego), so CI checks what it can see of them
+on every pull request and posts the result as a comment.
+
+1. **Disclose it.** Keep the `Co-Authored-By` trailer your tool adds (Claude
+   Code, Copilot and Cursor add one on their own), add an
+   `Assisted-by: <tool>` trailer, or tick the AI Disclosure box in the pull
+   request template. A change that looks AI-assisted but says nothing gets a
+   nudge in the comment and a maintainer's look; it is never blocked on
+   suspicion.
+2. **Test it.** AI-authored code comes with tests. Source added without a
+   test is flagged.
+3. **Own it.** You have read and understood what you submit and can answer
+   questions about it in review. Changes to CI, dependencies or
+   security-sensitive paths get extra eyes.
+
+The trailers survive a squash merge only when the merge message includes the
+commit details, not just the title; see the guide's
+[rollout notes](docs/oss-ai-policy.md#set-it-up).
+
 ## Design Principles
 
 When contributing, keep these principles in mind:
