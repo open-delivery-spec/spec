@@ -1,0 +1,88 @@
+docs/_includes/title.html
+  s_9433bfadf9b69b::t_ca63c57344c555 1-2
+docs/_sass/custom/custom.scss
+  s_9433bfadf9b69b::t_8eb7fcf61ad04b 547
+  s_9433bfadf9b69b::t_c78894e4e50188 1167-1234
+  s_9433bfadf9b69b::t_be5f3d89e25daf 1-546,548-1166
+docs/index.html
+  s_9433bfadf9b69b::t_888f7d8bb6a852 2-11,14,19-253
+  s_9433bfadf9b69b::t_a42fdf2fa44803 1,12-13,15-18
+docs/guides.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 1-20
+docs/background.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 1-16
+CHANGELOG.md
+  s_9433bfadf9b69b::t_3dae072d75301a 29
+docs/assets/img/ods-mark.svg
+  s_9433bfadf9b69b::t_1443c873b09bb5 1-7
+docs/_layouts/landing.html
+  s_9433bfadf9b69b::t_c78894e4e50188 1-82
+docs/_includes/nav_footer_custom.html
+  s_9433bfadf9b69b::t_ca63c57344c555 1-6
+docs/_includes/head_custom.html
+  s_9433bfadf9b69b::t_ca63c57344c555 1-26
+docs/oss-ai-policy.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 3-4
+docs/_includes/spec_status.html
+  s_9433bfadf9b69b::t_280eba16cfa3c9 1-5
+docs/scenarios/open-source-project.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 3-4
+  s_9433bfadf9b69b::t_b18c528634fe4d 2
+docs/_includes/header_custom.html
+  s_9433bfadf9b69b::t_ca63c57344c555 1
+docs/ods-artifacts.md
+  s_9433bfadf9b69b::t_3dae072d75301a 7
+  s_9433bfadf9b69b::t_280eba16cfa3c9 2-4
+docs/proposals/001-ai-code-evidence.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 3-4
+docs/comparison/slsa.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 3-4
+docs/ecosystem.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 3-4
+docs/_includes/theme_toggle.html
+  s_9433bfadf9b69b::t_ca63c57344c555 1-4
+docs/threats-and-failure-modes.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 3-4
+docs/specification.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 1-54
+docs/org-view.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 3-4
+docs/policy-authoring.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 3-4
+docs/schemas.md
+  s_9433bfadf9b69b::t_280eba16cfa3c9 2-4
+  s_9433bfadf9b69b::t_b18c528634fe4d 7-9
+docs/_config.yml
+  s_9433bfadf9b69b::t_4b11c1d916d5c4 2-3,5-6,10,14-17,20-42,46-49,52-65
+  s_9433bfadf9b69b::t_f5a8521e37ed11 66-73
+docs/_includes/footer_custom.html
+  s_9433bfadf9b69b::t_ca63c57344c555 1-2
+docs/_includes/ods_scripts.html
+  s_9433bfadf9b69b::t_ca63c57344c555 1-35
+docs/_sass/color_schemes/ods-dark.scss
+  s_9433bfadf9b69b::t_6ba3926355398d 1-19
+docs/_sass/color_schemes/ods.scss
+  s_9433bfadf9b69b::t_1cbb2ddad8fdeb 1-18
+docs/_sass/custom/setup.scss
+  s_9433bfadf9b69b::t_58e11cdb592478 1-9
+docs/assets/css/just-the-docs-ods-dark.scss
+  s_9433bfadf9b69b::t_14ec5961b82df6 1-3
+docs/assets/css/just-the-docs-ods.scss
+  s_9433bfadf9b69b::t_84db2625cae796 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "94f281203143ba2b67a763ae4b2744932cf7884d",
+  "prompts": {},
+  "sessions": {
+    "s_9433bfadf9b69b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4cfc4c8c-e4c8-40b0-8e4d-1acb19fe3770",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
