@@ -1,0 +1,23 @@
+CHANGELOG.md
+  s_9433bfadf9b69b::t_1644053c055d26 12-17,28,34-36,48
+README.md
+  s_9433bfadf9b69b::t_749347551df1f0 78,80,82,114-117,145,181
+ROADMAP.md
+  s_9433bfadf9b69b::t_1a7f06e3f69bac 16,25,38-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f27361be9f00411940e79d5e631657d8e9292005",
+  "prompts": {},
+  "sessions": {
+    "s_9433bfadf9b69b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4cfc4c8c-e4c8-40b0-8e4d-1acb19fe3770",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
