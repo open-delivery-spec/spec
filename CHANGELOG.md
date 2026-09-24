@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **The organization runs the template it ships.** Every `open-delivery-spec` repository now uses `examples/ods-policy-oss-disclosure.rego` as its `.ods/policy.rego` with review routing on (this repository's CI keeps the copy identical to the template); the AI clause is in CONTRIBUTING.md, the [Open-Source AI Policy](docs/oss-ai-policy.md) guide offers that wording for projects that have none, and `_dogfooding/pull-request-body.md` is the description for submitting the workflow to another project.
-- **`_ods_detect_error`** in the policy-input schema: the sentinel CI sets when the detect stage failed, already used by the `warn-detect-inconclusive` scenario, so policies can treat such input as inconclusive rather than as human code.
+- **`_ods_detect_error`** in the policy-input schema: the sentinel a pipeline that assembles the policy input itself sets when its detect stage failed, so policies can treat such input as inconclusive rather than as human code. The reference CLI does not set it; the `warn-detect-inconclusive` scenario checks that such an input does not block.
+- **`ods check --input`** evaluates a prepared policy-input document instead of the working tree; fields the document omits keep the `-1` "not measured" sentinel. The conformance scenarios now run with one command each (`spec/conformance/README.md`).
+- **`ods attest`** emits the AI-code evidence document as a CycloneDX 1.6 BOM, from the same pipeline run that gates the change ([proposal 001](docs/proposals/001-ai-code-evidence.md), phase 1).
+- **`evidence_tier`** in the policy input and check output (`corroborated` / `attested` / `inferred`): how the AI attribution was obtained, derived from `detection_sources`; omitted when no source fired.
+- **Mutation score** (`mutation_score`): the diff-scoped mutation score from a mutation-testing report (gremlins JSON, `ods check --mutation`), with a `-1` "not measured" sentinel.
+- **git-ai authorship notes** (`git-ai-notes`) as a detection source: measured line-level attribution read from `refs/notes/ai`. The Linux kernel's **`Assisted-by:`** trailer is read like `Co-Authored-By`.
 - **Organization-wide view**: `ods report merge` combines per-repository `ods report --json` files into one report (summed shares, per-tool breakdown, merged trend, per-repository table) as JSON, Markdown or an HTML dashboard; `ods report --repo` names the repository in each file. The `org-ai-report` reusable workflow in `open-delivery-spec/.github` scans an organization on a schedule and publishes the dashboard as an artifact, a job summary, or GitHub Pages. Guide: [Organization-wide View](docs/org-view.md).
 - **Open-source policy templates**: `examples/ods-policy-oss-disclosure.rego` (disclose it, test it, own it — nudges and routes, denies only critical findings, with opt-in STRICT gates) and `examples/ods-policy-oss-no-ai.rego` (for projects that do not accept AI contributions), with the [Open-Source AI Policy](docs/oss-ai-policy.md) guide and `scripts/check-example-policies.sh`, which CI runs against the conformance scenarios.
 - **`risk`** in the score output (`low` / `moderate` / `high` / `critical`): the band the debt delta falls in, separated from `verdict`.
@@ -20,12 +25,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **AI reviewer verdicts** (`ai_reviews`, via `ods check --ai-review`) as a `review-verdict/v1` input — advisory: routes attention, never denies unless a policy opts in.
 - **Disclosure completeness** (`detection_sources`): distinguishes disclosed AI use (commit-trailer / git-ai-notes / pr-body) from merely suspected, so policies can nudge for attribution without blocking.
 - **`ai-hallucinated-api`** analysis rule (hallucinated / deprecated API usage) — the fifth analysis rule.
-- **Real test-coverage parsing** (Go / LCOV / Cobertura / NYC) feeding the coverage-gap score, replacing the heuristic estimate when a report is present.
+- **Real test-coverage parsing** (Go / LCOV / Cobertura / NYC) feeding the coverage-gap score. Without a report, `test_coverage` is `-1` (not measured); the heuristic estimate from test-file line counts is gone.
 - **`ods report`**: per-repo AI attribution report with text, JSON, and a self-contained HTML dashboard.
 - **Review-tier routing** (`review_tier`: `auto` / `standard` / `elevated`) as an advisory output of `ods check`.
 - Conformance suite for the policy-input contract (19 scenarios).
 
 ### Changed
+- **One pipeline, one default policy.** `ods score`, `ods check` and `ods attest` run the same detect → analyze → score pass, so the score `ods score` prints is the one the gate acts on. Each reads only the `--sarif` file passed to it: pass the file to `ods check` for the gate to see the findings. `ods init` writes the built-in default policy to `.ods/policy.rego` instead of a separate starter policy, so a repository behaves the same before and after `init`.
+- **`ods detect` exits 0 whenever detection ran**, whether or not AI was found; a non-zero exit now means detection itself failed. Gating is `ods check`'s job. (On the CLI's main branch; not yet in a release.)
+- **Defect density is informational only.** It stays in the score breakdown but is no longer charged into the debt delta; the absolute count of critical and high findings already is.
 - **Docs consolidated around the current positioning.** The site front page, ecosystem and SLSA pages and the open-source scenario now describe governance and visibility for AI-assisted code; the adoption guide's rollout and troubleshooting sections moved into Get Started; `.ods/` Convention defers to the schema page for the field list, and its policy example gained the `test_coverage >= 0` guard.
 - **Detection confidence is capped at 0.95** and corroboration counts distinct sources, not signals: five attributed commits no longer stack to 100%.
 - **`verdict` is the direction of the delta** (`increase` / `neutral` / `decrease`), as the schema always described it; `+0.1` is no longer labelled `decrease`. The risk band moved to the new `risk` field, and the recommendation text no longer repeats it.
@@ -37,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ai_code_ratio` was invented (`changed_lines × confidence × 0.5`) whenever no per-file attribution existed — "49%" for a change whose every commit was attested AI. It is now attested from the commits, or 0 with `ai_code_ratio_source: unknown`.
 
 ### Removed
+- From the CLI: `ods hook install` (use the [pre-commit](https://pre-commit.com) hook, which runs `ods analyze --fail-on high`), `ods score --test-dir` (coverage now comes only from a report) and `ods analyze --ai-only`.
 - Docs that were unreachable, duplicated or described June-era behaviour: `docs/levels.md` (L1–L3 was never implemented as a contract), `docs/adoption-guide.md` (merged into Get Started), `docs/case-study.md`, the enterprise and AI-team scenario pages, `spec/index.md` (still declared version 1.0.0), `meta-schema.json`, and the two dogfooding templates that already landed upstream. The module 01–09 deprecation notice now lives in one place, `docs/schemas.md`.
 
 ## [2.0.0] — 2026-06-11

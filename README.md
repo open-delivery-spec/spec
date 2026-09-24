@@ -75,9 +75,11 @@ independent source, capped at 95% — ODS never reports certainty about authorsh
 | Signal | Source | Confidence |
 |---|---|---|
 | **`Co-Authored-By` commit trailers** | Auto-emitted by Claude Code, GitHub Copilot, Cursor — primary signal | high |
+| `Assisted-by` commit trailers | The Linux kernel convention, `Assisted-by: AGENT:MODEL` | high |
 | ODS trailer fields | `AI-assisted: true`, `AI-tool: name` — supplemental, optional | high |
+| git-ai authorship notes | Line-level attribution recorded by [git-ai](https://github.com/git-ai-project/git-ai) under `refs/notes/ai` | highest (measured) |
 | PR body AI disclosure | Checkbox and section parsing | high |
-| Branch name prefix | `claude/`, `copilot/`, `cursor/`, `ai-*` prefixes | medium |
+| Branch name prefix | `claude/`, `copilot/`, `cursor/`, `codeium/`, `ai-*` prefixes | medium |
 | Diff heuristics | Comment ratio, verbose naming, error patterns | low (fallback) |
 
 ### 2. Analyze — Quality Defect Detection
@@ -105,10 +107,13 @@ AI-written. Quality signals form the base debt:
 
 | Quality dimension | Weight |
 |---|---|
-| Defect density (high/critical per KLOC) | 2.0 |
 | Critical + high issues | 1.5 each |
 | Test coverage gap (when measured) | 1.0 |
 | Code duplication | 1.0 |
+
+Defect density (high/critical findings per KLOC) is reported in the breakdown
+for information only; it is not part of the delta, because a per-KLOC rate
+charges the same finding far more in a small change than in a large one.
 
 The **AI code ratio** is then applied as a bounded risk multiplier
 (`1.0 + 0.5 × ai_ratio`, i.e. 1.0–1.5×): AI-authored defects and untested AI
@@ -137,6 +142,7 @@ default allow := true
 
 deny[msg] {
     input.ai_confidence > 0.8
+    input.test_coverage >= 0      # -1 means coverage was not measured
     input.test_coverage < 0.3
     msg = "AI code with low test coverage"
 }
@@ -172,7 +178,7 @@ turn "disclose it, test it, own it" into this check.
 2. **Deterministic rules, probabilistic signals.** Quality rules are yes/no. Detection confidence is a signal for policy thresholds, not a verdict.
 3. **Tool-agnostic.** Works with GitHub, GitLab, Jenkins, or any CI/CD that can run a binary.
 4. **Policy as code.** Enterprise rules written in Rego, version-controlled alongside code.
-5. **Prevent, don’t just report.** The same checks run locally (`ods check`) and as a [pre-commit](https://pre-commit.com) hook before they reach CI.
+5. **Prevent, don’t just report.** The policy gate runs the same way locally and in CI (`ods check`), and the built-in analysis also runs as a [pre-commit](https://pre-commit.com) hook (`ods analyze --fail-on high`) before a change is pushed.
 6. **Consume AI review, don’t become an AI reviewer.** ODS is the governance layer that turns attribution, static findings, and any AI reviewer's verdict into one auditable "can this merge?" decision — it does not reproduce CodeRabbit/Copilot. See [POSITIONING.md](POSITIONING.md).
 
 ---

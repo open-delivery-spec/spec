@@ -13,7 +13,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 
 ---
 
-## Current Status (August 2026)
+## Current Status (September 2026)
 
 > **Strategy**: Zero-config governance and visibility for AI-assisted code. Claude Code, GitHub Copilot, and Cursor auto-emit `Co-Authored-By` trailers — ODS reads them in CI to attribute AI-assisted code, surface how much of delivery it is, route review attention, and enforce policy on every PR.
 
@@ -22,7 +22,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | Command | What it does | Status |
 |---------|-------------|--------|
 | `ods detect` | Multi-source AI code detection | ✅ Stable |
-| `ods analyze` | AI code quality analysis (5 rule categories) | ✅ Stable |
+| `ods analyze` | AI code quality analysis (5 rules) | ✅ Stable |
 | `ods score` | 5-dimension technical debt scoring | ✅ Stable |
 | `ods check` | OPA Rego policy enforcement | ✅ Stable |
 | `ods init` | Scaffold CI workflow + `.ods/policy.rego` | ✅ Stable |
@@ -35,10 +35,12 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | Signal | Source | Confidence | Status |
 |--------|--------|-----------|--------|
 | `Co-Authored-By` commit trailers | Auto-emitted by Claude Code, GitHub Copilot, Cursor — **primary signal** | 90% | ✅ Stable |
-| ODS trailer fields | `AI-assisted: true`, `AI-tool: name` — supplemental, optional | 85% | ✅ Stable |
-| PR body AI disclosure | Checkbox and section parsing | 75% | ✅ Stable |
-| Branch name prefix | `claude/`, `copilot/`, `cursor/`, `codeium/`, `ai-*` | 35–50% | ✅ Stable |
-| Diff heuristics | Comment ratio, verbose naming, error patterns | 40% | ✅ Candidate |
+| `Assisted-by` commit trailers | Linux kernel convention, `Assisted-by: AGENT:MODEL` | 90% | ✅ Stable |
+| ODS trailer fields | `AI-assisted: true`, `AI-generated: true`, `AI-tool: name` — supplemental, optional | 90% | ✅ Stable |
+| git-ai authorship notes | Line-level attribution recorded by git-ai under `refs/notes/ai` | 95% | ✅ Candidate |
+| PR body AI disclosure | Ticked disclosure checkbox (85%) or disclosure text (80%) | 80–85% | ✅ Stable |
+| Branch name prefix | `claude/`, `copilot/`, `cursor/`, `codeium/` (60%); `ai-` (50%); an `ai-` segment further down (35%) | 35–60% | ✅ Stable |
+| Diff heuristics | Comment ratio, verbose naming, error patterns (per-file score) | ≥ 40% | ✅ Candidate |
 
 ### Analysis Rules
 
