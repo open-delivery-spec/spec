@@ -1,0 +1,26 @@
+<link rel="icon" type="image/svg+xml" href="{{ '/assets/img/ods-mark.svg' | relative_url }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
+<meta property="og:image" content="{{ '/assets/img/og-card.png' | absolute_url }}">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  // Pick the color scheme before first paint: a saved choice wins, otherwise
+  // follow the operating system. The toggle lives in header_custom.html.
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('ods-theme'); } catch (e) {}
+    var dark = saved ? saved === 'dark'
+      : !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    window.odsThemeBase = '{{ "/assets/css/just-the-docs-" | relative_url }}';
+    window.odsApplyTheme = function (isDark) {
+      var sheet = document.querySelector('link[rel="stylesheet"]');
+      if (sheet) sheet.setAttribute('href', window.odsThemeBase + (isDark ? 'ods-dark' : 'ods') + '.css');
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    };
+    if (dark) window.odsApplyTheme(true);
+    else document.documentElement.setAttribute('data-theme', 'light');
+  })();
+</script>

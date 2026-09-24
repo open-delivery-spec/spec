@@ -1,9 +1,10 @@
 ---
-title: ODS Artifacts
-nav_order: 7
+title: "The .ods/ Convention"
+parent: Specification
+nav_order: 2
 ---
 
-# `.ods/` Artifact Directory Convention
+# The `.ods/` Convention
 
 ODS keeps its repository-local configuration under a `.ods/` directory at the repository root. The check works with **no configuration at all**; `.ods/` only exists when you want to enforce your own policy.
 

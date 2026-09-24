@@ -1,25 +1,73 @@
 title: Open Delivery Spec
-description: An open specification for machine-readable delivery governance evidence in the AI era
+description: Zero-config governance and visibility for AI-assisted code, on every pull request. An open specification with a reference CLI and GitHub Action.
+tagline: Governance for AI-assisted code
 baseurl: "/spec"
-remote_theme: just-the-docs/just-the-docs
+url: "https://open-delivery-spec.github.io"
+remote_theme: just-the-docs/just-the-docs@v0.12.0
 plugins:
   - jekyll-remote-theme
   - jekyll-relative-links
+  - jekyll-seo-tag
 relative_links:
   enabled: true
   collections: true
-color_scheme: light
+
+# Look and feel: _sass/color_schemes/ods.scss (light) and ods-dark.scss;
+# the toggle in _includes/header_custom.html switches between them.
+color_scheme: ods
 search_enabled: true
 heading_anchors: true
-aux_links:
-  "GitHub":
-    - "https://github.com/open-delivery-spec"
-  "Spec":
-    - "https://github.com/open-delivery-spec/spec"
-  "CLI":
-    - "https://github.com/open-delivery-spec/cli"
-aux_links_new_tab: true
-nav_sort: case_insensitive
+enable_copy_code_button: true
 back_to_top: true
 back_to_top_text: "Back to top"
-footer_content: "Copyright © 2026 Open Delivery Spec Contributors. Licensed under <a href=\"https://www.apache.org/licenses/LICENSE-2.0\">Apache 2.0</a>."
+
+# `> [!NOTE]` style alerts in the Markdown are converted to these callouts
+# (_includes/footer_custom.html), so the pages read the same here and on GitHub.
+callouts:
+  note:
+    title: Note
+    color: blue
+  tip:
+    title: Tip
+    color: green
+  important:
+    title: Important
+    color: purple
+  warning:
+    title: Warning
+    color: yellow
+  caution:
+    title: Caution
+    color: red
+
+aux_links:
+  "CLI":
+    - "https://github.com/open-delivery-spec/cli"
+  "GitHub Action":
+    - "https://github.com/open-delivery-spec/validate-action"
+  "GitHub":
+    - "https://github.com/open-delivery-spec/spec"
+aux_links_new_tab: true
+nav_sort: case_insensitive
+
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub"
+gh_edit_repository: "https://github.com/open-delivery-spec/spec"
+gh_edit_branch: "main"
+gh_edit_source: docs
+gh_edit_view_mode: "edit"
+
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .bundle
+
+# Every page uses the theme's layout unless it names one (the home page uses
+# _layouts/landing.html). GitHub Pages adds this implicitly; local builds don't.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

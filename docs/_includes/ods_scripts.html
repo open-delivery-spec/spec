@@ -1,0 +1,35 @@
+<script>
+  (function () {
+    // Theme toggle: remember an explicit choice; without one, track the OS.
+    function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+    document.querySelectorAll('.ods-theme-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var next = !isDark();
+        window.odsApplyTheme(next);
+        try { localStorage.setItem('ods-theme', next ? 'dark' : 'light'); } catch (e) {}
+      });
+    });
+    if (window.matchMedia) {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      var follow = function (e) {
+        var saved = null;
+        try { saved = localStorage.getItem('ods-theme'); } catch (err) {}
+        if (!saved) window.odsApplyTheme(e.matches);
+      };
+      if (mq.addEventListener) mq.addEventListener('change', follow);
+    }
+
+    // GitHub alerts (> [!NOTE], > [!TIP], ...) render as plain quotes in
+    // kramdown; turn them into the theme's callouts so one Markdown source
+    // reads well both on github.com and here.
+    document.querySelectorAll('.main-content blockquote').forEach(function (bq) {
+      var p = bq.querySelector('p');
+      if (!p) return;
+      var m = p.innerHTML.match(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(<br\s*\/?>)?\s*/i);
+      if (!m) return;
+      p.innerHTML = p.innerHTML.slice(m[0].length);
+      if (!p.textContent.trim()) p.remove();
+      bq.classList.add(m[1].toLowerCase());
+    });
+  })();
+</script>

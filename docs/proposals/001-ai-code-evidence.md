@@ -1,6 +1,7 @@
 ---
 title: "Proposal 001: AI Code Evidence"
-nav_order: 12
+parent: Specification
+nav_order: 3
 ---
 
 # Proposal 001 — AI-Code Evidence Documents (CycloneDX-aligned)

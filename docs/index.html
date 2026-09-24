@@ -1,0 +1,253 @@
+---
+title: Open Delivery Spec
+layout: landing
+nav_exclude: true
+search_exclude: true
+permalink: /
+---
+
+<section class="lp-hero">
+  <div class="lp-wrap lp-hero-grid">
+    <div>
+      <div class="lp-eyebrow">Open specification · policy as code · Apache-2.0</div>
+      <h1>AI writes the code. <span class="lp-h1-accent">Your policy decides what merges.</span></h1>
+      <p class="lp-lede">
+        ODS reads the attribution AI tools already leave (<code>Co-Authored-By</code> and <code>Assisted-by</code>
+        trailers, git-ai notes, PR disclosure), combines it with your scanners' findings and any AI reviewer's
+        verdict, and renders one auditable PASS, WARN or BLOCK on every pull request. No forms, no tagging,
+        no black box.
+      </p>
+      <div class="lp-ctas">
+        <a class="lp-btn lp-btn-primary" href="{{ '/get-started.html' | relative_url }}">Get started in 5 minutes <span aria-hidden="true">→</span></a>
+        <a class="lp-btn lp-btn-ghost" href="{{ '/specification.html' | relative_url }}">Read the specification</a>
+      </div>
+      <div class="lp-install">
+        <span class="lp-install-prompt">$</span>
+        <code>go install github.com/open-delivery-spec/cli/cmd/ods@latest</code>
+        <button type="button" data-copy="go install github.com/open-delivery-spec/cli/cmd/ods@latest">Copy</button>
+      </div>
+      <p class="lp-install-note">Or add <code>open-delivery-spec/validate-action@v1</code> to a workflow: it runs on every PR with no configuration.</p>
+    </div>
+
+    <figure class="lp-report" aria-label="An ODS report as it appears on a pull request">
+      <div class="lp-report-head">
+        <img src="{{ '/assets/img/ods-mark.svg' | relative_url }}" alt="">
+        <span><b>ods</b> commented on pull request <b>#61</b></span>
+      </div>
+      <div class="lp-report-body">
+        <div class="lp-report-title">
+          <strong>ODS AI Code Report</strong>
+          <span class="lp-chip lp-chip-warn">WARN</span>
+        </div>
+        <dl class="lp-report-rows">
+          <dt>AI-assisted</dt><dd>Yes · confidence 95%</dd>
+          <dt>Evidence</dt><dd>attested (commit trailer)</dd>
+          <dt>Tech debt</dt><dd>+0.0 · low risk</dd>
+          <dt>Policy</dt><dd>allowed, 2 warnings</dd>
+          <dt>Review tier</dt><dd><span class="lp-chip lp-chip-warn">ELEVATED</span></dd>
+        </dl>
+        <div class="lp-report-signals">
+          <div><span class="src">commit-trailer</span><span>Co-Authored-By: Claude</span><span class="conf">90%</span></div>
+          <div><span class="src">pr-body</span><span>AI disclosure box ticked</span><span class="conf">85%</span></div>
+          <div><span class="src">branch-name</span><span><code>claude/…</code> prefix</span><span class="conf">60%</span></div>
+        </div>
+        <div class="lp-report-warn">AI-assisted change touches a sensitive path (<code>.github/workflows/ci.yml</code>): maintainer review required.</div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="lp-wrap">
+    <p class="lp-kicker">How it works</p>
+    <h2>Four stages, each with a published contract.</h2>
+    <p class="lp-sub">Every stage writes a versioned JSON document, so any pipeline can produce or consume it, and the policy decides on facts rather than on a black box.</p>
+    <div class="lp-pipeline">
+      <div class="lp-stage">
+        <h3>Detect</h3>
+        <p>Which changes are AI-assisted, from the signals the tools volunteer: trailers, git-ai notes, PR disclosure, branch prefixes. Confidence is capped at 95%.</p>
+        <div class="lp-stage-cmd">$ ods detect</div>
+        <div class="lp-stage-schema">detect-output/v1</div>
+      </div>
+      <div class="lp-stage">
+        <h3>Analyze</h3>
+        <p>What the built-in heuristics flag, plus every finding your scanners already produce, imported as SARIF (Semgrep, CodeQL, golangci-lint).</p>
+        <div class="lp-stage-cmd">$ ods analyze --sarif</div>
+        <div class="lp-stage-schema">analyze-output/v1</div>
+      </div>
+      <div class="lp-stage">
+        <h3>Score</h3>
+        <p>How much technical debt the change adds, driven by quality. AI share only amplifies real findings: a clean, fully AI-written change scores about zero.</p>
+        <div class="lp-stage-cmd">$ ods score</div>
+        <div class="lp-stage-schema">score-output/v1</div>
+      </div>
+      <div class="lp-stage">
+        <h3>Check</h3>
+        <p>Your policy, in Rego, over one input document: attribution, findings, coverage, risky paths and any AI reviewer's verdict.</p>
+        <div class="lp-stage-cmd">$ ods check</div>
+        <div class="lp-stage-schema">policy-input/v1 → check-output/v1</div>
+      </div>
+    </div>
+    <div class="lp-outcome">
+      <span>Result on the pull request:</span>
+      <span class="lp-chip lp-chip-pass">PASS</span>
+      <span class="lp-chip lp-chip-warn">WARN</span>
+      <span class="lp-chip lp-chip-block">BLOCK</span>
+      <span>plus a review tier, a PR comment and a machine-readable report.</span>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section lp-section-alt">
+  <div class="lp-wrap">
+    <p class="lp-kicker">The decision</p>
+    <h2>One gate. Deterministic findings may block; AI opinions may only ask for more review.</h2>
+    <p class="lp-sub">Reviewers, scanners and humans all feed the same gate. Whatever an LLM says, it can raise the bar for a change but never wave one through on its own.</p>
+    <div class="lp-verdicts">
+      <div class="lp-verdict lp-verdict-pass">
+        <span class="lp-chip lp-chip-pass">PASS</span>
+        <h3>No rule fired</h3>
+        <p>Merge as usual. A pass means your policy found nothing, not that the code is proven correct.</p>
+      </div>
+      <div class="lp-verdict lp-verdict-warn">
+        <span class="lp-chip lp-chip-warn">WARN</span>
+        <h3>Look before merging</h3>
+        <p>Undisclosed AI use, source without tests, a sensitive path touched. The PR comment says why.</p>
+      </div>
+      <div class="lp-verdict lp-verdict-block">
+        <span class="lp-chip lp-chip-block">BLOCK</span>
+        <h3>The job fails</h3>
+        <p>A deny rule matched, such as a critical finding. With a required check, the merge button stays grey.</p>
+      </div>
+    </div>
+    <div class="lp-tiers">
+      <strong>Review routing</strong>
+      <span class="lp-tier"><span class="lp-chip lp-chip-plain">auto</span> mechanically safe</span>
+      <span class="lp-tier"><span class="lp-chip lp-chip-plain">standard</span> normal review</span>
+      <span class="lp-tier"><span class="lp-chip lp-chip-plain">elevated</span> a maintainer should look</span>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="lp-wrap">
+    <p class="lp-kicker">Specification first</p>
+    <h2>A contract anyone can implement, and tools that implement it.</h2>
+    <p class="lp-sub">The JSON Schemas and the conformance suite are the specification. The CLI and the GitHub Action are one implementation of it, not the only one allowed.</p>
+    <div class="lp-split">
+      <div class="lp-card">
+        <h3>The specification</h3>
+        <p>Versioned contracts between the stages, and the files a repository keeps.</p>
+        <ul>
+          <li><code>policy-input/v1</code><span>The one document a policy reads.</span></li>
+          <li><code>check-output/v1</code><span>Allowed, denials, warnings, review tier.</span></li>
+          <li><code>review-verdict/v1</code><span>How any AI reviewer's opinion enters the gate.</span></li>
+          <li><code>.ods/</code><span>Where the policy lives in a repository.</span></li>
+          <li><code>conformance/</code><span>Scenarios every implementation must pass.</span></li>
+        </ul>
+      </div>
+      <div class="lp-card">
+        <h3>Reference tooling</h3>
+        <p>Open source, single binary, runs in any CI that can run a program.</p>
+        <ul>
+          <li><code>ods</code><span>The CLI: detect, analyze, score, check.</span></li>
+          <li><code>validate-action</code><span>All four stages on every PR, with a comment.</span></li>
+          <li><code>ods report</code><span>AI share over history, per repo or organization.</span></li>
+          <li><code>ods attest</code><span>AI-code evidence as a CycloneDX 1.6 document.</span></li>
+          <li><code>org-ai-report</code><span>A scheduled dashboard across every repository.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section lp-section-alt">
+  <div class="lp-wrap">
+    <p class="lp-kicker">Honest by design</p>
+    <h2>It governs the AI you can see, and says so.</h2>
+    <p class="lp-sub">Detectors that claim to spot AI-written code also flag careful humans. ODS does not pretend to. It reads what tools disclose and keeps its claims inside what that evidence supports.</p>
+    <div class="lp-principles">
+      <div>
+        <div class="lp-principle-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Attribution, not forensics</h3>
+        <p>The primary signal is the trailer the tool writes. Stripping it evades ODS; diff heuristics are only a low-confidence fallback, and never certainty.</p>
+      </div>
+      <div>
+        <div class="lp-principle-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 8h14M7 16h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>A signal producer, not an oracle</h3>
+        <p>ODS never says code is correct. It reports facts, scores them, and lets your policy decide, with every input on the record.</p>
+      </div>
+      <div>
+        <div class="lp-principle-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v4l2.5 2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Humans where they matter</h3>
+        <p>The aim is not merging without people. It is freeing them from the changes that are mechanically safe and pointing them at the ones that are not.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="lp-wrap">
+    <p class="lp-kicker">Start where you are</p>
+    <h2>Pick the question you need answered.</h2>
+    <p class="lp-sub">Each path takes minutes, runs on what your repositories already have, and leaves you with something in CI.</p>
+    <div class="lp-paths">
+      <a class="lp-path" href="{{ '/oss-ai-policy.html' | relative_url }}">
+        <span class="who">Maintainers</span>
+        <strong>Enforce the AI clause in CONTRIBUTING</strong>
+        <span class="desc">Disclose it, test it, own it: a ready-made policy that nudges and routes instead of banning.</span>
+        <span class="go">Open-source AI policy →</span>
+      </a>
+      <a class="lp-path" href="{{ '/get-started.html' | relative_url }}">
+        <span class="who">Platform teams</span>
+        <strong>A report on every pull request</strong>
+        <span class="desc">One workflow file. Start in report-only mode, then turn on the rules you trust.</span>
+        <span class="go">Get started →</span>
+      </a>
+      <a class="lp-path" href="{{ '/policy-authoring.html' | relative_url }}">
+        <span class="who">Policy authors</span>
+        <strong>Write the rules in Rego</strong>
+        <span class="desc">One input document, tested with <code>opa test</code>, versioned next to the code it governs.</span>
+        <span class="go">Writing policies →</span>
+      </a>
+      <a class="lp-path" href="{{ '/org-view.html' | relative_url }}">
+        <span class="who">Leadership &amp; audit</span>
+        <strong>How much of our delivery is AI?</strong>
+        <span class="desc">AI share by repository, tool and month across the organization, with evidence you can hand to an auditor.</span>
+        <span class="go">Organization-wide view →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section lp-section-alt">
+  <div class="lp-wrap">
+    <p class="lp-kicker">Works with</p>
+    <h2>The signals and tools you already have.</h2>
+    <p class="lp-sub">Nothing to install in developers' editors, nothing new to learn in CI.</p>
+    <div class="lp-works">
+      <span>Claude Code<small>trailer</small></span>
+      <span>GitHub Copilot<small>trailer</small></span>
+      <span>Cursor<small>trailer</small></span>
+      <span>git-ai<small>line notes</small></span>
+      <span>Semgrep<small>SARIF</small></span>
+      <span>CodeQL<small>SARIF</small></span>
+      <span>golangci-lint<small>SARIF</small></span>
+      <span>Open Policy Agent<small>Rego</small></span>
+      <span>Go · LCOV · Cobertura<small>coverage</small></span>
+      <span>CycloneDX 1.6<small>evidence</small></span>
+      <span>GitHub Actions · GitLab CI · Jenkins<small>any CI</small></span>
+    </div>
+  </div>
+</section>
+
+<section class="lp-cta">
+  <div class="lp-wrap">
+    <h2>Five minutes to a report on every pull request.</h2>
+    <p>Add the action, open a pull request, read the comment. Tighten the policy once you have seen what your repositories look like.</p>
+    <div class="lp-ctas">
+      <a class="lp-btn lp-btn-primary" href="{{ '/get-started.html' | relative_url }}">Get started <span aria-hidden="true">→</span></a>
+      <a class="lp-btn lp-btn-ghost" href="https://github.com/open-delivery-spec/spec/tree/main/examples/walkthrough">See a worked example</a>
+    </div>
+  </div>
+</section>
