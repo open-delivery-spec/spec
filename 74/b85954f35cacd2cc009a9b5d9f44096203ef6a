@@ -1,0 +1,30 @@
+docs/ecosystem.md
+  s_9433bfadf9b69b::t_432f864dee7f1e 52,56
+docs/get-started.md
+  s_9433bfadf9b69b::t_868ad7bf406890 93-95,99,101,105,108
+  s_9433bfadf9b69b::t_61f5ee10647e1f 265-275,277
+  s_9433bfadf9b69b::t_ede32ab115db53 23,25-34,37-38,40,44,47-48
+  s_9433bfadf9b69b::t_017c5de43fc815 109,112,133,157,166-167
+docs/policy-authoring.md
+  s_9433bfadf9b69b::t_43eae09300882c 72,139-141,146,150-162
+examples/README.md
+  s_9433bfadf9b69b::t_2dd8299d694a72 49-50
+examples/walkthrough/README.md
+  s_9433bfadf9b69b::t_124150a3ebde83 78-79,92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "74b85954f35cacd2cc009a9b5d9f44096203ef6a",
+  "prompts": {},
+  "sessions": {
+    "s_9433bfadf9b69b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4cfc4c8c-e4c8-40b0-8e4d-1acb19fe3770",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
