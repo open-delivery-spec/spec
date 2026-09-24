@@ -20,28 +20,33 @@ Start with the smallest production-ready loop: the ODS check on every pull reque
 
 ### 1. Install the CLI
 
-**Binary install (recommended):**
-
-Download a pre-compiled binary from the [releases page](https://github.com/open-delivery-spec/cli/releases/latest):
-
-```bash
-# macOS (Apple Silicon)
-curl -L https://github.com/open-delivery-spec/cli/releases/latest/download/ods_latest_darwin_arm64.tar.gz | tar xz
-sudo mv ods /usr/local/bin/
-
-# macOS (Intel)
-curl -L https://github.com/open-delivery-spec/cli/releases/latest/download/ods_latest_darwin_amd64.tar.gz | tar xz
-sudo mv ods /usr/local/bin/
-
-# Linux (amd64)
-curl -L https://github.com/open-delivery-spec/cli/releases/latest/download/ods_latest_linux_amd64.tar.gz | tar xz
-sudo mv ods /usr/local/bin/
-```
-
-**From source (Go required):**
+**With Go (recommended):**
 
 ```bash
 go install github.com/open-delivery-spec/cli/cmd/ods@latest
+```
+
+**Pre-compiled binary:**
+
+Each [release](https://github.com/open-delivery-spec/cli/releases) ships archives
+named `ods_<version>_<os>_<arch>.tar.gz` for `darwin` and `linux` on `amd64` and
+`arm64`, and `ods_<version>_windows_amd64.zip`. Set `VERSION` to the release you
+want (without the leading `v`) and pick your platform:
+
+```bash
+VERSION=0.7.9
+
+# macOS (Apple Silicon)
+curl -L "https://github.com/open-delivery-spec/cli/releases/download/v${VERSION}/ods_${VERSION}_darwin_arm64.tar.gz" | tar xz
+sudo mv ods /usr/local/bin/
+
+# macOS (Intel)
+curl -L "https://github.com/open-delivery-spec/cli/releases/download/v${VERSION}/ods_${VERSION}_darwin_amd64.tar.gz" | tar xz
+sudo mv ods /usr/local/bin/
+
+# Linux (amd64; use linux_arm64 on ARM)
+curl -L "https://github.com/open-delivery-spec/cli/releases/download/v${VERSION}/ods_${VERSION}_linux_amd64.tar.gz" | tar xz
+sudo mv ods /usr/local/bin/
 ```
 
 ### 2. Add to your CI
@@ -85,23 +90,26 @@ ods check     # Does the OPA policy allow this change?
 
 ### Optional: Bring your own scanner (SARIF)
 
-ODS can ingest SARIF v2.1.0 output from tools like semgrep or CodeQL and include their findings in the policy input's `issues[]` array. This lets a single Rego policy block on both ODS-native findings and external scanner findings:
+ODS can ingest SARIF v2.1.0 output from tools like semgrep or CodeQL and include their findings in the policy input's `issues[]` array. This lets a single Rego policy block on both ODS-native findings and external scanner findings.
+
+Each command runs the pipeline itself and reads only the SARIF file you pass it, so give the file to the command whose result you want: `ods check --sarif` for the gate, `ods score --sarif` for the score, `ods analyze --sarif` for the findings list. Running `ods analyze --sarif` first does not carry the findings into a later `ods check`.
 
 ```bash
-# Run semgrep and pass its findings to ods analyze
 semgrep --config=auto --sarif > semgrep.sarif
-ods analyze --sarif semgrep.sarif --json
+ods check --sarif semgrep.sarif     # the gate sees the semgrep findings
 
-# Or in a CI step, before ods check:
+# Or in CI:
 - name: Semgrep
   run: semgrep --config=auto --sarif > semgrep.sarif
 - name: ODS check
-  run: ods analyze --sarif semgrep.sarif && ods score && ods check
+  run: ods check --sarif semgrep.sarif
 ```
+
+The [walkthrough](https://github.com/open-delivery-spec/spec/tree/main/examples/walkthrough) shows the whole loop. With the Action, set `semgrep: true` or `sarif: path/to/your.sarif`; it passes the file to every stage.
 
 ### Optional: Real test coverage
 
-ODS automatically detects coverage reports in the working directory and uses them instead of estimating from test file line counts. Supported formats:
+ODS automatically detects coverage reports in the working directory and reads the coverage from them. Supported formats:
 
 | Format | File(s) |
 |--------|---------|
@@ -122,7 +130,7 @@ npx jest --coverage
 ods score  # auto-detects coverage/coverage-summary.json
 ```
 
-When no coverage file is found, ODS sets `test_coverage = -1` ("not measured") and skips the coverage penalty. Your Rego policies **must guard** coverage rules with `input.test_coverage >= 0` to avoid false positives on projects without coverage tooling.
+When no coverage file is found, ODS sets `test_coverage = -1` ("not measured") and skips the coverage penalty; it never estimates coverage. Your Rego policies **must guard** coverage rules with `input.test_coverage >= 0` to avoid false positives on projects without coverage tooling.
 
 ---
 
@@ -146,16 +154,16 @@ feat(auth): add OAuth login
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-For tools that don't emit `Co-Authored-By` automatically, add it manually or use the ODS supplemental trailer fields:
+For tools that don't emit `Co-Authored-By` automatically, add it manually, use the Linux kernel's `Assisted-by: AGENT:MODEL` trailer, or use the ODS supplemental trailer fields:
 
 ```text
 feat(auth): add OAuth login
 
 AI-assisted: true
 AI-tool: GitHub Copilot
-AI-review: pending
-AI-confidence: high
 ```
+
+The detector reads `AI-assisted: true` (or `AI-generated: true`), `AI-tool:` and `AI-scope:`. Other `AI-*` lines from the retired commit-message module, such as `AI-review:` and `AI-confidence:`, are ignored.
 
 ### 3. Add AI disclosure to PR descriptions
 
@@ -254,10 +262,19 @@ ref; a checkout of `github.head_ref` fails on fork PRs. To post the comment on
 fork PRs anyway, use the `workflow_run` recipe in
 [Permissions and Fork Pull Requests](https://github.com/open-delivery-spec/validate-action#permissions-and-fork-pull-requests).
 
-**I want to diff against a different base.** The Action diffs against the PR
-base; override it with `diff-base: origin/develop`.
+**The diff covers the wrong range.** The Action diffs against `origin/main` by
+default, not the PR's base branch. To diff against the PR base whatever branch
+it targets, pass its commit:
 
-**I want a specific CLI version.** Pin it with `cli-ref: v0.7.8` (any tag,
+```yaml
+- uses: open-delivery-spec/validate-action@v1
+  with:
+    diff-base: ${{ github.event.pull_request.base.sha }}
+```
+
+Any other ref works too, e.g. `diff-base: origin/develop`.
+
+**I want a specific CLI version.** Pin it with `cli-ref: v0.7.9` (any tag,
 branch or commit of the CLI repository).
 
 **I want to pass the PR body explicitly.** `pr-body: ${{ github.event.pull_request.body }}`;

@@ -69,7 +69,7 @@ Policies read from `input.*`. The full contract is the
 | `input.ai_generated` | bool | `input.ai_generated == true` |
 | `input.ai_confidence` | 0.0–1.0 | `input.ai_confidence > 0.8` |
 | `input.technical_debt_delta` | float | `input.technical_debt_delta > 5.0` |
-| `input.test_coverage` | −1 or 0.0–1.0 | `input.test_coverage < 0.6` |
+| `input.test_coverage` | −1 or 0.0–1.0 | `input.test_coverage >= 0; input.test_coverage < 0.6` |
 | `input.issues[_]` | array | `.severity`, `.rule`, `.file`, `.line` |
 | `input.ai_files[_]` | array | `.path`, `.confidence`, `.ai_lines` |
 | `input.changed_files[_]` | string[] | `endswith(input.changed_files[_], ".go")` |
@@ -136,18 +136,30 @@ warn[msg] {
 
 ## Testing your policy locally
 
-Run the pipeline against your working tree — no push required:
+`ods check` runs the whole pipeline (detect, analyze, score) on your working
+tree and evaluates the policy — no push required, and no need to run the other
+commands first:
 
 ```bash
-ods detect && ods analyze && ods score
 ods check                 # evaluates .ods/policy.rego, exits non-zero if denied
 ods check --json          # machine-readable result
-ods check --debug         # prints every input value and each deny/warn (see why it fired)
+ods check --json --debug  # the same, plus decision diagnostics on stderr
 ```
 
 `--debug` is the fastest way to understand a decision: it logs the detection
-signals, score breakdown, coverage source, and every denial/warning to stderr
-while keeping `--json` output clean.
+signals, the analysis and score breakdown, the coverage source, and every
+denial/warning to stderr while keeping `--json` output clean. It logs a
+selection of the input values, not the whole input.
+
+To test a policy against an exact input instead of your working tree, write a
+[policy input](schemas.md) document and evaluate it directly:
+
+```bash
+ods check --input input.json --policy .ods/policy.rego --json
+```
+
+The [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
+are ready-made inputs to start from.
 
 ## Ready-made starting points
 
