@@ -6,8 +6,10 @@
   publish = "_site"
   # Served from the preview's root, so no /spec prefix.
   command = "bundle exec jekyll build --baseurl ''"
-  # Exit 0 skips the build: nothing under docs/ (or this file) changed.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ../netlify.toml"
+  # Exit 0 skips the build: nothing under docs/ (or this file) changed since
+  # the last build. A build without cache has CACHED_COMMIT_REF equal to
+  # COMMIT_REF, so it always builds rather than comparing a commit to itself.
+  ignore = "[ \"$CACHED_COMMIT_REF\" != \"$COMMIT_REF\" ] && git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ../netlify.toml"
 
 [build.environment]
   RUBY_VERSION = "3.3"
