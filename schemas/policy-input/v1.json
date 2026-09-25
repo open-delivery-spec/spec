@@ -86,7 +86,7 @@
     },
     "_ods_detect_error": {
       "type": "boolean",
-      "description": "Set to true by CI (the reference GitHub Action) when the detect stage failed to run, so the input carries no detection facts: ai_generated is false and ai_confidence 0 by construction, not by evidence. Policies should treat such an input as inconclusive (warn, route to review) rather than as human code; see the warn-detect-inconclusive conformance scenario."
+      "description": "Set to true by a pipeline that assembles the policy input itself when its detect stage failed to run, so the input carries no detection facts: ai_generated is false and ai_confidence 0 by construction, not by evidence. The reference CLI does not set it in the input it builds. Policies should treat such an input as inconclusive (warn, route to review) rather than as human code, and must not block on it (the warn-detect-inconclusive conformance scenario checks the latter)."
     }
   },
   "$defs": {

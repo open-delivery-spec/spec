@@ -22,8 +22,8 @@ The policy input contract is published as a versioned JSON Schema:
 You can use it to validate policy inputs or generate typed bindings in your language of choice:
 
 ```bash
-# Validate a local policy input against the schema
-npx ajv-cli validate -s schemas/policy-input/v1.json -d .ods/out/detect.json
+# Validate a policy input (e.g. one you pass to `ods check --input`)
+npx ajv-cli validate -s schemas/policy-input/v1.json -d input.json --spec=draft2020
 ```
 
 ## Per-Command Output Schemas
@@ -52,11 +52,11 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `ai_generated` | bool | ✅ | `detect` | Whether AI code was detected in the diff |
 | `ai_confidence` | float (0.0–1.0) | ✅ | `detect` | Aggregate detection confidence. The reference CLI caps it at 0.95 — attribution is volunteered, never proven — so a policy threshold above 0.95 never fires |
 | `detection_sources` | string[] | | `detect` | Which signals fired (`commit-trailer`/`git-ai-notes`/`pr-body`/`branch-name`/`diff-heuristics`) — see [Disclosure completeness](#disclosure-completeness-inputdetection_sources) |
-| `evidence_tier` | string | | `detect` | Strongest evidence class present: `corroborated`/`attested`/`inferred`/`inconclusive` — see [Evidence tiers](#evidence-tiers-inputevidence_tier) |
+| `evidence_tier` | string | | `detect` | Strongest evidence class present: `corroborated`/`attested`/`inferred`; omitted when no source fired (`inconclusive` is in the enum but the reference CLI does not emit it) — see [Evidence tiers](#evidence-tiers-inputevidence_tier) |
 | `issues` | array | | `analyze` | Quality issues found |
 | `technical_debt_delta` | float | | `score` | Weighted technical-debt impact of the PR |
 | `test_coverage` | float (−1 or 0.0–1.0) | | `score` | Test coverage ratio; **−1 means not measured** |
-| `test_coverage_source` | string | | `score` | How coverage was measured (`go`/`lcov`/`cobertura`/`nyc`/`estimated`/`unknown`) |
+| `test_coverage_source` | string | | `score` | How coverage was measured (`go`/`lcov`/`cobertura`/`nyc`), or `unknown` when it was not. `estimated` is a legacy value: the reference CLI no longer estimates coverage and does not emit it |
 | `patch_coverage` | float (−1 or 0.0–1.0) | | `check` | Coverage of the **diff's added lines only**; **−1 means not measured** — see [Patch coverage](#patch-coverage-inputpatch_coverage) |
 | `mutation_score` | float (−1 or 0.0–1.0) | | `check` | Mutants killed on the **diff's added lines**; **−1 means not measured** — see [Mutation score](#mutation-score-inputmutation_score) |
 | `branch` | string | | context | The PR's head branch name |
@@ -64,7 +64,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `ai_files` | array | | `detect` | Per-file AI attribution detail |
 | `ai_reviews` | array | | `check --ai-review` | AI code-reviewer verdicts (advisory by default — see below) |
 | `merge_confidence` | object | | `check` | Deterministic diff facts: tested? shaped like real work? touches sensitive paths? — see [Merge-confidence signals](#merge-confidence-signals-inputmerge_confidence) |
-| `_ods_detect_error` | bool | | CI | `true` when the detect stage failed to run, so `ai_generated: false` is an absence of facts, not a finding. The reference GitHub Action sets it; the `warn-detect-inconclusive` conformance scenario shows the policy pattern (warn, route to review) |
+| `_ods_detect_error` | bool | | CI | `true` when the detect stage failed to run, so `ai_generated: false` is an absence of facts, not a finding. For pipelines that assemble the policy input themselves: the reference CLI never sets it in the input it builds, and `ods check --input` does not pass it through to the policy. The reference GitHub Action marks a failed detect stage the same way in its report and shows the run as WARN, outside the policy. The `warn-detect-inconclusive` conformance scenario checks that such an input does not block |
 
 > **`test_coverage` sentinel:** A value of `−1` means coverage was not measured (no coverage file found). Policies that check coverage MUST guard with `input.test_coverage >= 0` to avoid false positives on PRs where coverage is unavailable.
 
@@ -73,7 +73,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | Field | Type | Description |
 |-------|------|-------------|
 | `rule` | string | Rule id, e.g. `ai-unsafe-deserialization` |
-| `severity` | string | `low` \| `medium` \| `high` \| `critical` |
+| `severity` | string | `info` \| `low` \| `medium` \| `high` \| `critical` |
 | `file` | string | Path to the affected file |
 | `line` | integer | Line number of the finding |
 | `message` | string | Human-readable description |
@@ -282,7 +282,7 @@ ODS surfaces what it can see rather than claiming to unmask what hides.
 | `corroborated` | Independently **measured** — the strongest evidence | `git-ai-notes` (per-file AI line attribution) |
 | `attested` | The author or tool **declared** it | `commit-trailer`, `pr-body` |
 | `inferred` | **Heuristic** guess only | `branch-name`, `diff-heuristics` |
-| `inconclusive` | Detection did not run, or produced no signal | (no sources; or detect failed) |
+| `inconclusive` | Detection did not run, or produced no signal. Not emitted by the reference CLI, which omits `evidence_tier` in that case | (no sources; or detect failed) |
 
 Derivation (normative):
 
@@ -295,7 +295,9 @@ Derivation (normative):
   signal that `detection_sources` does not already carry.
 - **`inconclusive` is distinct from `inferred`.** Not-measured (detection did
   not run) is not the same as measured-weakly; policies MUST distinguish them
-  (guard as needed) and MUST NOT read `inconclusive` as "no AI".
+  (guard as needed) and MUST NOT read `inconclusive` as "no AI". The reference
+  CLI expresses this state by omitting the field, so a policy should treat an
+  absent `evidence_tier` the same way.
 - **A confidence label, not a verdict.** A policy MAY require a minimum tier
   before granting `auto` (e.g. "auto only when `attested` or better"); it MUST
   NOT treat a low tier as grounds to *deny* on its own — that would punish
@@ -446,9 +448,20 @@ exercise both directions.
 
 ## Inspecting the Input
 
-To see the exact object for the current diff, run the pipeline locally:
+`ods check` assembles the input from the current diff and evaluates it in one
+run; `--debug` logs the main input values (detection, analysis, score,
+coverage) to stderr alongside the result:
 
 ```bash
-ods detect && ods analyze && ods score
-ods check   # evaluates input against .ods/policy.rego
+ods check --json --debug
 ```
+
+To evaluate a policy against an input you control, pass a document that follows
+this schema to `ods check --input`:
+
+```bash
+ods check --input input.json --policy .ods/policy.rego --json
+```
+
+Fields the document omits are not measured: `test_coverage`, `patch_coverage`
+and `mutation_score` default to `-1`.

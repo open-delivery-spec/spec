@@ -76,7 +76,7 @@ CLI build until it is satisfied.
 | `warn-ai-detected` | AI code detected but no quality issues | WARN |
 | `block-critical-issue` | Critical quality issue → policy blocks | BLOCK |
 | `block-ai-no-tests` | High-confidence AI code with low test coverage | BLOCK |
-| `warn-detect-inconclusive` | Detection failed; pipeline degrades gracefully | WARN |
+| `warn-detect-inconclusive` | Detection failed (`_ods_detect_error`); the policy does not block on the missing facts. The warning is the pipeline's to raise (the reference Action reports such a run as WARN), not this policy's | PASS |
 | `auto-clean-ai-change` | Clean, tested, low-debt AI change | PASS, `review_tier: auto` |
 | `elevated-ai-high-issue` | AI change with a high finding — mergeable but risky | PASS, `review_tier: elevated` |
 | `elevated-ai-review-requests-changes` | Otherwise auto-eligible change, but an AI reviewer requested changes | PASS, WARN, `review_tier: elevated` |

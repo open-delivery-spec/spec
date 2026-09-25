@@ -49,11 +49,11 @@ ODS does not compete with these standards — it **builds on them** by treating 
 | **Policy enforcement** | Rule suppression / audit logs | OPA Rego gates in CI |
 | **AI focus** | None by default | Primary |
 
-Semgrep and CodeQL are **complementary inputs to ODS**. Run them as a CI step, then pass their SARIF output to `ods analyze --sarif`:
+Semgrep and CodeQL are **complementary inputs to ODS**. Run them as a CI step, then pass their SARIF output to the policy gate with `ods check --sarif` (`ods score --sarif` feeds the same findings into the score):
 
 ```bash
 semgrep --config=auto --sarif > semgrep.sarif
-ods analyze --sarif semgrep.sarif --json
+ods check --sarif semgrep.sarif
 ```
 
 ODS converts SARIF severity levels (`error` → `high`, `warning` → `medium`, `note` → `low`) into its own issue schema and includes them in the policy input's `issues[]` array. A Rego policy can then block on semgrep `critical` findings the same way it blocks on native ODS findings.

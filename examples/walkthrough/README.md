@@ -75,8 +75,8 @@ The Semgrep finding is carried through with its **own rule id and severity**
 ```console
 $ ods score --sarif semgrep.sarif
 ⚠️  Technical Debt Score
-   Tech Debt Delta: +1.5 | AI Ratio: 0% | Defects: 0.0/KLOC | Critical: 1 | Coverage: N/A | Duplication: 0%
-   Verdict: neutral (Moderate risk — review recommended, ensure adequate tests)
+   Tech Debt Delta: +1.5 | Risk: moderate | AI Ratio: 0% | Defects: 0.0/KLOC | Critical: 1 | Coverage: N/A | Duplication: 0%
+   Verdict: increase, moderate risk (Review recommended, ensure adequate tests)
 ```
 
 The high-severity finding counts as a critical issue in the score.
@@ -89,6 +89,7 @@ $ ods check --sarif semgrep.sarif --policy .ods/policy.rego
    Policy: .ods/policy.rego
    Denials:
      ❌ high: python-subprocess-shell-true (app/runner.py:11)
+Error: policy denied: 1 denial(s)
 $ echo $?
 1
 ```

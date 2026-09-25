@@ -46,8 +46,8 @@ ods init
 mkdir -p .ods
 cp examples/ods-policy-enterprise.rego .ods/policy.rego
 
-# Run the pipeline locally
-ods detect && ods analyze && ods score && ods check
+# Run the check locally (it runs detect, analyze and score itself)
+ods check
 ```
 
 For CI integration, see [Get Started](../docs/get-started.md).
