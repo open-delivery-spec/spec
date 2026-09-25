@@ -57,9 +57,10 @@ jobs:
     env:
       # Track the CLI's main tip directly: the module proxy's branch cache
       # lags fresh merges, and these templates are tested against the
-      # policy-input contract the CLI implements today.
-      GOPROXY: direct
-      GOSUMDB: "off"
+      # policy-input contract the CLI implements today. Only the ODS module
+      # bypasses the proxy; fetching every dependency straight from its VCS
+      # (golang.org/x/* from go.googlesource.com) can hang for many minutes.
+      GOPRIVATE: github.com/open-delivery-spec
     steps:
       - uses: actions/checkout@v7
 
@@ -88,8 +89,7 @@ jobs:
     name: CLI ↔ Spec Schema Sync
     runs-on: ubuntu-latest
     env:
-      GOPROXY: direct
-      GOSUMDB: "off"
+      GOPRIVATE: github.com/open-delivery-spec
     steps:
       - uses: actions/checkout@v7
         with:
