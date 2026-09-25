@@ -1,6 +1,7 @@
 ---
 title: Threats & Failure Modes
-nav_order: 8
+parent: Why ODS
+nav_order: 1
 ---
 
 # Threats and Failure Modes

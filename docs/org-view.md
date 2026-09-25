@@ -1,6 +1,7 @@
 ---
 title: Organization-wide View
-nav_order: 6
+parent: Guides
+nav_order: 3
 ---
 
 # Organization-wide View

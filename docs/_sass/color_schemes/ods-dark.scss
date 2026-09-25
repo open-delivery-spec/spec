@@ -1,0 +1,19 @@
+// ODS dark scheme: the light scheme's structure on a blue-black ground.
+$color-scheme: dark;
+$body-background-color: #0d1117;
+$body-heading-color: #f0f3f6;
+$body-text-color: #c5ced8;
+$link-color: #5cc6d6;
+$nav-child-link-color: #9aa5b3;
+$sidebar-color: #0a0d12;
+$base-button-color: #1a212b;
+$btn-primary-color: #0b6e82;
+$code-background-color: #111821;
+$code-linenumber-color: #6e7a88;
+$feedback-color: #151b23;
+$table-background-color: #121821;
+$search-background-color: #121821;
+$search-result-preview-color: #9aa5b3;
+$border-color: #232b36;
+
+@import "./vendor/accessible-pygments/github-dark";

@@ -1,6 +1,7 @@
 ---
 title: Open-Source AI Policy
-nav_order: 5
+parent: Guides
+nav_order: 2
 ---
 
 # Open-Source AI Policy

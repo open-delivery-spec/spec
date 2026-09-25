@@ -1,6 +1,7 @@
 ---
-title: Scenario: Open-Source Project
-nav_order: 11
+title: "Scenario: Open-Source Project"
+parent: Guides
+nav_order: 4
 ---
 
 # Scenario: Open-Source Project

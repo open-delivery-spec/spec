@@ -1,11 +1,12 @@
 ---
-title: Policy Input Schema
-layout: default
-has_children: false
-nav_order: 4
+title: "Contracts & Schemas"
+parent: Specification
+nav_order: 1
 ---
 
-# Policy Input Schema
+# Contracts & Schemas
+
+{% include spec_status.html status="Stable" version="v1" %}
 
 ODS's machine-readable contract is the **policy input** — the structured object the pipeline feeds to your OPA Rego policy at the `check` stage. Any policy you write reads from these fields.
 

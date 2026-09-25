@@ -1,0 +1,82 @@
+---
+layout: table_wrappers
+---
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+{% include head.html %}
+<body class="lp">
+  <a class="skip-to-main" href="#main-content">Skip to main content</a>
+  <header class="lp-nav">
+    <div class="lp-wrap lp-nav-inner">
+      <a class="lp-brand" href="{{ '/' | relative_url }}">
+        <img src="{{ '/assets/img/ods-mark.svg' | relative_url }}" alt="" width="28" height="28">
+        <span>Open Delivery Spec</span>
+      </a>
+      <nav class="lp-links" aria-label="Primary">
+        <a href="{{ '/get-started.html' | relative_url }}">Get started</a>
+        <a class="lp-hide-sm" href="{{ '/guides.html' | relative_url }}">Guides</a>
+        <a class="lp-hide-sm" href="{{ '/specification.html' | relative_url }}">Specification</a>
+        <a class="lp-hide-xs" href="https://github.com/open-delivery-spec">GitHub</a>
+        {% include theme_toggle.html %}
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    {{ content }}
+  </main>
+
+  <footer class="lp-footer">
+    <div class="lp-wrap">
+      <div class="lp-footer-grid">
+        <div class="lp-footer-brand">
+          <a class="lp-brand" href="{{ '/' | relative_url }}">
+            <img src="{{ '/assets/img/ods-mark.svg' | relative_url }}" alt="" width="28" height="28">
+            <span>Open Delivery Spec</span>
+          </a>
+          <p>An open specification, with reference tooling, for governing AI-assisted code on every pull request.</p>
+        </div>
+        <div>
+          <h4>Use</h4>
+          <ul>
+            <li><a href="{{ '/get-started.html' | relative_url }}">Get started</a></li>
+            <li><a href="{{ '/policy-authoring.html' | relative_url }}">Writing policies</a></li>
+            <li><a href="{{ '/oss-ai-policy.html' | relative_url }}">Open-source AI policy</a></li>
+            <li><a href="{{ '/org-view.html' | relative_url }}">Organization-wide view</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Specification</h4>
+          <ul>
+            <li><a href="{{ '/schemas.html' | relative_url }}">Contracts &amp; schemas</a></li>
+            <li><a href="{{ '/ods-artifacts.html' | relative_url }}">The <code>.ods/</code> convention</a></li>
+            <li><a href="https://github.com/open-delivery-spec/spec/tree/main/spec/conformance">Conformance suite</a></li>
+            <li><a href="{{ '/proposals/001-ai-code-evidence.html' | relative_url }}">Proposal 001</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Project</h4>
+          <ul>
+            <li><a href="https://github.com/open-delivery-spec/spec/blob/main/POSITIONING.md">Positioning</a></li>
+            <li><a href="https://github.com/open-delivery-spec/spec/blob/main/ROADMAP.md">Roadmap</a></li>
+            <li><a href="https://github.com/open-delivery-spec/spec/blob/main/GOVERNANCE.md">Governance</a></li>
+            <li><a href="https://github.com/open-delivery-spec/spec/blob/main/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="lp-footer-legal">Copyright © 2026 Open Delivery Spec Contributors. Licensed under Apache 2.0.</div>
+    </div>
+  </footer>
+  {% include ods_scripts.html %}
+  <script>
+    document.querySelectorAll('[data-copy]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var text = btn.getAttribute('data-copy');
+        if (navigator.clipboard) navigator.clipboard.writeText(text);
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+      });
+    });
+  </script>
+</body>
+</html>

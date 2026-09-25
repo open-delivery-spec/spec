@@ -1,6 +1,7 @@
 ---
 title: ODS and SLSA
-nav_order: 10
+parent: Why ODS
+nav_order: 3
 ---
 
 # ODS and SLSA
