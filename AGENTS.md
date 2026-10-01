@@ -86,7 +86,7 @@ Tests live in `spec/conformance/`. Each scenario is a directory containing:
 
 The scenario's name says what it tests; `spec/conformance/README.md` lists every scenario with its expected result, so add a row there.
 
-All scenarios must pass against the reference CLI implementation before merging.
+All scenarios must pass against the reference CLI implementation before merging. `scripts/test-policies.sh` checks every scenario's policy against its `expected.json` with OPA, and runs the unit tests each template under `examples/` has next to it (`<name>_test.rego`).
 
 ## PR Workflow
 

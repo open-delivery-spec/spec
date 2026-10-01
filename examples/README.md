@@ -25,6 +25,12 @@ The ODS CLI evaluates this file using OPA (Open Policy Agent).
 [conformance scenarios](../spec/conformance/) and checks that the open-source
 templates behave as documented; CI runs it on every change.
 
+Each policy has unit tests next to it (`<name>_test.rego`) that cover all of
+it. Copy them along as `.ods/policy_test.rego` and run
+`opa test .ods/policy.rego .ods/policy_test.rego` as you adapt the policy
+([Writing Policies](../docs/policy-authoring.md#testing-your-policy-locally));
+`scripts/test-policies.sh` runs them here.
+
 The CLI ships with a built-in default policy (`ods check` with no `.ods/policy.rego`).
 These examples show how to customize it.
 

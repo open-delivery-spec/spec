@@ -69,6 +69,17 @@ When contributing, keep these principles in mind:
 
 The reference implementation lives in the [CLI repo](https://github.com/open-delivery-spec/cli). Detection signals, analysis rules, scoring dimensions, and the policy engine are implemented and tested there.
 
+### Testing the Policies
+
+Every `.rego` file here is written in OPA 1.0 syntax and imports `rego.v1`. With [OPA](https://www.openpolicyagent.org/docs/latest/) 1.x and `jq` on your PATH:
+
+```bash
+scripts/test-policies.sh            # compiles every policy, runs the templates' unit tests and the conformance suite
+scripts/check-example-policies.sh   # runs the templates through the reference CLI (ods on PATH)
+```
+
+A template added under `examples/` should come with unit tests next to it (`<name>_test.rego`); `scripts/test-policies.sh` reports how much of each template its tests cover. A conformance scenario added under `spec/conformance/` is picked up by both scripts.
+
 ### Previewing Documentation
 
 ```bash

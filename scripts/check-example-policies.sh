@@ -17,6 +17,7 @@ trap 'rm -rf "$tmp"' EXIT
 
 # ── 1. Every policy, every scenario ──────────────────────────────────────
 for policy in examples/*.rego; do
+  case $policy in *_test.rego) continue ;; esac   # unit tests: scripts/test-policies.sh
   for dir in spec/conformance/*/; do
     input="$dir/input.json"
     [ -f "$input" ] || continue

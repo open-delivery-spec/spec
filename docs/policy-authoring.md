@@ -174,6 +174,17 @@ ods check --input input.json --policy .ods/policy.rego --json
 The [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
 are ready-made inputs to start from.
 
+To keep a policy doing what you meant as it changes, unit-test its rules with
+[`opa test`](https://www.openpolicyagent.org/docs/latest/policy-testing/). Each
+template under `examples/` has its tests next to it (`<name>_test.rego`): copy
+them along with the template, as `.ods/policy_test.rego`, and extend them as you
+edit the policy. ODS reads only `.ods/policy.rego`, so the tests stay out of the
+gate.
+
+```bash
+opa test .ods/policy.rego .ods/policy_test.rego
+```
+
 ## Ready-made starting points
 
 Copy one of these to `.ods/policy.rego` and adapt:

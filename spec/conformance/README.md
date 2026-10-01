@@ -60,8 +60,20 @@ rather than an implementation's output shape and exit code:
 
 ```bash
 opa eval -d spec/conformance/block-ai-no-tests/policy.rego \
-         -I spec/conformance/block-ai-no-tests/input.json \
+         -i spec/conformance/block-ai-no-tests/input.json \
          'data.ods.policy'
+```
+
+[`conformance_test.rego`](conformance_test.rego) turns that into a check: run
+with a scenario's policy and its two documents, it compares the result with
+`expected.json` under the semantics above. `scripts/test-policies.sh` runs it
+for every scenario, and this repository's CI runs that script:
+
+```bash
+opa test spec/conformance/conformance_test.rego \
+         spec/conformance/block-ai-no-tests/policy.rego \
+         conformance.input:spec/conformance/block-ai-no-tests/input.json \
+         conformance.expected:spec/conformance/block-ai-no-tests/expected.json
 ```
 
 The reference implementation runs this suite in its own CI at both layers —
