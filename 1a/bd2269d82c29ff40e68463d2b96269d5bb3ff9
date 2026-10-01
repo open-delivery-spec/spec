@@ -1,0 +1,72 @@
+CHANGELOG.md
+  s_66212c309e21f0::t_47aaa2bb529f4a 34
+scripts/check-example-policies.sh
+  s_66212c309e21f0::t_4ecfe0ccf3f362 99
+  s_66212c309e21f0::t_18261fd5a5b327 91-92,94
+.ods/policy.rego
+  s_66212c309e21f0::t_39cf90c6a22175 30-31,37,47,51,55,62,68,73,79,87,92,97,103,109,115,122,133,138,144,150,154,163,167,171
+examples/ods-policy-enterprise.rego
+  s_66212c309e21f0::t_18b660559e2aba 10-11,15,22,33,39,50,56
+examples/ods-policy-oss-disclosure.rego
+  s_66212c309e21f0::t_bcae5f61191cc0 30-31,37,47,51,55,62,68,73,79,87,92,97,103,109,115,122,133,138,144,150,154,163,167,171
+examples/ods-policy-oss-no-ai.rego
+  s_66212c309e21f0::t_5d063b7e22be7b 20-21,25,31,35,39,44,51,57,62
+examples/ods-policy-oss.rego
+  s_66212c309e21f0::t_a36ea7207cfba1 9-10,14,21,31
+examples/walkthrough/.ods/policy.rego
+  s_66212c309e21f0::t_ef606dbb4657e4 3-4,9,15
+spec/conformance/auto-clean-ai-change/policy.rego
+  s_66212c309e21f0::t_d5ef277c8cfc08 3-4,7,16,21,26,30
+spec/conformance/block-ai-no-tests/policy.rego
+  s_66212c309e21f0::t_18df25be8422ad 3-4,7,13
+spec/conformance/block-critical-issue/policy.rego
+  s_66212c309e21f0::t_e830a4caf2796c 3-4,7,13
+spec/conformance/elevated-ai-high-issue/policy.rego
+  s_66212c309e21f0::t_63d2a8f7da552e 3-4,7,16,21,26,30
+spec/conformance/elevated-ai-review-requests-changes/policy.rego
+  s_66212c309e21f0::t_dcd7378dc9279b 3-4,7,18,24,28,32,36,40
+spec/conformance/evidence-attested-auto/policy.rego
+  s_66212c309e21f0::t_359fe22578e35d 3-4,7,18-19,21
+spec/conformance/evidence-inferred-elevated/policy.rego
+  s_66212c309e21f0::t_88addea13c37a8 3-4,7,18-19,21
+spec/conformance/pass-ai-covered-patch/policy.rego
+  s_66212c309e21f0::t_24ca5dda8ee0e7 3-4,7,18,24,30
+spec/conformance/pass-ai-disclosed/policy.rego
+  s_66212c309e21f0::t_7b65adb5e2ab85 3-4,7,16,20,24,28,34,42
+spec/conformance/pass-ai-strong-mutation/policy.rego
+  s_66212c309e21f0::t_0fecd9d01dc4fa 3-4,7,19,25,31
+spec/conformance/pass-human-code/policy.rego
+  s_66212c309e21f0::t_eaca196c23b32e 3-4,7,13
+spec/conformance/pass-tested-change/policy.rego
+  s_66212c309e21f0::t_4952e0618eead4 3-4,7,17,22,27
+spec/conformance/standard-ai-review-approve/policy.rego
+  s_66212c309e21f0::t_25bde90c87b30f 3-4,7,18,24,28,32,36
+spec/conformance/warn-ai-detected/policy.rego
+  s_66212c309e21f0::t_92f6cc2d184d61 3-4,7,13,20
+spec/conformance/warn-ai-low-patch-coverage/policy.rego
+  s_66212c309e21f0::t_1b98113bcc8437 3-4,7,18,24,30
+spec/conformance/warn-ai-no-tests/policy.rego
+  s_66212c309e21f0::t_6e22e3187eecc4 3-4,7,17,22,27
+spec/conformance/warn-ai-undisclosed/policy.rego
+  s_66212c309e21f0::t_05a3c3db575ea6 3-4,7,16,20,24,28,34,42
+spec/conformance/warn-ai-weak-mutation/policy.rego
+  s_66212c309e21f0::t_cc9863f788aa3f 3-4,7,19,25,31
+spec/conformance/warn-detect-inconclusive/policy.rego
+  s_66212c309e21f0::t_cc3e466472ee77 3-4,7,14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1abd2269d82c29ff40e68463d2b96269d5bb3ff9",
+  "prompts": {},
+  "sessions": {
+    "s_66212c309e21f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8763d161-5362-48a1-ae9b-11f7bcd83469",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
