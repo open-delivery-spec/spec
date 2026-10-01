@@ -15,8 +15,13 @@ default allow := true
 deny contains msg if {
     issue := input.issues[_]
     issue.severity == "critical"
-    msg = sprintf("CRITICAL: %s at %s:%d — %s", [issue.rule, issue.file, issue.line, issue.message])
+    msg = sprintf("CRITICAL: %s at %s:%d%s", [issue.rule, issue.file, issue.line, message_suffix(issue)])
 }
+
+# An issue's message is optional: the denial must not depend on it.
+message_suffix(issue) := sprintf(" — %s", [issue.message]) if object.get(issue, "message", "") != ""
+
+message_suffix(issue) := "" if object.get(issue, "message", "") == ""
 
 # Block AI code in payment/auth/billing without adequate test coverage
 deny contains msg if {

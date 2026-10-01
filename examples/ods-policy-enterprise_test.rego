@@ -43,6 +43,17 @@ test_critical_issue_denies_with_its_message if {
 	policy.deny == {"CRITICAL: ai-unsafe-deserialization at src/parser.py:87 — json.Unmarshal into interface{}"} with input as object.union(clean, {"issues": [critical, high]})
 }
 
+test_critical_issue_without_a_message_still_denies if {
+	# `message` is optional on an issue (schemas/policy-input/v1.json); the
+	# denial must not depend on it
+	unlabelled := object.remove(critical, ["message"])
+	policy.deny == {"CRITICAL: ai-unsafe-deserialization at src/parser.py:87"} with input as object.union(clean, {"issues": [unlabelled]})
+
+	# nor leave a dangling separator when the message is empty
+	blank := object.union(critical, {"message": ""})
+	policy.deny == {"CRITICAL: ai-unsafe-deserialization at src/parser.py:87"} with input as object.union(clean, {"issues": [blank]})
+}
+
 # ── AI code in sensitive modules ──────────────────────────────────────────
 
 payment_file := {"path": "src/payment/charge.go", "ai_lines": 40, "total_lines": 50, "confidence": 0.9}
