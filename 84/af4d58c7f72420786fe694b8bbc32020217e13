@@ -1,0 +1,25 @@
+examples/ods-policy-enterprise_test.rego
+  s_66212c309e21f0::t_b03ce9ee343b2c 46-50,55-56
+  s_66212c309e21f0::t_dc5b26e47c90b3 51-54
+examples/ods-policy-enterprise.rego
+  s_66212c309e21f0::t_cf8a2bf26aff30 18,21-24
+  s_66212c309e21f0::t_30a37b6306cf12 25
+CHANGELOG.md
+  s_66212c309e21f0::t_4daa34e2b87302 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "84af4d58c7f72420786fe694b8bbc32020217e13",
+  "prompts": {},
+  "sessions": {
+    "s_66212c309e21f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8763d161-5362-48a1-ae9b-11f7bcd83469",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
