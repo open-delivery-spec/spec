@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    # Let a new release age a week before proposing it, so a compromised or
+    # yanked release is usually caught before it reaches a pull request.
+    cooldown:
+      default-days: 7
     groups:
       github-actions:
         patterns:

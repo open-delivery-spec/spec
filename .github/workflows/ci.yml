@@ -6,6 +6,12 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+# Every job only reads the repository. The repository's default token is
+# read-write, and these jobs run code fetched at run time (npm, the CLI at
+# main), so do not hand them more than they need.
+permissions:
+  contents: read
+
 jobs:
   # ── Schema validation ─────────────────────────────────────────
   # The contracts live at schemas/<name>/v1.json. Each must compile as a JSON
@@ -17,13 +23,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
 
       - name: Install AJV
-        run: npm install -g ajv-cli ajv-formats
+        run: npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
 
       - name: Compile every schema
         run: |
@@ -83,6 +91,8 @@ jobs:
       GOPRIVATE: github.com/open-delivery-spec
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       # This repository runs the open-source disclosure template on its own
       # pull requests, byte for byte: what adopters copy is what the
@@ -114,6 +124,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: actions/setup-go@v7
         with:
@@ -127,7 +138,7 @@ jobs:
       - name: Install ODS CLI and AJV
         run: |
           go install github.com/open-delivery-spec/cli/cmd/ods@main
-          npm install -g ajv-cli ajv-formats
+          npm install -g ajv-cli@5.0.0 ajv-formats@3.0.1
 
       - name: Run the pipeline on this repository
         env:
