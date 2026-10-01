@@ -1,0 +1,48 @@
+examples/ods-policy-enterprise_test.rego
+  s_66212c309e21f0::t_5a7955b329926e 1-124
+examples/README.md
+  s_66212c309e21f0::t_dfdbedc8f5f573 28-33
+examples/ods-policy-oss_test.rego
+  s_66212c309e21f0::t_558afeae0def51 1-72
+scripts/check-example-policies.sh
+  s_66212c309e21f0::t_fc487c1f3b9438 20
+scripts/test-policies.sh
+  s_66212c309e21f0::t_ff07ca76581786 80-84
+  s_66212c309e21f0::t_5b09fe78ff71e9 1-79
+examples/walkthrough/.ods/policy_test.rego
+  s_66212c309e21f0::t_643f5010fca5ba 1-42
+examples/ods-policy-oss-no-ai_test.rego
+  s_66212c309e21f0::t_06b7cd3f583695 1-64
+spec/conformance/README.md
+  s_66212c309e21f0::t_982b2c69b4afe4 63,67-76
+  s_66212c309e21f0::t_82e60ccada1ec3 77-78
+CONTRIBUTING.md
+  s_66212c309e21f0::t_768c9096dbdabc 72-82
+AGENTS.md
+  s_66212c309e21f0::t_679309df5ee65a 89
+CHANGELOG.md
+  s_66212c309e21f0::t_51556404ff0911 11
+spec/conformance/conformance_test.rego
+  s_66212c309e21f0::t_45490efcfe5127 1-63
+examples/ods-policy-oss-disclosure_test.rego
+  s_66212c309e21f0::t_cbb45b9cd6de44 1-100,110-195
+  s_66212c309e21f0::t_26049942ed45d3 101-109
+docs/policy-authoring.md
+  s_66212c309e21f0::t_d61036737df800 177-187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4944bfeb671f3dd890fc547f022183d33c172848",
+  "prompts": {},
+  "sessions": {
+    "s_66212c309e21f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8763d161-5362-48a1-ae9b-11f7bcd83469",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
