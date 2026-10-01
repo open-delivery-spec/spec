@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Conformance suite for the policy-input contract (19 scenarios).
 
 ### Changed
+- **Policies are written in OPA 1.0 syntax.** Every `.rego` file here (the templates under `examples/`, this repository's `.ods/policy.rego` and the conformance scenarios) uses `if` and `contains` and imports `rego.v1`. OPA 1.x tools (`opa check`, `opa test`, `opa eval`) read them as written instead of rejecting the pre-1.0 syntax, and the ODS CLI, which takes the import as its cue for that syntax, reads them the same way. Every policy returns the same result on every conformance input as before.
 - **One pipeline, one default policy.** `ods score`, `ods check` and `ods attest` run the same detect → analyze → score pass, so the score `ods score` prints is the one the gate acts on. Each reads only the `--sarif` file passed to it: pass the file to `ods check` for the gate to see the findings. `ods init` writes the built-in default policy to `.ods/policy.rego` instead of a separate starter policy, so a repository behaves the same before and after `init`.
 - **`ods detect` exits 0 whenever detection ran**, whether or not AI was found; a non-zero exit now means detection itself failed. Gating is `ods check`'s job. (On the CLI's main branch; not yet in a release.)
 - **Defect density is informational only.** It stays in the score breakdown but is no longer charged into the debt delta; the absolute count of critical and high findings already is.

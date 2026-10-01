@@ -7,17 +7,19 @@
 
 package ods.policy
 
+import rego.v1
+
 default allow := true
 
 # Block critical issues unconditionally
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]
     issue.severity == "critical"
     msg = sprintf("CRITICAL: %s at %s:%d — %s", [issue.rule, issue.file, issue.line, issue.message])
 }
 
 # Block AI code in payment/auth/billing without adequate test coverage
-deny[msg] {
+deny contains msg if {
     file := input.ai_files[_]
     regex.match(".*(payment|auth|billing|security).*", file.path)
     file.confidence > 0.5
@@ -28,13 +30,13 @@ deny[msg] {
 }
 
 # Block excessive tech debt
-deny[msg] {
+deny contains msg if {
     input.technical_debt_delta > 5.0
     msg = sprintf("Technical debt increase %v exceeds block threshold (5.0)", [input.technical_debt_delta])
 }
 
 # Warn on high AI confidence with low test coverage
-warn[msg] {
+warn contains msg if {
     input.ai_generated == true
     input.ai_confidence > 0.7
     input.test_coverage >= 0
@@ -45,13 +47,13 @@ warn[msg] {
 }
 
 # Warn on high issue count
-warn[msg] {
+warn contains msg if {
     count(input.issues) > 5
     msg = sprintf("High issue count: %d issues found — consider addressing before merge", [count(input.issues)])
 }
 
 # Warn on moderate tech debt
-warn[msg] {
+warn contains msg if {
     input.technical_debt_delta > 2.0
     input.technical_debt_delta <= 5.0
     msg = sprintf("Moderate technical debt increase: %v (threshold: 5.0)", [input.technical_debt_delta])

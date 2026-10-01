@@ -1,8 +1,10 @@
 package ods.policy
 
+import rego.v1
+
 default allow := true
 
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]
     issue.severity == "critical"
     msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
@@ -14,18 +16,18 @@ deny[msg] {
 # than coverage, so the threshold is lower. Deny stays opt-in.
 default review_tier := "standard"
 
-ai_weak_mutation_score {
+ai_weak_mutation_score if {
     input.ai_generated == true
     input.mutation_score >= 0
     input.mutation_score < 0.5
 }
 
-warn[msg] {
+warn contains msg if {
     ai_weak_mutation_score
     pct := round(input.mutation_score * 100)
     msg := sprintf("AI-authored change: tests kill only %d%% of mutations on the added lines", [pct])
 }
 
-review_tier := "elevated" {
+review_tier := "elevated" if {
     ai_weak_mutation_score
 }

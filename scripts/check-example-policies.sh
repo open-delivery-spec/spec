@@ -88,15 +88,15 @@ expect $N pass-human-code             true  standard -
 expect $N block-critical-issue        false -        "*"
 
 # ── 3. The STRICT blocks of the disclosure template still compile ────────
-# They ship commented out; uncomment every `# deny[msg] {` … `# }` block
-# and check they deny what the comments say.
+# They ship commented out; uncomment every `# deny contains msg if {` … `# }`
+# block and check they deny what the comments say.
 awk '
-  /^# deny\[msg\] \{$/ { s = 1 }
+  /^# deny contains msg if \{$/ { s = 1 }
   s { sub(/^# ?/, "") }
   { print }
   s && /^\}$/ { s = 0 }
 ' examples/ods-policy-oss-disclosure.rego > "$tmp/strict.rego"
-if [ "$(grep -c '^deny\[msg\] {' "$tmp/strict.rego")" != 3 ]; then
+if [ "$(grep -c '^deny contains msg if {' "$tmp/strict.rego")" != 3 ]; then
   echo "FAIL could not uncomment the STRICT blocks of ods-policy-oss-disclosure.rego"
   fail=1
 fi

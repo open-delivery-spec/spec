@@ -17,46 +17,48 @@
 
 package ods.policy
 
+import rego.v1
+
 default allow := true
 default review_tier := "standard"
 
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]
     issue.severity == "critical"
     msg = sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
 }
 
-ai_disclosed {
+ai_disclosed if {
     input.detection_sources[_] == "commit-trailer"
 }
 
-ai_disclosed {
+ai_disclosed if {
     input.detection_sources[_] == "git-ai-notes"
 }
 
-ai_disclosed {
+ai_disclosed if {
     input.detection_sources[_] == "pr-body"
 }
 
 # Attested: refuse, and say why.
-deny[msg] {
+deny contains msg if {
     input.ai_generated
     ai_disclosed
     msg = "This project does not accept AI-generated contributions (see CONTRIBUTING.md). Thank you for disclosing it — please rewrite the change by hand, or open an issue to discuss it first"
 }
 
 # Suspected only: route to a maintainer, never refuse on a heuristic.
-ai_suspected {
+ai_suspected if {
     input.ai_generated
     input.ai_confidence >= 0.5
     not ai_disclosed
 }
 
-warn[msg] {
+warn contains msg if {
     ai_suspected
     msg = "AI assistance suspected (heuristics only) — a maintainer should confirm with the contributor before review"
 }
 
-review_tier := "elevated" {
+review_tier := "elevated" if {
     ai_suspected
 }

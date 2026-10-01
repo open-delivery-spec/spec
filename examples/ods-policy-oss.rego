@@ -6,17 +6,19 @@
 
 package ods.policy
 
+import rego.v1
+
 default allow := true
 
 # Block critical issues unconditionally
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]
     issue.severity == "critical"
     msg = sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
 }
 
 # Warn when AI ratio is very high with no tests
-warn[msg] {
+warn contains msg if {
     input.ai_generated == true
     input.ai_confidence > 0.9
     input.test_coverage >= 0
@@ -26,7 +28,7 @@ warn[msg] {
 }
 
 # Warn on extreme tech debt
-warn[msg] {
+warn contains msg if {
     input.technical_debt_delta > 8.0
     msg = sprintf("Large technical debt increase: %v (consider splitting this PR)", [input.technical_debt_delta])
 }
