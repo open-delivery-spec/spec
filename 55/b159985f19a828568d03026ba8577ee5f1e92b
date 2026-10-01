@@ -1,0 +1,39 @@
+examples/walkthrough/README.md
+  s_66212c309e21f0::t_17c24da51263a1 35
+  s_66212c309e21f0::t_1109d2d6761554 33-34,38
+docs/policy-authoring.md
+  s_66212c309e21f0::t_90cdfcf88040ac 145-146
+  s_66212c309e21f0::t_7a39e570fa57f9 101-102,108-110
+  s_66212c309e21f0::t_d6ed1a8c9f5fd2 133
+  s_66212c309e21f0::t_a3c0157d49180c 30-33,40-41
+  s_66212c309e21f0::t_153a0881884f23 24-25,54-55,58,92,98,111,118,131,140
+CHANGELOG.md
+  s_66212c309e21f0::t_83bba10c681f68 46
+  s_66212c309e21f0::t_6dcaf3ddfd32cc 34
+docs/schemas.md
+  s_66212c309e21f0::t_64e26ad7efd07c 142-149
+  s_66212c309e21f0::t_b4eb28a8708ed5 215-218
+  s_66212c309e21f0::t_994f11802b6d44 105-106,109,133,138,211,252-254,256,322-323,325,352,358,392,398,433,439
+README.md
+  s_66212c309e21f0::t_e39f9fdf78f542 141-142,145
+docs/get-started.md
+  s_66212c309e21f0::t_9f948599813e7c 197-198,202,210
+docs/ods-artifacts.md
+  s_66212c309e21f0::t_910d567cf49e65 39-40,44,53,61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "55b159985f19a828568d03026ba8577ee5f1e92b",
+  "prompts": {},
+  "sessions": {
+    "s_66212c309e21f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8763d161-5362-48a1-ae9b-11f7bcd83469",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
