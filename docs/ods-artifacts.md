@@ -36,10 +36,12 @@ The `check` stage evaluates each PR against an [OPA Rego](https://www.openpolicy
 ```rego
 package ods.policy
 
+import rego.v1
+
 default allow := true
 
 # Block critical issues unconditionally
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]
     issue.severity == "critical"
     msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
@@ -48,7 +50,7 @@ deny[msg] {
 # Block high-confidence AI code with low test coverage.
 # -1 means "not measured": guard with >= 0 or the rule fires on every
 # repository without coverage tooling.
-deny[msg] {
+deny contains msg if {
     input.ai_confidence > 0.8
     input.test_coverage >= 0
     input.test_coverage < 0.3
@@ -56,7 +58,7 @@ deny[msg] {
 }
 
 # Warn on high-confidence AI with multiple quality issues
-warn[msg] {
+warn contains msg if {
     input.ai_generated == true
     input.ai_confidence > 0.8
     count(input.issues) > 2

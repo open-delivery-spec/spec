@@ -30,9 +30,12 @@ external analyzer via `--sarif`:
 
 ```rego
 package ods.policy
+
+import rego.v1
+
 default allow := true
 
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]
     issue.severity == "high"
     msg := sprintf("%s: %s (%s:%d)", [issue.severity, issue.rule, issue.file, issue.line])

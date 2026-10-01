@@ -102,9 +102,11 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 ```rego
 package ods.policy
 
+import rego.v1
+
 default allow := true
 
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]
     issue.severity == "critical"
     msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
@@ -128,14 +130,22 @@ returns one of:
 ```rego
 default review_tier := "standard"
 
-review_tier := "auto" {
+review_tier := "auto" if {
     input.technical_debt_delta <= 1.0
     not has_high_or_critical
 }
 
-review_tier := "elevated" {
+review_tier := "elevated" if {
     input.ai_generated == true
     has_high_or_critical
+}
+
+has_high_or_critical if {
+    input.issues[_].severity == "critical"
+}
+
+has_high_or_critical if {
+    input.issues[_].severity == "high"
 }
 ```
 
@@ -198,11 +208,14 @@ Semantics (normative):
   explicitly in its own policy over `input.ai_reviews`:
 
   ```rego
-  deny[msg] {
+  deny contains msg if {
       rev := input.ai_reviews[_]
       f := rev.findings[_]
       f.severity == "high"
-      msg := sprintf("AI reviewer %s: %s (%s:%d)", [rev.tool, f.message, f.file, f.line])
+      # file and line are optional on a finding: default them, or a finding
+      # without a location would not deny
+      loc := sprintf("%s:%d", [object.get(f, "file", "-"), object.get(f, "line", 0)])
+      msg := sprintf("AI reviewer %s: %s (%s)", [rev.tool, f.message, loc])
   }
   ```
 
@@ -236,11 +249,11 @@ from merely **suspected** AI use:
 | `diff-heuristics` | suspicion | Statistical patterns in the diff itself |
 
 ```rego
-ai_disclosed { input.detection_sources[_] == "commit-trailer" }
-ai_disclosed { input.detection_sources[_] == "git-ai-notes" }
-ai_disclosed { input.detection_sources[_] == "pr-body" }
+ai_disclosed if { input.detection_sources[_] == "commit-trailer" }
+ai_disclosed if { input.detection_sources[_] == "git-ai-notes" }
+ai_disclosed if { input.detection_sources[_] == "pr-body" }
 
-warn[msg] {
+warn contains msg if {
     input.ai_generated == true
     not ai_disclosed
     msg = "AI code detected without author disclosure — ask for attribution"
@@ -306,10 +319,10 @@ Derivation (normative):
 
 ```rego
 # Grant auto-merge only when attribution is at least attested.
-strong_evidence { input.evidence_tier == "corroborated" }
-strong_evidence { input.evidence_tier == "attested" }
+strong_evidence if { input.evidence_tier == "corroborated" }
+strong_evidence if { input.evidence_tier == "attested" }
 
-review_tier := "elevated" {
+review_tier := "elevated" if {
     input.ai_generated
     not strong_evidence          # inferred-only or inconclusive AI → extra eyes
 }
@@ -336,13 +349,13 @@ the code is *correct* — that needs a human or an AI reviewer.
 | `files_changed` / `net_added_lines` / `source_files_changed` / `test_files_changed` | int | Diff shape, for wide-but-shallow detection |
 
 ```rego
-warn[msg] {
+warn contains msg if {
     input.merge_confidence.added_source_without_tests
     msg = "Source code changed but no tests were added or updated"
 }
 
 # Opt in to enforce — deterministic facts may deny:
-deny[msg] {
+deny contains msg if {
     input.ai_generated
     input.merge_confidence.added_source_without_tests
     msg = "AI-authored change adds source without tests"
@@ -376,13 +389,13 @@ lines with the diff's *added* lines. The result is a fraction in
 with `>= 0` before comparing.
 
 ```rego
-ai_low_patch_coverage {
+ai_low_patch_coverage if {
     input.ai_generated == true
     input.patch_coverage >= 0        # guard: −1 means "not measured"
     input.patch_coverage < 0.8       # tune to your team
 }
 
-warn[msg] {
+warn contains msg if {
     ai_low_patch_coverage
     pct := round(input.patch_coverage * 100)
     msg = sprintf("AI-authored change: only %d%% of added lines are covered by tests", [pct])
@@ -417,13 +430,13 @@ not-covered / not-viable mutants are excluded). The value is in
 with `>= 0`.
 
 ```rego
-ai_weak_mutation_score {
+ai_weak_mutation_score if {
     input.ai_generated == true
     input.mutation_score >= 0        # guard: −1 means "not measured"
     input.mutation_score < 0.5       # mutation scores run lower than coverage
 }
 
-warn[msg] {
+warn contains msg if {
     ai_weak_mutation_score
     pct := round(input.mutation_score * 100)
     msg = sprintf("AI-authored change: tests kill only %d%% of mutations on the added lines", [pct])

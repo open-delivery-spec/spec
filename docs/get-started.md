@@ -194,10 +194,12 @@ The policy runs as the `check` stage of the pipeline.
 ```rego
 package ods.policy
 
+import rego.v1
+
 default allow := true
 
 # Block critical issues unconditionally
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]
     issue.severity == "critical"
     msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
@@ -205,7 +207,7 @@ deny[msg] {
 
 # Block high-confidence AI code with low test coverage
 # NOTE: guard with >= 0 — value of -1 means "not measured", skip the check
-deny[msg] {
+deny contains msg if {
     input.ai_confidence > 0.8
     input.test_coverage >= 0
     input.test_coverage < 0.3

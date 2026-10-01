@@ -138,9 +138,11 @@ Write enterprise policies in Rego:
 # .ods/policy.rego
 package ods.policy
 
+import rego.v1
+
 default allow := true
 
-deny[msg] {
+deny contains msg if {
     input.ai_confidence > 0.8
     input.test_coverage >= 0      # -1 means coverage was not measured
     input.test_coverage < 0.3

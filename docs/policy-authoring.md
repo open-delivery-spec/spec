@@ -21,18 +21,24 @@ file is found it falls back to a built-in default. Every policy starts the same 
 ```rego
 package ods.policy
 
+import rego.v1
+
 default allow := true
 ```
 
 - `package ods.policy` — required; ODS reads rules from this package.
+- `import rego.v1` — the policy is written in OPA 1.0 syntax (`if`, `contains`),
+  as every example here and under `examples/` is. Keep it: the ODS CLI reads a
+  file without it in the pre-1.0 syntax (`deny[msg] { … }`), which still works
+  but does not mix with these examples.
 - `default allow := true` — changes pass unless a `deny` rule fires.
 
 ## The three rule types
 
 | Rule | Effect | Use for |
 |------|--------|---------|
-| `deny[msg]` | **Blocks** the change (check exits non-zero) | Hard gates — critical issues, untested sensitive code |
-| `warn[msg]` | Surfaces a warning, does **not** block | Advisory signals — "consider adding tests" |
+| `deny contains msg` | **Blocks** the change (check exits non-zero) | Hard gates — critical issues, untested sensitive code |
+| `warn contains msg` | Surfaces a warning, does **not** block | Advisory signals — "consider adding tests" |
 | `allow` | Defaults to `true`; a `deny` overrides it | Leave as the default in most policies |
 
 Each `deny`/`warn` is a *set rule*: it can fire zero or more times, once per
@@ -45,9 +51,11 @@ Block any change that contains a critical-severity issue:
 ```rego
 package ods.policy
 
+import rego.v1
+
 default allow := true
 
-deny[msg] {
+deny contains msg if {
     issue := input.issues[_]          # iterate every issue
     issue.severity == "critical"      # match critical ones
     msg := sprintf("CRITICAL: %s at %s:%d", [issue.rule, issue.file, issue.line])
@@ -81,20 +89,25 @@ found). A naive comparison treats "not measured" as 0% and produces false blocks
 
 ```rego
 # ❌ WRONG — fires on every PR that has no coverage tooling
-deny[msg] {
+deny contains msg if {
     input.test_coverage < 0.6
     msg := "insufficient coverage"
 }
 
 # ✅ RIGHT — only enforce coverage when it was actually measured
-deny[msg] {
+deny contains msg if {
     input.test_coverage >= 0
     input.test_coverage < 0.6
-    msg := sprintf("coverage %.0f%% below 60%%", [input.test_coverage * 100])
+    pct := round(input.test_coverage * 100)
+    msg := sprintf("coverage %d%% below 60%%", [pct])
 }
 ```
 
 Always guard coverage comparisons with `input.test_coverage >= 0`.
+
+Print percentages with `round(…)` and `%d`, as above. OPA hands whole numbers
+to `sprintf` as integers, so `%.0f` renders 50% as `%!f(int64=50)`; `%v` prints
+any number as is.
 
 ## Common patterns
 
@@ -102,7 +115,7 @@ Always guard coverage comparisons with `input.test_coverage >= 0`.
 coverage is adequate:
 
 ```rego
-deny[msg] {
+deny contains msg if {
     file := input.ai_files[_]
     regex.match(".*(payment|auth|billing|security).*", file.path)
     file.confidence > 0.5
@@ -115,21 +128,22 @@ deny[msg] {
 **Cap technical debt.** Block large debt increases:
 
 ```rego
-deny[msg] {
+deny contains msg if {
     input.technical_debt_delta > 5.0
-    msg := sprintf("tech debt +%.1f exceeds threshold 5.0", [input.technical_debt_delta])
+    msg := sprintf("tech debt +%v exceeds threshold 5.0", [input.technical_debt_delta])
 }
 ```
 
 **Advise, don't block.** Warn on high-confidence AI with little testing:
 
 ```rego
-warn[msg] {
+warn contains msg if {
     input.ai_generated == true
     input.ai_confidence > 0.7
     input.test_coverage >= 0
     input.test_coverage < 0.3
-    msg := sprintf("AI code (%.0f%%) with low coverage", [input.ai_confidence * 100])
+    pct := round(input.ai_confidence * 100)
+    msg := sprintf("AI code (%d%%) with low coverage", [pct])
 }
 ```
 
