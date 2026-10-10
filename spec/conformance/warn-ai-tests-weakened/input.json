@@ -1,0 +1,44 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.9,
+  "detection_sources": [
+    "commit-trailer"
+  ],
+  "evidence_tier": "attested",
+  "technical_debt_delta": 0.2,
+  "test_coverage": -1,
+  "branch": "claude/fix-login",
+  "changed_files": [
+    "src/auth/login.py",
+    "tests/test_login.py",
+    "tests/test_auth.py"
+  ],
+  "issues": [],
+  "ai_files": [
+    {
+      "path": "src/auth/login.py",
+      "ai_lines": 12,
+      "total_lines": 12,
+      "confidence": 0.9
+    }
+  ],
+  "merge_confidence": {
+    "files_changed": 3,
+    "source_files_changed": 1,
+    "test_files_changed": 1,
+    "net_added_lines": 14,
+    "tests_touched": true,
+    "added_source_without_tests": false,
+    "risky_paths": [],
+    "tests_weakened": true,
+    "test_weakening": {
+      "deleted_test_files": [
+        "tests/test_auth.py"
+      ],
+      "skips_added": 1,
+      "assertions_removed": 3,
+      "assertions_added": 0
+    },
+    "suppressions_added": 0
+  }
+}

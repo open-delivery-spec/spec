@@ -1,0 +1,33 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.95,
+  "detection_sources": [
+    "agent-trace"
+  ],
+  "evidence_tier": "corroborated",
+  "technical_debt_delta": 0.1,
+  "test_coverage": -1,
+  "branch": "feature/rate-limit",
+  "changed_files": [
+    "internal/limit/limit.go",
+    "internal/limit/limit_test.go"
+  ],
+  "issues": [],
+  "ai_files": [
+    {
+      "path": "internal/limit/limit.go",
+      "ai_lines": 22,
+      "total_lines": 40,
+      "confidence": 0.95
+    }
+  ],
+  "merge_confidence": {
+    "files_changed": 2,
+    "source_files_changed": 1,
+    "test_files_changed": 1,
+    "net_added_lines": 52,
+    "tests_touched": true,
+    "added_source_without_tests": false,
+    "risky_paths": []
+  }
+}

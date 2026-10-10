@@ -78,6 +78,10 @@ expect $D pass-ai-covered-patch       true  auto     -
 expect $D warn-ai-low-patch-coverage  true  elevated "covered by tests"
 expect $D pass-human-code             true  standard -
 expect $D warn-detect-inconclusive    true  standard -
+expect $D pass-agent-trace-disclosed  true  auto     -
+expect $D warn-ai-unverified-claim    true  elevated "does not show it"
+expect $D pass-verified-claim         true  auto     -
+expect $D warn-ai-tests-weakened      true  elevated "deletes, skips or loosens tests"
 expect $D block-critical-issue        false -        "*"
 
 N=ods-policy-oss-no-ai.rego

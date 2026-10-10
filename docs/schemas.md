@@ -52,7 +52,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 |-------|------|----------|-------------|-------------|
 | `ai_generated` | bool | ✅ | `detect` | Whether AI code was detected in the diff |
 | `ai_confidence` | float (0.0–1.0) | ✅ | `detect` | Aggregate detection confidence. The reference CLI caps it at 0.95 — attribution is volunteered, never proven — so a policy threshold above 0.95 never fires |
-| `detection_sources` | string[] | | `detect` | Which signals fired (`commit-trailer`/`git-ai-notes`/`pr-body`/`branch-name`/`diff-heuristics`) — see [Disclosure completeness](#disclosure-completeness-inputdetection_sources) |
+| `detection_sources` | string[] | | `detect` | Which signals fired (`commit-trailer`/`git-ai-notes`/`agent-trace`/`pr-body`/`branch-name`/`diff-heuristics`) — see [Disclosure completeness](#disclosure-completeness-inputdetection_sources) |
 | `evidence_tier` | string | | `detect` | Strongest evidence class present: `corroborated`/`attested`/`inferred`; omitted when no source fired (`inconclusive` is in the enum but the reference CLI does not emit it) — see [Evidence tiers](#evidence-tiers-inputevidence_tier) |
 | `issues` | array | | `analyze` | Quality issues found |
 | `technical_debt_delta` | float | | `score` | Weighted technical-debt impact of the PR |
@@ -64,7 +64,7 @@ npx ajv-cli validate -s schemas/detect-output/v1.json -d detect.json
 | `changed_files` | string[] | | context | Paths of files changed in the PR |
 | `ai_files` | array | | `detect` | Per-file AI attribution detail |
 | `ai_reviews` | array | | `check --ai-review` | AI code-reviewer verdicts (advisory by default — see below) |
-| `merge_confidence` | object | | `check` | Deterministic diff facts: tested? shaped like real work? touches sensitive paths? — see [Merge-confidence signals](#merge-confidence-signals-inputmerge_confidence) |
+| `merge_confidence` | object | | `check` | Deterministic diff facts: tested? shaped like real work? touches sensitive paths? tests weakened? does the description match the diff? — see [Merge-confidence signals](#merge-confidence-signals-inputmerge_confidence) |
 | `_ods_detect_error` | bool | | CI | `true` when the detect stage failed to run, so `ai_generated: false` is an absence of facts, not a finding. For pipelines that assemble the policy input themselves: the reference CLI never sets it in the input it builds, and `ods check --input` does not pass it through to the policy. The reference GitHub Action marks a failed detect stage the same way in its report and shows the run as WARN, outside the policy. The `warn-detect-inconclusive` conformance scenario checks that such an input does not block |
 
 > **`test_coverage` sentinel:** A value of `−1` means coverage was not measured (no coverage file found). Policies that check coverage MUST guard with `input.test_coverage >= 0` to avoid false positives on PRs where coverage is unavailable.
@@ -231,13 +231,15 @@ from merely **suspected** AI use:
 |--------|-------|---------|
 | `commit-trailer` | disclosure | `Co-Authored-By:` / `Assisted-by:` trailer written by the author |
 | `git-ai-notes` | disclosure | Measured line-level authorship recorded by [git-ai](https://github.com/git-ai-project/git-ai) |
-| `pr-body` | disclosure | An AI-disclosure section in the PR description |
+| `agent-trace` | disclosure | Measured line-level authorship in [Agent Trace](https://agent-trace.dev) records for a commit in the change (the reference CLI reads `.agent-trace/*.jsonl`) |
+| `pr-body` | disclosure | An AI disclosure in the PR description: a ticked checkbox, a disclosure sentence, a filled-in `AI Tool:` field, or a tool footer such as "Generated with Claude Code". The only disclosure available in projects that keep AI attribution out of git history (Kubernetes asks for a sentence in the PR description and does not accept AI trailers) |
 | `branch-name` | suspicion | Agent-style branch prefix (`claude/`, `copilot/`, …) |
 | `diff-heuristics` | suspicion | Statistical patterns in the diff itself |
 
 ```rego
 ai_disclosed { input.detection_sources[_] == "commit-trailer" }
 ai_disclosed { input.detection_sources[_] == "git-ai-notes" }
+ai_disclosed { input.detection_sources[_] == "agent-trace" }
 ai_disclosed { input.detection_sources[_] == "pr-body" }
 
 warn[msg] {
@@ -280,7 +282,7 @@ ODS surfaces what it can see rather than claiming to unmask what hides.
 
 | Tier | Meaning | Derived from |
 |------|---------|--------------|
-| `corroborated` | Independently **measured** — the strongest evidence | `git-ai-notes` (per-file AI line attribution) |
+| `corroborated` | Independently **measured** — the strongest evidence | `git-ai-notes`, `agent-trace` (per-file AI line attribution) |
 | `attested` | The author or tool **declared** it | `commit-trailer`, `pr-body` |
 | `inferred` | **Heuristic** guess only | `branch-name`, `diff-heuristics` |
 | `inconclusive` | Detection did not run, or produced no signal. Not emitted by the reference CLI, which omits `evidence_tier` in that case | (no sources; or detect failed) |
@@ -334,6 +336,10 @@ the code is *correct* — that needs a human or an AI reviewer.
 | `tests_touched` | bool | Any test file was added or modified |
 | `risky_paths` | string[] | Changed files on sensitive paths (CI config, dependency manifests/lockfiles, `auth`/`crypto`/`security`) |
 | `files_changed` / `net_added_lines` / `source_files_changed` / `test_files_changed` | int | Diff shape, for wide-but-shallow detection |
+| `claims` | array | What the PR description says the change does, each checked against the diff — see [Claims](#claims-inputmerge_confidenceclaims) |
+| `tests_weakened` | bool | The change deletes a test file, adds a test skip, or removes more assertion lines than it adds — see [Test weakening](#test-weakening-inputmerge_confidencetest_weakening) |
+| `test_weakening` | object | The counts behind `tests_weakened` |
+| `suppressions_added` | int | Added lines that silence a linter or type checker (`nolint`, `type: ignore`, `noqa`, `@ts-ignore`, `eslint-disable`, `@SuppressWarnings`, `#[allow(...)]`, …) |
 
 ```rego
 warn[msg] {
@@ -364,6 +370,95 @@ The `warn-ai-no-tests` and `pass-tested-change`
 [conformance scenarios](https://github.com/open-delivery-spec/spec/tree/main/spec/conformance)
 exercise both directions: an AI change adding source without tests warns and
 routes elevated, and adding a test clears it.
+
+### Claims: `input.merge_confidence.claims`
+
+A pull request description makes claims a reviewer takes on trust: tests were
+added, the docs were updated, it fixes an issue. Maintainers of projects that
+receive many agent-authored pull requests report that the useful question is
+not "is this AI?" but "is this claim backed by evidence?". `claims` asks it
+for the claims a diff can settle.
+
+| `claim` | Read from | Verified when |
+|---------|-----------|---------------|
+| `tests-added` | a ticked checkbox naming tests with a verb such as added / updated / cover, or a sentence such as "added unit tests" | a test file is added or modified |
+| `docs-updated` | a ticked checkbox or sentence naming docs / documentation / README / changelog with added / updated | a documentation file (Markdown, reST, AsciiDoc, `docs/`, README, CHANGELOG) is added or modified |
+| `fixes-issue` | a GitHub closing keyword: `Fixes #12`, `Closes owner/repo#3`, `Resolves <issue URL>` | a file other than a test is added or modified |
+
+Each entry is `{claim, text, verified, evidence}`: the kind, the line that made
+it, whether the diff bears it out, and what the diff showed
+(`"no test file was added or modified"`).
+
+```json
+"claims": [
+  {"claim": "fixes-issue", "text": "Fixes #12", "verified": true, "evidence": "1 non-test file changed: calc/calc.go"},
+  {"claim": "docs-updated", "text": "- [x] Documentation updated", "verified": false, "evidence": "no documentation file was added or modified"}
+]
+```
+
+```rego
+warn[msg] {
+    c := input.merge_confidence.claims[_]
+    c.verified == false
+    msg = sprintf("The PR description claims %s, but the diff does not show it (%s)", [c.claim, c.evidence])
+}
+```
+
+Semantics (normative):
+
+- **Structured phrasing only.** An implementation MUST NOT interpret free
+  prose with a model. Unticked checkboxes, HTML comments, quoted lines, fenced
+  code and negated sentences ("no tests added", "tests will follow") claim
+  nothing, so an unfilled pull request template is silent.
+- **Files the change adds or modifies.** Deleted files do not verify a claim:
+  deleting a test file does not add a test.
+- **`fixes-issue` needs a change outside the tests.** A "fix" whose only change
+  is to a test makes the check pass without changing the code. A
+  documentation-only fix is a fix.
+- **Verified means present, not adequate.** A verified `tests-added` says a
+  test file changed. Whether the tests are any good is for
+  `test_weakening`, `patch_coverage` and `mutation_score`.
+- **Unknown kinds.** Implementations MAY add claim kinds; a policy that renders
+  them SHOULD fall back to the kind's name.
+- **Omitted when nothing is claimed.** No description, or one that claims
+  nothing checkable, leaves `claims` out.
+
+The `warn-ai-unverified-claim` and `pass-verified-claim` conformance scenarios
+exercise both directions.
+
+### Test weakening: `input.merge_confidence.test_weakening`
+
+A suite can go green because a check went away. Studies of agent-authored
+pull requests list the patterns: a test deleted, a test skipped, an assertion
+loosened or removed. `test_weakening` counts them in test files:
+
+| Field | Meaning |
+|-------|---------|
+| `deleted_test_files` | Test files the change deletes. A renamed test file is not deleted |
+| `skips_added` | Added lines that disable a test (`t.Skip`, `@pytest.mark.skip`, `it.skip`, `xit`, `@Disabled`, `#[ignore]`, …) |
+| `assertions_removed` | Removed assertion lines (assert, expect, require, `t.Error`, `t.Fatal`, …) in test files the change keeps |
+| `assertions_added` | Added assertion lines in test files |
+
+`tests_weakened` is true when a test file is deleted, a skip is added, or
+`assertions_removed > assertions_added`. Swapping one assertion for another
+(`assert.Equal` for `require.Equal`) nets out.
+
+Semantics (normative):
+
+- **Route, do not judge.** Every pattern has legitimate uses: a removed
+  feature takes its tests with it, a flaky test gets quarantined, assertions
+  get consolidated. Measured detectors for these patterns are too imprecise to
+  block on (a published audit of 327 agent pull requests found 0–50% precision
+  per detector), so a policy
+  SHOULD warn and route and MAY deny only when the team opts in.
+- **Attribution raises the bar.** As with the other merge-confidence facts, a
+  policy SHOULD route AI-authored weakening to `elevated`; it MUST NOT use
+  these counts to infer that a change is AI-written.
+- **Always present.** The reference CLI emits `test_weakening` with zero
+  counts when nothing was weakened, so a policy can compare the counts without
+  guarding for absence.
+
+The `warn-ai-tests-weakened` conformance scenario exercises it.
 
 ## Patch coverage: `input.patch_coverage`
 

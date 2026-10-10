@@ -49,8 +49,8 @@
         },
         "ai_code_ratio_source": {
           "type": "string",
-          "enum": ["git-ai", "commit-trailer", "diff-heuristics", "unknown"],
-          "description": "Provenance of the AI-line numerator: measured by git-ai authorship notes, attested by the code lines AI-attributed commits added, estimated by the diff heuristics, or unknown (nothing measured or attested). Optional: older CLIs omit it."
+          "enum": ["git-ai", "agent-trace", "commit-trailer", "diff-heuristics", "unknown"],
+          "description": "Provenance of the AI-line numerator: measured by git-ai authorship notes or Agent Trace records, attested by the code lines AI-attributed commits added, estimated by the diff heuristics, or unknown (nothing measured or attested). Optional: older CLIs omit it."
         },
         "defect_density": {
           "type": "number",

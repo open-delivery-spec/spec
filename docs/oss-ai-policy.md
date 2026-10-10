@@ -17,9 +17,10 @@ copy as it is, and says plainly what such a check can and cannot see.
 
 | Your CONTRIBUTING says | ODS reads | What happens on the PR |
 |---|---|---|
-| "Disclose AI assistance" | `Co-Authored-By` / `Assisted-by` commit trailers, git-ai notes, the AI-disclosure checkbox in the PR body | A change with AI signals but no disclosure gets a nudge in the ODS comment and is routed to `elevated` review. It is never blocked on suspicion. |
-| "AI-generated code must come with tests" | Whether the diff adds source without touching a test; patch coverage of the added lines when a coverage report exists | Warn and route to `elevated`. A `deny` is available as an opt-in for changes the author attested. |
-| "A human must understand and own the change" | Nothing directly. It reads *where* the change lands: CI config, dependency manifests and lockfiles, auth / crypto / security paths | AI-assisted changes on those paths are routed to `elevated` with the maintainers you name. The human-review statement stays in the PR template, where a person writes it. |
+| "Disclose AI assistance" | `Co-Authored-By` / `Assisted-by` commit trailers, git-ai notes, Agent Trace records, the AI disclosure in the PR body (ticked checkbox, disclosure sentence, or tool footer) | A change with AI signals but no disclosure gets a nudge in the ODS comment and is routed to `elevated` review. It is never blocked on suspicion. |
+| "AI-generated code must come with tests" | Whether the diff adds source without touching a test; patch coverage of the added lines when a coverage report exists; whether it deletes or skips tests or removes more assertions than it adds | Warn and route to `elevated`. A `deny` is available as an opt-in for changes the author attested. |
+| "A human must understand and own the change" | Nothing directly. It reads *where* the change lands (CI config, dependency manifests and lockfiles, auth / crypto / security paths) and whether the description's claims (tests added, docs updated, fixes an issue) match the diff | AI-assisted changes on those paths, or with a claim the diff does not bear out, are routed to `elevated` with the maintainers you name. The human-review statement stays in the PR template, where a person writes it. |
+| "Disclose AI use in the PR description, not in commits" (Kubernetes) | The PR description only | The same nudge and routing as the first row. Commit trailers are not needed: a disclosure sentence such as "written in part with the assistance of generative AI" counts. |
 | "We do not accept AI-generated contributions" | The same disclosure signals | Attested AI changes are refused with a message that says why and thanks the contributor for disclosing; suspected ones are routed to a maintainer. See the second template below. |
 
 What it cannot see: undisclosed AI use that leaves no trailer, and whether the
@@ -135,8 +136,8 @@ those tools add the `Co-Authored-By` trailer on their own.
 is the same check with a stricter consequence, and it is honest about what a
 ban can enforce:
 
-- **Attested** AI use (the author's own trailer, git-ai notes, or PR-body
-  disclosure) is a deterministic fact, so it denies. The message thanks the
+- **Attested** AI use (the author's own trailer, git-ai notes, Agent Trace
+  records, or PR-body disclosure) is a deterministic fact, so it denies. The message thanks the
   contributor for disclosing. A refusal that punishes disclosure teaches
   people to hide it, which is the one outcome a ban cannot survive.
 - **Suspected** AI use (branch name, diff heuristics) is a guess with false

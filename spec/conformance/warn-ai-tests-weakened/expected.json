@@ -1,0 +1,10 @@
+{
+  "allowed": true,
+  "denials": [],
+  "warnings": [
+    "Test file deleted: tests/test_auth.py",
+    "Test skips added: 1",
+    "Assertions removed: 3, added: 0"
+  ],
+  "review_tier": "elevated"
+}

@@ -35,6 +35,10 @@ ai_disclosed {
 }
 
 ai_disclosed {
+    input.detection_sources[_] == "agent-trace"
+}
+
+ai_disclosed {
     input.detection_sources[_] == "pr-body"
 }
 

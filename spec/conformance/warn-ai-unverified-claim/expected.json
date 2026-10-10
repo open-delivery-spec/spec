@@ -1,0 +1,6 @@
+{
+  "allowed": true,
+  "denials": [],
+  "warnings": ["The PR description claims tests-added, but the diff does not show it (no test file was added or modified)"],
+  "review_tier": "elevated"
+}
