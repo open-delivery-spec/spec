@@ -279,7 +279,7 @@
         "skips_added": {
           "type": "integer",
           "minimum": 0,
-          "description": "Added lines that disable a test (t.Skip, @pytest.mark.skip, it.skip, xit, @Disabled, #[ignore], ...)."
+          "description": "Added lines that disable a test (t.Skip, @pytest.mark.skip, it.skip, xit, @Disabled, #[ignore], ...) in test files that existed before the change. Markers inside string literals are not counted."
         },
         "assertions_removed": {
           "type": "integer",

@@ -435,13 +435,20 @@ loosened or removed. `test_weakening` counts them in test files:
 | Field | Meaning |
 |-------|---------|
 | `deleted_test_files` | Test files the change deletes. A renamed test file is not deleted |
-| `skips_added` | Added lines that disable a test (`t.Skip`, `@pytest.mark.skip`, `it.skip`, `xit`, `@Disabled`, `#[ignore]`, …) |
+| `skips_added` | Added lines that disable a test (`t.Skip`, `@pytest.mark.skip`, `it.skip`, `xit`, `@Disabled`, `#[ignore]`, …) in test files that existed before the change |
 | `assertions_removed` | Removed assertion lines (assert, expect, require, `t.Error`, `t.Fatal`, …) in test files the change keeps |
 | `assertions_added` | Added assertion lines in test files |
 
 `tests_weakened` is true when a test file is deleted, a skip is added, or
 `assertions_removed > assertions_added`. Swapping one assertion for another
 (`assert.Equal` for `require.Equal`) nets out.
+
+Skips count only in test files that existed before the change. Weakening is
+about the checks the base already ran, and a test that is skipped from the
+moment it is written hides none of them. Markers inside string literals are
+data, not code: a test fixture that spells `t.Skip(` or quotes a `# noqa`
+comment counts as nothing. This matters most for test tooling, whose own
+tests are full of such fixtures.
 
 Semantics (normative):
 
