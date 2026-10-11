@@ -1,0 +1,48 @@
+{
+  "ai_generated": true,
+  "ai_confidence": 0.9,
+  "detection_sources": [
+    "commit-trailer"
+  ],
+  "evidence_tier": "attested",
+  "technical_debt_delta": 0.2,
+  "test_coverage": -1,
+  "branch": "claude/retry-backoff",
+  "changed_files": [
+    "src/client/retry.py",
+    "tests/client/test_retry.py"
+  ],
+  "issues": [],
+  "ai_files": [
+    {
+      "path": "src/client/retry.py",
+      "ai_lines": 30,
+      "total_lines": 30,
+      "confidence": 0.9
+    }
+  ],
+  "merge_confidence": {
+    "files_changed": 2,
+    "source_files_changed": 1,
+    "test_files_changed": 1,
+    "net_added_lines": 30,
+    "tests_touched": true,
+    "added_source_without_tests": false,
+    "risky_paths": [],
+    "claims": [
+      {
+        "claim": "tests-added",
+        "text": "- [x] Unit tests added/updated",
+        "verified": true,
+        "evidence": "1 test file changed: tests/client/test_retry.py"
+      }
+    ],
+    "tests_weakened": false,
+    "test_weakening": {
+      "skips_added": 0,
+      "assertions_removed": 0,
+      "assertions_added": 4
+    },
+    "suppressions_added": 0
+  }
+}

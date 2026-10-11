@@ -20,7 +20,9 @@ nav_order: 1
 | 3 | **AI introduces subtle quality defects** | Hallucinated or deprecated APIs and unsafe deserialization pass CI but rot the codebase | `analyze` flags known AI failure patterns as hints and ingests your scanners' SARIF, so one policy sees both |
 | 4 | **Technical debt accumulates invisibly** | Each AI PR looks fine alone; the aggregate quality slide is never measured | `score` produces a weighted technical-debt delta per PR |
 | 5 | **No consistent quality bar** | Whether risky AI code merges depends on which reviewer happened to look | `check` enforces an OPA Rego policy identically on every PR |
-| 6 | **No audit trail for AI-era changes** | Compliance asks "how do you control AI risk?" and there's no structured answer | Every detection, analysis, score, and policy decision is emitted as structured JSON, and `ods attest` writes a CycloneDX evidence document |
+| 6 | **Tests weakened to make a change pass** | A test is deleted, skipped or stripped of assertions, so CI goes green because the check went away | `check` reports `tests_weakened` with the deleted files, added skips and removed assertions, and routes the change to review |
+| 7 | **The description says more than the diff does** | "Added tests", "fixes #12" — the reviewer takes the claim on trust | `check` verifies the description's claims against the files the change touches (`claims`) and flags the ones the diff does not bear out |
+| 8 | **No audit trail for AI-era changes** | Compliance asks "how do you control AI risk?" and there's no structured answer | Every detection, analysis, score, and policy decision is emitted as structured JSON, and `ods attest` writes a CycloneDX evidence document |
 
 ---
 

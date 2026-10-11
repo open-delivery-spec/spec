@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **PR-description claims** (`merge_confidence.claims`): the checkable statements in the PR description (`tests-added`, `docs-updated`, `fixes-issue`), each verified against the files the change adds or modifies. Structured phrasing only (ticked checkboxes, GitHub closing keywords, short sentences); unticked boxes, comments, quotes, fenced code and negated sentences claim nothing. Advisory: warn and route, deny opt-in. Scenarios `warn-ai-unverified-claim` and `pass-verified-claim`.
+- **Test weakening** (`merge_confidence.tests_weakened`, `test_weakening`): deleted test files, skips added to existing test files, and more assertion lines removed than added (markers inside string literals are ignored); plus `suppressions_added` for added lint / type-check suppressions. Advisory. Scenario `warn-ai-tests-weakened`.
+- **Agent Trace** (`agent-trace`) as a detection source: measured line-level attribution from [Agent Trace](https://agent-trace.dev) records; evidence tier `corroborated`, `ai_code_ratio_source: agent-trace`. Scenario `pass-agent-trace-disclosed`. The open-source templates count it as disclosure.
+- The open-source disclosure template routes AI-assisted changes that weaken their tests or make an unverified claim to `elevated` review.
 - **The organization runs the template it ships.** Every `open-delivery-spec` repository now uses `examples/ods-policy-oss-disclosure.rego` as its `.ods/policy.rego` with review routing on (this repository's CI keeps the copy identical to the template); the AI clause is in CONTRIBUTING.md, the [Open-Source AI Policy](docs/oss-ai-policy.md) guide offers that wording for projects that have none, and `_dogfooding/pull-request-body.md` is the description for submitting the workflow to another project.
 - **`_ods_detect_error`** in the policy-input schema: the sentinel a pipeline that assembles the policy input itself sets when its detect stage failed, so policies can treat such input as inconclusive rather than as human code. The reference CLI does not set it; the `warn-detect-inconclusive` scenario checks that such an input does not block.
 - **`ods check --input`** evaluates a prepared policy-input document instead of the working tree; fields the document omits keep the `-1` "not measured" sentinel. The conformance scenarios now run with one command each (`spec/conformance/README.md`).
@@ -28,9 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Real test-coverage parsing** (Go / LCOV / Cobertura / NYC) feeding the coverage-gap score. Without a report, `test_coverage` is `-1` (not measured); the heuristic estimate from test-file line counts is gone.
 - **`ods report`**: per-repo AI attribution report with text, JSON, and a self-contained HTML dashboard.
 - **Review-tier routing** (`review_tier`: `auto` / `standard` / `elevated`) as an advisory output of `ods check`.
-- Conformance suite for the policy-input contract (19 scenarios).
+- Conformance suite for the policy-input contract (23 scenarios).
 
 ### Changed
+- **PR-description disclosure is read line by line.** An unticked template checkbox and an empty `AI Tool:` field no longer count as disclosure (both did before), nor does a negated, quoted or commented-out statement. Disclosure sentences ("with the assistance of generative AI", the Kubernetes wording) and tool footers ("Generated with Claude Code") now count.
 - **One pipeline, one default policy.** `ods score`, `ods check` and `ods attest` run the same detect → analyze → score pass, so the score `ods score` prints is the one the gate acts on. Each reads only the `--sarif` file passed to it: pass the file to `ods check` for the gate to see the findings. `ods init` writes the built-in default policy to `.ods/policy.rego` instead of a separate starter policy, so a repository behaves the same before and after `init`.
 - **`ods detect` exits 0 whenever detection ran**, whether or not AI was found; a non-zero exit now means detection itself failed. Gating is `ods check`'s job. (On the CLI's main branch; not yet in a release.)
 - **Defect density is informational only.** It stays in the score breakdown but is no longer charged into the debt delta; the absolute count of critical and high findings already is.

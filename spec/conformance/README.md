@@ -91,3 +91,7 @@ CLI build until it is satisfied.
 | `pass-ai-strong-mutation` | Same change with a strong mutation score — the signal is cleared | PASS, `review_tier: standard` |
 | `evidence-inferred-elevated` | AI attribution is only `inferred` (branch + heuristics) — route to extra review | PASS, `review_tier: elevated` |
 | `evidence-attested-auto` | Same change with `attested` attribution (commit trailer) — trusted enough to stay standard | PASS, `review_tier: standard` |
+| `pass-agent-trace-disclosed` | AI attribution from an Agent Trace record (`agent-trace`, `corroborated`) — counts as disclosure, no nudge | PASS, `review_tier: standard` |
+| `warn-ai-unverified-claim` | The PR description claims tests were added; the diff has no test file — warn and route, never block | PASS, WARN, `review_tier: elevated` |
+| `pass-verified-claim` | Same change with a test file added — the claim is verified and the signal is cleared | PASS, `review_tier: standard` |
+| `warn-ai-tests-weakened` | AI-authored change deletes a test file, adds a skip and removes assertions — one warning per pattern, routed, never blocked | PASS, WARN, `review_tier: elevated` |

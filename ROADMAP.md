@@ -38,6 +38,7 @@ This document outlines the planned evolution of Open Delivery Spec. Priorities s
 | `Assisted-by` commit trailers | Linux kernel convention, `Assisted-by: AGENT:MODEL` | 90% | ✅ Stable |
 | ODS trailer fields | `AI-assisted: true`, `AI-generated: true`, `AI-tool: name` — supplemental, optional | 90% | ✅ Stable |
 | git-ai authorship notes | Line-level attribution recorded by git-ai under `refs/notes/ai` | 95% | ✅ Candidate |
+| Agent Trace records | Line-level attribution in the open Agent Trace format (`.agent-trace/*.jsonl`) | 95% | 🧪 Experimental |
 | PR body AI disclosure | Ticked disclosure checkbox (85%) or disclosure text (80%) | 80–85% | ✅ Stable |
 | Branch name prefix | `claude/`, `copilot/`, `cursor/`, `codeium/` (60%); `ai-` (50%); an `ai-` segment further down (35%) | 35–60% | ✅ Stable |
 | Diff heuristics | Comment ratio, verbose naming, error patterns (per-file score) | ≥ 40% | ✅ Candidate |
@@ -79,6 +80,9 @@ changes, and deny stays opt-in.
 | Diff shape (`files_changed`, `net_added_lines`, …) | Wide-but-shallow change detection | ✅ Stable |
 | `patch_coverage` | Coverage of the diff's *added* lines (Go / LCOV / Cobertura) | ✅ Candidate |
 | `ai_reviews` (`--ai-review`) | AI code-reviewer verdicts — advisory, never auto-deny | ✅ Candidate |
+| `claims` | PR-description claims (tests added, docs updated, fixes an issue) checked against the diff | 🧪 Experimental |
+| `tests_weakened` / `test_weakening` | Deleted test files, added skips, more assertions removed than added | 🧪 Experimental |
+| `suppressions_added` | Added lint / type-check suppressions | 🧪 Experimental |
 
 ---
 

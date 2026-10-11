@@ -69,6 +69,10 @@ The trailers also have to survive the merge: a squash merge whose message keeps
 only the pull request title erases them from `main`, so configure squash merging
 to include the commit details, or use rebase or merge commits (see
 [Reading the numbers](docs/org-view.md#reading-the-numbers)).
+Some projects keep AI attribution out of git history on purpose: Kubernetes asks
+for a sentence in the PR description and does not accept AI trailers. There the
+PR description is the disclosure, and ODS reads it line by line, so an unticked
+template checkbox or an empty `AI Tool:` field discloses nothing.
 The aggregate confidence is the strongest signal plus a small boost per additional
 independent source, capped at 95% — ODS never reports certainty about authorship.
 
@@ -78,7 +82,8 @@ independent source, capped at 95% — ODS never reports certainty about authorsh
 | `Assisted-by` commit trailers | The Linux kernel convention, `Assisted-by: AGENT:MODEL` | high |
 | ODS trailer fields | `AI-assisted: true`, `AI-tool: name` — supplemental, optional | high |
 | git-ai authorship notes | Line-level attribution recorded by [git-ai](https://github.com/git-ai-project/git-ai) under `refs/notes/ai` | highest (measured) |
-| PR body AI disclosure | Checkbox and section parsing | high |
+| Agent Trace records | Line-level attribution in the open [Agent Trace](https://agent-trace.dev) format, read from `.agent-trace/` | highest (measured) |
+| PR body AI disclosure | Ticked checkbox, disclosure sentence, filled-in `AI Tool:` field, or a tool footer ("Generated with Claude Code") | high |
 | Branch name prefix | `claude/`, `copilot/`, `cursor/`, `codeium/`, `ai-*` prefixes | medium |
 | Diff heuristics | Comment ratio, verbose naming, error patterns | low (fallback) |
 

@@ -20,14 +20,14 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["commit-trailer", "git-ai-notes", "pr-body", "branch-name", "diff-heuristics"]
+        "enum": ["commit-trailer", "git-ai-notes", "agent-trace", "pr-body", "branch-name", "diff-heuristics"]
       },
-      "description": "Which detection signals fired. Lets policies separate disclosed AI use (author attribution: commit-trailer, git-ai-notes, pr-body) from merely suspected AI use (branch-name, diff-heuristics only), making author-disclosure norms (SFC guidance, kernel docs) checkable at the gate."
+      "description": "Which detection signals fired. Lets policies separate disclosed AI use (author attribution: commit-trailer, git-ai-notes, agent-trace, pr-body) from merely suspected AI use (branch-name, diff-heuristics only), making author-disclosure norms (SFC guidance, kernel docs) checkable at the gate."
     },
     "evidence_tier": {
       "type": "string",
       "enum": ["corroborated", "attested", "inferred", "inconclusive"],
-      "description": "The strongest class of AI-attribution evidence present, derived deterministically from detection_sources: 'corroborated' = independently measured (git-ai-notes, per-file AI line attribution); 'attested' = the author/tool declared it (commit-trailer, pr-body); 'inferred' = heuristic only (branch-name, diff-heuristics); 'inconclusive' = detection did not run or produced no signal. It is a confidence label for how the attribution was obtained — NOT forensic proof of authorship. Ordered corroborated > attested > inferred > inconclusive; a policy can require a minimum tier (e.g. attested) before granting auto-merge."
+      "description": "The strongest class of AI-attribution evidence present, derived deterministically from detection_sources: 'corroborated' = independently measured (git-ai-notes or agent-trace, per-file AI line attribution); 'attested' = the author/tool declared it (commit-trailer, pr-body); 'inferred' = heuristic only (branch-name, diff-heuristics); 'inconclusive' = detection did not run or produced no signal. It is a confidence label for how the attribution was obtained — NOT forensic proof of authorship. Ordered corroborated > attested > inferred > inconclusive; a policy can require a minimum tier (e.g. attested) before granting auto-merge."
     },
     "technical_debt_delta": {
       "type": "number",
@@ -190,7 +190,7 @@
     },
     "MergeConfidence": {
       "type": "object",
-      "description": "Deterministic diff-scoped signals. All fields are facts computed from the diff alone.",
+      "description": "Deterministic diff-scoped signals. All fields are facts computed from the diff, except claims, which checks the PR description against it. No LLM and no stylometry.",
       "properties": {
         "files_changed": {
           "type": "integer",
@@ -224,6 +224,72 @@
           "type": "array",
           "items": { "type": "string" },
           "description": "Changed files on sensitive paths — CI config (.github/workflows/), dependency manifests/lockfiles, and auth/crypto/security paths."
+        },
+        "claims": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Claim" },
+          "description": "What the PR description says the change does, each checked against the files the change adds or modifies. Read from structured phrasing only (ticked checkboxes, GitHub closing keywords, short sentences such as 'added unit tests'); unticked checkboxes, HTML comments, quoted lines, fenced code and negated sentences claim nothing. One entry per claim kind. Omitted when there is no description or it claims nothing checkable. A policy SHOULD warn/route on an unverified claim; it MAY deny only when the team opts in."
+        },
+        "tests_weakened": {
+          "type": "boolean",
+          "description": "The change deletes a test file, adds a test skip, or removes more assertion lines than it adds (details in test_weakening). Each pattern has legitimate uses, so a policy SHOULD warn/route on it and MAY deny only when the team opts in."
+        },
+        "test_weakening": {
+          "$ref": "#/$defs/TestWeakening"
+        },
+        "suppressions_added": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Added lines, in any code file, that silence a linter or type checker (nolint, type: ignore, noqa, @ts-ignore, eslint-disable, @SuppressWarnings, #[allow(...)], ...)."
+        }
+      }
+    },
+    "Claim": {
+      "type": "object",
+      "description": "One PR-description claim checked against the diff. Verified reports what the diff shows and nothing more: a verified tests-added claim means a test file changed, not that the tests are adequate.",
+      "required": ["claim", "verified"],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "description": "The kind of claim. Defined kinds: 'tests-added' (verified when a test file is added or modified), 'docs-updated' (verified when a documentation file is added or modified), 'fixes-issue' (a GitHub closing keyword such as 'Fixes #12'; verified when a file other than a test is added or modified). Implementations MAY add kinds; policies SHOULD handle unknown kinds."
+        },
+        "text": {
+          "type": "string",
+          "description": "The PR-description line that made the claim (implementations MAY truncate it)."
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Whether the diff contains what the claim implies."
+        },
+        "evidence": {
+          "type": "string",
+          "description": "What the diff showed, in words a warning can quote (e.g. 'no test file was added or modified')."
+        }
+      }
+    },
+    "TestWeakening": {
+      "type": "object",
+      "description": "Counts of the ways a change can make its own tests easier to pass, measured in test files. Renames are not deletions.",
+      "properties": {
+        "deleted_test_files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Test files the change deletes."
+        },
+        "skips_added": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Added lines that disable a test (t.Skip, @pytest.mark.skip, it.skip, xit, @Disabled, #[ignore], ...) in test files that existed before the change. Markers inside string literals are not counted."
+        },
+        "assertions_removed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Removed lines in surviving test files that check a result (assert, expect, require, t.Error, t.Fatal, ...). A deleted file's lines are not counted here."
+        },
+        "assertions_added": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Added lines in test files that check a result."
         }
       }
     }

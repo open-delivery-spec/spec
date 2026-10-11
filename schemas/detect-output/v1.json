@@ -14,7 +14,7 @@
       "type": "number",
       "minimum": 0,
       "maximum": 1,
-      "description": "Aggregate detection confidence: the highest individual signal plus 0.05 per additional distinct source (commit-trailer, git-ai-notes, pr-body, branch-name, diff-heuristics), capped at 0.95. Several signals from one source — five attributed commits — count once. Attribution is volunteered by tools and authors, never proven, so certainty (1.0) is never reported."
+      "description": "Aggregate detection confidence: the highest individual signal plus 0.05 per additional distinct source (commit-trailer, git-ai-notes, agent-trace, pr-body, branch-name, diff-heuristics), capped at 0.95. Several signals from one source — five attributed commits — count once. Attribution is volunteered by tools and authors, never proven, so certainty (1.0) is never reported."
     },
     "files": {
       "type": "array",
